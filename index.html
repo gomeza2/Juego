@@ -1250,9 +1250,9 @@ function addParametricArchitecturalPiece(type,g) {
     return;
   }
   if(type==='floor'){
-    box(g,currentColor,[0,d/2,0],[w,d,h],true,{roughness:.8,metalness:.01});
-    const trimT=Math.min(.024,d);
-    box(g,'#e5e9ed',[0,d-trimT/2,0],[w,trimT,h],false,{roughness:.76});
+    box(g,currentColor,[0,h/2,0],[w,h,d],true,{roughness:.8,metalness:.01});
+    const trimT=Math.min(.024,h);
+    box(g,'#e5e9ed',[0,h-trimT/2,0],[w,trimT,d],false,{roughness:.76});
     return;
   }
   if(type==='door'){
@@ -2083,7 +2083,7 @@ const promptEntityCatalog=[
   {type:'spaceship',aliases:'naves?|ovnis?',label:'Nave'}
 ];
 function parsePromptCount(token,pluralWord) {
-  if(!token)return /\b(?:s|es)$/.test(pluralWord||'')?2:1;
+  if(!token)return /(?:s|es)$/.test(pluralWord||'')?2:1;
   if(/^\d+$/.test(token))return Math.max(1,Math.min(24,parseInt(token,10)));
   return Math.max(1,Math.min(24,promptCountWords[token]||1));
 }
