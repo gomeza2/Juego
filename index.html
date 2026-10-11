@@ -2494,8 +2494,17 @@ function startBlankProject(options={}) {
   clearModels();
   $('projectName').value='Concepto sin título';$('promptInput').value='';
   currentType='blank';currentColor='#c8ff57';currentMaterial='matte';currentTexture='none';textureScale=2;architecturalFloors=10;
+  unitSystem='m';showDimensions=false;snapEnabled=false;wireEnabled=false;gridEnabled=true;
+  shadowsEnabled=true;highlightEnabled=true;lightLevel=.72;
   addMode=true;$('addModeBtn').classList.add('active');$('addModeBtn').innerHTML='✓ <span>Modo añadir activo</span>';
-  $('quickShapeSelect').value='cube';
+  $('quickShapeSelect').value='cube';$('unitsSelect').value='m';
+  $('dimensionsBtn').classList.remove('active');$('dimensionOverlay').classList.remove('active');
+  $('snapBtn').classList.remove('active');$('wireBtn').classList.remove('active');
+  $('gridBtn').classList.add('active');grid.visible=true;
+  $('gridSwitch').classList.add('on');$('shadowSwitch').classList.add('on');$('highlightSwitch').classList.add('on');
+  keyLight.castShadow=true;keyLight.intensity=3.25;fillLight.intensity=1.35;rimLight.intensity=8;
+  $('lightRange').value=72;$('lightValue').textContent='72%';$('lightReadout').textContent='72%';
+  applyGraphicsQuality('high');
   setCameraView('perspective');
   camera.position.set(7.5,5.4,7.5);controls.target.set(0,0,0);controls.update();
   updateSwatches();updateTextureUI();updateMeta();updateDimensions();persist();
