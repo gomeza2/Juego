@@ -1106,7 +1106,17 @@ function applyPrimaryMaterial(root) {
     tex.map.needsUpdate=true;tex.roughnessMap.needsUpdate=true;tex.bumpMap.needsUpdate=true;
   }
   root.traverse(o=>{
-    if(o.isMesh && o.userData.primary) {
+    if(o.isMesh&&o.userData.generatedMesh){
+      const materials=Array.isArray(o.material)?o.material:[o.material];
+      materials.forEach(m=>{
+        if(!m)return;
+        m.color.set(currentColor);
+        m.roughness=Math.max(.12,Math.min(.98,(finish.roughness+(textureProfile[currentTexture]?.roughness??finish.roughness))/2));
+        m.metalness=(finish.metalness+(textureProfile[currentTexture]?.metalness??finish.metalness))/2;
+        m.wireframe=wireEnabled;m.needsUpdate=true;
+      });
+      o.castShadow=shadowsEnabled;o.receiveShadow=true;
+    }else if(o.isMesh && o.userData.primary) {
       if(o.material) {
         if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());
         else o.material.dispose();
@@ -1121,9 +1131,7 @@ function applyPrimaryMaterial(root) {
       o.material=material(currentColor,{...finish,...p});
       o.material.color.set(currentColor);
       o.material.wireframe=wireEnabled;
-      o.castShadow=shadowsEnabled;
-      o.receiveShadow=true;
-      o.material.needsUpdate=true;
+      o.castShadow=shadowsEnabled;o.receiveShadow=true;o.material.needsUpdate=true;
     }
   });
   root.userData.style={color:currentColor,material:currentMaterial,texture:currentTexture,textureScale};
