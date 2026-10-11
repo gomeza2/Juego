@@ -188,6 +188,16 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
 
 .inspector-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important}
 .inspector-actions .btn{min-width:0;padding-left:6px!important;padding-right:6px!important;font-size:10px!important;white-space:nowrap}
+
+.scene-arrange{border:1px solid #dce4ed;border-radius:9px;padding:9px;margin:9px 0;background:#f8fafc;display:flex;flex-direction:column;gap:7px}
+.scene-arrange-title{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#607087}
+.scene-arrange-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px}
+.scene-arrange .select-control{height:30px;font-size:9px;min-width:0;padding:0 6px}
+.scene-arrange .btn{height:30px;justify-content:center;padding:0 8px;font-size:10px}
+.scene-arrange .btn:disabled{opacity:.45;cursor:not-allowed}
+.scene-arrange-hint{font-size:9px;line-height:1.55;color:#7b899c}
+@media(max-width:1180px){.scene-arrange-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+
 </style>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}
@@ -324,7 +334,20 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
           <div class="prop-title">Escena <span id="sceneCount" style="color:#748398;font:9px 'DM Mono',monospace">01 OBJETO</span></div>
           <div class="scene-actions"><button class="btn" id="groupBtn" title="Agrupar objetos marcados">Agrupar marcados</button><button class="btn" id="ungroupBtn" title="Separar el grupo seleccionado">Separar grupo</button></div>
           <div id="sceneObjectList" class="scene-object-list" aria-label="Jerarquía de objetos"></div>
-          <div class="scene-footnote">Activá “Añadir piezas” para sumar modelos sin reemplazar el diseño actual. Marcá varios objetos para agruparlos.</div>
+          <div class="scene-arrange">
+            <div class="scene-arrange-title">Alineación y distribución</div>
+            <div class="scene-arrange-row">
+              <select class="select-control" id="arrangeAxis" aria-label="Eje para alinear"><option value="x">Eje X · ancho</option><option value="y">Eje Y · alto</option><option value="z">Eje Z · fondo</option></select>
+              <select class="select-control" id="arrangeMode" aria-label="Tipo de alineación"><option value="min">Bordes iniciales</option><option value="center">Centros</option><option value="max">Bordes finales</option></select>
+            </div>
+            <button class="btn" id="alignSelectedBtn" type="button" disabled>Alinear marcados</button>
+            <div class="scene-arrange-row distribute-row">
+              <select class="select-control" id="distributeAxis" aria-label="Eje para distribuir"><option value="x">Distribuir en X</option><option value="y">Distribuir en Y</option><option value="z">Distribuir en Z</option></select>
+              <button class="btn" id="distributeSelectedBtn" type="button" disabled>Distribuir uniforme</button>
+            </div>
+            <div class="scene-arrange-hint">Marcá 2 o más piezas para alinear, o 3 o más para distribuir. Se conservan sus tamaños y materiales.</div>
+          </div>
+          <div class="scene-footnote">Activá “Añadir piezas” para sumar modelos sin reemplazar el diseño actual. Las piezas marcadas sirven para agruparlas o ajustar su distribución.</div>
         </div>
         <div class="prop-section"><div class="prop-title">Transformación <button id="resetTransform">RESTABLECER</button></div>
           <div class="prop-row"><div class="prop-label"><span>Posición</span><strong>XYZ</strong></div><div class="axis-fields"><div class="axis-field x"><label>X <input id="posX" type="number" step=".1" value="0"></label></div><div class="axis-field y"><label>Y <input id="posY" type="number" step=".1" value="0"></label></div><div class="axis-field z"><label>Z <input id="posZ" type="number" step=".1" value="0"></label></div></div></div>
@@ -1418,6 +1441,8 @@ function renderSceneList() {
   list.replaceChildren();
   $('sceneCount').textContent=String(designObjects.length).padStart(2,'0')+' '+(designObjects.length===1?'OBJETO':'OBJETOS');
   $('ungroupBtn').disabled=!(selected&&selected.userData.isSceneGroup);
+  $('alignSelectedBtn').disabled=groupSelection.size<2;
+  $('distributeSelectedBtn').disabled=groupSelection.size<3;
   designObjects.forEach((root,index)=>{
     const row=document.createElement('div');row.className='scene-object-row';
     const selectBtn=document.createElement('button');selectBtn.type='button';selectBtn.className='scene-object-select'+(root===selected?' active':'');selectBtn.dataset.sceneSelect=String(index);
@@ -1735,6 +1760,55 @@ function addDuplicate() {
   const copy=restoreSceneNode(data,modelRoot);
   designObjects.push(copy);groupSelection.clear();
   currentType=copy.userData.designType||'group';selectDesign(copy);updateMeta();focusScene();persist();toast('Se duplicó el objeto.');
+}
+function getMarkedBounds() {
+  return designObjects.filter(root=>groupSelection.has(root)).map(root=>{
+    root.updateMatrixWorld(true);
+    const bounds=new THREE.Box3().setFromObject(root);
+    return {root,bounds};
+  }).filter(item=>!item.bounds.isEmpty());
+}
+function finishSceneArrangement(message) {
+  if(selected){selectDesign(selected);if(selectionHelper)selectionHelper.update();}
+  updateMeta();updateDimensions();persist();toast(message);
+}
+function alignMarkedObjects() {
+  const items=getMarkedBounds();
+  if(items.length<2){toast('Marcá al menos dos objetos con volumen para alinearlos.');return;}
+  const axis=$('arrangeAxis').value,mode=$('arrangeMode').value;
+  const low=Math.min(...items.map(item=>item.bounds.min[axis]));
+  const high=Math.max(...items.map(item=>item.bounds.max[axis]));
+  const target=mode==='min'?low:mode==='max'?high:(low+high)/2;
+  pushHistory();
+  items.forEach(item=>{
+    const own=mode==='min'?item.bounds.min[axis]:mode==='max'?item.bounds.max[axis]:(item.bounds.min[axis]+item.bounds.max[axis])/2;
+    item.root.position[axis]+=target-own;
+    item.root.updateMatrixWorld(true);
+  });
+  const axisLabel={x:'X',y:'Y',z:'Z'}[axis];
+  const modeLabel={min:'bordes iniciales',center:'centros',max:'bordes finales'}[mode];
+  finishSceneArrangement('Alineación aplicada: '+axisLabel+' · '+modeLabel+'.');
+}
+function distributeMarkedObjects() {
+  const items=getMarkedBounds();
+  if(items.length<3){toast('Marcá al menos tres objetos con volumen para distribuirlos.');return;}
+  const axis=$('distributeAxis').value;
+  items.sort((a,b)=>(a.bounds.min[axis]+a.bounds.max[axis])-(b.bounds.min[axis]+b.bounds.max[axis]));
+  const outerMin=Math.min(...items.map(item=>item.bounds.min[axis]));
+  const outerMax=Math.max(...items.map(item=>item.bounds.max[axis]));
+  const lengths=items.map(item=>item.bounds.max[axis]-item.bounds.min[axis]);
+  const totalLength=lengths.reduce((sum,value)=>sum+value,0);
+  const gap=(outerMax-outerMin-totalLength)/(items.length-1);
+  if(gap < -1e-5){toast('No hay espacio suficiente para repartir las piezas sin superponerlas. Separá los extremos y probá de nuevo.');return;}
+  pushHistory();
+  let cursor=outerMin;
+  items.forEach((item,index)=>{
+    item.root.position[axis]+=cursor-item.bounds.min[axis];
+    item.root.updateMatrixWorld(true);
+    cursor+=lengths[index]+Math.max(0,gap);
+  });
+  const axisLabel={x:'X',y:'Y',z:'Z'}[axis];
+  finishSceneArrangement('Distribución uniforme aplicada en '+axisLabel+'.');
 }
 function groupSelectedObjects() {
   const chosen=designObjects.filter(root=>groupSelection.has(root));
@@ -2079,6 +2153,8 @@ $('unitsSelect').addEventListener('change',e=>{
 $('blueprintBtn').addEventListener('click',exportTechnicalSVG);
 $('groupBtn').addEventListener('click',groupSelectedObjects);
 $('ungroupBtn').addEventListener('click',ungroupSelectedObject);
+$('alignSelectedBtn').addEventListener('click',alignMarkedObjects);
+$('distributeSelectedBtn').addEventListener('click',distributeMarkedObjects);
 $('sceneObjectList').addEventListener('click',e=>{
   const selectBtn=e.target.closest('[data-scene-select]');
   const eyeBtn=e.target.closest('[data-scene-eye]');
