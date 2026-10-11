@@ -1963,31 +1963,52 @@ function setTexture(value) {
 }
 function applyArchitecturalDimensions() {
   if(!selected||!architecturalSizeTypes.has(selected.userData.designType)){
-    toast('Seleccioná una pared, piso, puerta o ventana paramétrica.');return;
+    toast('Seleccioná una pieza con geometría editable.');return;
   }
   const factor=unitFactors[unitSystem]||1;
   const inputValues=['archSizeX','archSizeY','archSizeZ'].map(id=>parseFloat($(id).value));
   if(inputValues.some(v=>!Number.isFinite(v)||v<=0||v>200*factor)){
     toast('Ingresá tres medidas positivas, de hasta 200 metros equivalentes.');return;
   }
-  const next=inputValues.map(v=>v/factor);
+  const next=inputValues.map(v=>v/factor),type=selected.userData.designType;
   if(next.some(v=>v<.02||v>200)){
     toast('Cada dimensión debe estar entre 0,02 y 200 metros.');return;
   }
-  if(selected.userData.designType==='door'&&(next[0]<.3||next[1]<.3)){
-    toast('La puerta debe tener al menos 0,3 metros de ancho y alto.');return;
+  if(type==='door'&&(next[0]<.3||next[1]<.3)){toast('La puerta debe tener al menos 0,3 metros de ancho y alto.');return;}
+  if(type==='window'&&(next[0]<.2||next[1]<.2)){toast('La ventana necesita al menos 0,2 metros de ancho y alto.');return;}
+  let opening=null;
+  if(type==='wall'){
+    const mode=$('wallOpeningType').value;
+    const ow=parseFloat($('openingWidth').value)/factor,oh=parseFloat($('openingHeight').value)/factor;
+    if(mode!=='none'){
+      if(!Number.isFinite(ow)||!Number.isFinite(oh)||ow<.2||oh<.2||ow>=next[0]*.82||oh>=next[1]*.92){
+        toast('La abertura debe medir al menos 0,2 m y ser más pequeña que la pared.');return;
+      }
+      if(mode==='door'&&oh>=next[1]-.05){toast('Dejá espacio de pared por encima de la puerta.');return;}
+      opening={type:mode,width:ow,height:oh};
+    }else opening={type:'none',width:Number.isFinite(ow)?ow:.9,height:Number.isFinite(oh)?oh:2.1};
   }
-  if(selected.userData.designType==='window'&&(next[0]<.2||next[1]<.2)){
-    toast('La ventana necesita al menos 0,2 unidades de ancho y alto.');return;
+  let sides=null,bevel=null;
+  if(type==='polygon'){
+    sides=parseInt($('polygonSides').value,10);
+    if(!Number.isFinite(sides)||sides<3||sides>16){toast('El polígono necesita entre 3 y 16 lados.');return;}
+  }
+  if(type==='rectangle'||type==='roundedCube'){
+    bevel=parseFloat($('bevelRadius').value)/factor;
+    if(!Number.isFinite(bevel)||bevel<0||bevel>Math.min(...next)*.22){
+      toast('El bisel no puede superar el 22% de la dimensión más pequeña.');return;
+    }
   }
   pushHistory();
-  const root=selected,type=root.userData.designType;
+  const root=selected;
   root.userData.archSize=next;
+  if(type==='wall')root.userData.archOpening=opening;
+  if(type==='polygon')root.userData.polygonSides=sides;
+  if(type==='rectangle'||type==='roundedCube')root.userData.bevelRadius=bevel;
   while(root.children.length){const child=root.children[0];root.remove(child);disposeTree(child);}
-  build(type,root);
-  applyPrimaryMaterial(root);
+  build(type,root);applyPrimaryMaterial(root);
   selectDesign(root);updateMeta();updateDimensions();persist();
-  toast('Dimensiones de '+(meta[type]?.name||'la pieza')+' actualizadas.');
+  toast('Geometría actualizada: '+(meta[type]?.name||'pieza')+'.');
 }
 function setPositionFromInputs() {
   if(!selected)return;
@@ -2792,9 +2813,21 @@ $('scaleRange').addEventListener('input',e=>{
   if(e.target.dataset.historyStarted!=='1'){pushHistory();e.target.dataset.historyStarted='1';}
   const v=parseFloat(e.target.value);selected.scale.set(v,v,v);
   $('scaleValue').textContent=v.toFixed(2);$('scaleReadout').textContent=v.toFixed(2)+' ×';
+  $('scaleX').value=v.toFixed(2);$('scaleY').value=v.toFixed(2);$('scaleZ').value=v.toFixed(2);
   if(selectionHelper)selectionHelper.update();updateDimensions();persist();
 });
 $('scaleRange').addEventListener('change',e=>{e.target.dataset.historyStarted='0';});
+function applyScaleXYZ() {
+  if(!selected)return;
+  const values=['scaleX','scaleY','scaleZ'].map(id=>parseFloat($(id).value));
+  if(values.some(v=>!Number.isFinite(v)||v<.05||v>20)){toast('La escala por eje debe estar entre 0,05× y 20×.');return;}
+  pushHistory();selected.scale.set(values[0],values[1],values[2]);
+  const avg=(values[0]+values[1]+values[2])/3;
+  $('scaleRange').value=THREE.MathUtils.clamp(avg,.05,5);$('scaleValue').textContent=avg.toFixed(2);$('scaleReadout').textContent=avg.toFixed(2)+' ×';
+  if(selectionHelper)selectionHelper.update();updateDimensions();persist();toast('Escala X/Y/Z aplicada.');
+}
+$('applyScaleXYZBtn').addEventListener('click',applyScaleXYZ);
+['scaleX','scaleY','scaleZ'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')applyScaleXYZ();}));
 $('rotationRange').addEventListener('input',e=>{
   if(!selected)return;
   if(e.target.dataset.historyStarted!=='1'){pushHistory();e.target.dataset.historyStarted='1';}
