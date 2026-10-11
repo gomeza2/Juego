@@ -1650,7 +1650,9 @@ function selectDesign(root) {
   $('arraySpacingUnit').textContent=unitSystem;
   const boundsForRepeat=new THREE.Box3().setFromObject(root);
   const repeatSize=boundsForRepeat.getSize(new THREE.Vector3());
-  $('arraySpacing').value=((repeatSize.x||1)+.25)*factor===0?'1.5':(((repeatSize.x||1)+.25)*factor).toFixed(unitSystem==='mm'?0:unitSystem==='cm'?1:2);
+  const repeatAxis=$('arrayAxis').value||'x';
+  const repeatDistance=(repeatSize[repeatAxis]||1)+.25;
+  $('arraySpacing').value=(repeatDistance*factor).toFixed(unitSystem==='mm'?0:unitSystem==='cm'?1:2);
   const deg=Math.round(THREE.MathUtils.radToDeg(root.rotation.y));
   $('rotationRange').value=deg;$('rotationValue').textContent=deg+'°';$('rotationReadout').textContent=deg+'°';
   $('rotX').value=Math.round(THREE.MathUtils.radToDeg(root.rotation.x));$('rotY').value=deg;$('rotZ').value=Math.round(THREE.MathUtils.radToDeg(root.rotation.z));
