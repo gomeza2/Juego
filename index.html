@@ -1572,6 +1572,9 @@ function createDesign(type, options={}) {
   const root=new THREE.Group();root.name=(options.name||meta[type].name);
   root.userData.designType=type;root.userData.designRoot=true;root.userData.style=styleSnapshot();
   if(architecturalSizeTypes.has(type))root.userData.archSize=[...(options.archSize||architecturalSizeDefaults[type])];
+  if(type==='wall')root.userData.archOpening={type:options.archOpening?.type||'none',width:options.archOpening?.width||.9,height:options.archOpening?.height||2.1};
+  if(type==='polygon')root.userData.polygonSides=THREE.MathUtils.clamp(Math.round(options.polygonSides||6),3,16);
+  if(type==='rectangle'||type==='roundedCube')root.userData.bevelRadius=Number(options.bevelRadius??(type==='rectangle'?.055:.12));
   modelRoot.add(root);designObjects.push(root);
   build(type,root);
   if(options.position)root.position.set(options.position[0]||0,options.position[1]||0,options.position[2]||0);
@@ -1600,7 +1603,8 @@ function selectDesign(root) {
   const factor=unitFactors[unitSystem]||1;
   $('posX').value=(root.position.x*factor).toFixed(2);$('posY').value=(root.position.y*factor).toFixed(2);$('posZ').value=(root.position.z*factor).toFixed(2);
   const scaleAvg=(root.scale.x+root.scale.y+root.scale.z)/3;
-  $('scaleRange').value=scaleAvg;$('scaleValue').textContent=scaleAvg.toFixed(2);$('scaleReadout').textContent=scaleAvg.toFixed(2)+' ×';
+  $('scaleRange').value=THREE.MathUtils.clamp(scaleAvg,.05,5);$('scaleValue').textContent=scaleAvg.toFixed(2);$('scaleReadout').textContent=scaleAvg.toFixed(2)+' ×';
+  $('scaleX').value=root.scale.x.toFixed(2);$('scaleY').value=root.scale.y.toFixed(2);$('scaleZ').value=root.scale.z.toFixed(2);
   const deg=Math.round(THREE.MathUtils.radToDeg(root.rotation.y));
   $('rotationRange').value=deg;$('rotationValue').textContent=deg+'°';$('rotationReadout').textContent=deg+'°';
   $('rotX').value=Math.round(THREE.MathUtils.radToDeg(root.rotation.x));$('rotY').value=deg;$('rotZ').value=Math.round(THREE.MathUtils.radToDeg(root.rotation.z));
@@ -1610,6 +1614,9 @@ function selectDesign(root) {
   $('selectedThumb').textContent=m.icon;$('selectedName').textContent=root.name;$('selectedType').textContent=m.type;
   const archPanel=$('archSizePanel'),isParametric=architecturalSizeTypes.has(currentType);
   archPanel.classList.toggle('show',isParametric);
+  $('wallOpeningControls').classList.toggle('show',!!selected&&currentType==='wall');
+  $('polygonControls').classList.toggle('show',!!selected&&currentType==='polygon');
+  $('bevelControls').classList.toggle('show',!!selected&&(currentType==='rectangle'||currentType==='roundedCube'));
   if(isParametric){
     const dims=root.userData.archSize||architecturalSizeDefaults[currentType];root.userData.archSize=[...dims];
     const factor=unitFactors[unitSystem]||1,digits=unitSystem==='mm'?0:unitSystem==='cm'?1:2;
@@ -1621,9 +1628,41 @@ function selectDesign(root) {
     $('archSizeY').value=(dims[1]*factor).toFixed(digits);
     $('archSizeZ').value=(dims[2]*factor).toFixed(digits);
     $('archSizeUnitTag').textContent=unitSystem;
-    $('archSizeYLabel').textContent=currentType==='floor'?'Y · Espesor':'Y · Alto';
-    $('archSizeZLabel').textContent=currentType==='floor'?'Z · Fondo':'Z · Profundidad';
-    $('archSizeHelp').textContent=currentType==='floor'?'X = ancho · Y = espesor de losa · Z = fondo. Las medidas se expresan en '+unitSystem+'.':'X = ancho · Y = alto · Z = profundidad. Las medidas se expresan en '+unitSystem+'.';
+    $('archSizeTitle').firstChild.textContent=({
+      wall:'Dimensiones de pared ',floor:'Dimensiones de losa ',door:'Dimensiones de puerta ',window:'Dimensiones de ventana ',
+      space:'Dimensiones del espacio ',disk:'Dimensiones del disco ',triangle:'Dimensiones del triángulo ',
+      rectangle:'Dimensiones del rectángulo ',polygon:'Dimensiones del polígono ',roundedCube:'Dimensiones del cubo biselado '
+    })[currentType]||'Dimensiones de geometría ';
+    $('archSizeYLabel').textContent=({
+      floor:'Y · Espesor',disk:'Y · Espesor',rectangle:'Y · Espesor',space:'Y · Alto de paredes',
+      triangle:'Y · Alto',polygon:'Y · Alto',roundedCube:'Y · Alto'
+    })[currentType]||(currentType==='door'||currentType==='window'||currentType==='wall'?'Y · Alto':'Y · Alto');
+    $('archSizeZLabel').textContent=({
+      floor:'Z · Fondo',space:'Z · Fondo',disk:'Z · Diámetro',rectangle:'Z · Fondo',
+      triangle:'Z · Extrusión',polygon:'Z · Fondo',roundedCube:'Z · Fondo'
+    })[currentType]||'Z · Profundidad';
+    $('archSizeHelp').textContent=({
+      wall:'Ancho, alto y espesor; podés recortar un hueco real para una puerta o ventana.',
+      floor:'X = ancho · Y = espesor · Z = fondo.',
+      door:'Cambia el ancho y alto de marco y hoja.',
+      window:'Cambia ancho, alto y profundidad del marco.',
+      space:'Interior abierto al frente, con piso y tres paredes. Podés añadir muebles y ventanas por separado.',
+      disk:'Un disco circular con diámetro X/Z y grosor Y.',
+      triangle:'Perfil triangular extruido en profundidad para construir rampas, piezas decorativas o volúmenes.',
+      rectangle:'Placa rectangular con bordes suaves y espesor editable.',
+      polygon:'Prisma poligonal; cambiá la cantidad de lados y extruí el perfil.',
+      roundedCube:'Volumen rectangular con radio de bisel ajustable.'
+    })[currentType]||'Editá las dimensiones reales de esta pieza.';
+    if(currentType==='wall'){
+      const o=root.userData.archOpening||{type:'none',width:.9,height:2.1};
+      $('wallOpeningType').value=o.type||'none';
+      $('openingWidth').value=(o.width*factor).toFixed(digits);
+      $('openingHeight').value=(o.height*factor).toFixed(digits);
+      $('openingWidth').max=String(Math.max(.2,dims[0]*.8*factor));
+      $('openingHeight').max=String(Math.max(.2,dims[1]*.92*factor));
+    }
+    if(currentType==='polygon')$('polygonSides').value=String(root.userData.polygonSides||6);
+    if(currentType==='rectangle'||currentType==='roundedCube')$('bevelRadius').value=((root.userData.bevelRadius??.12)*factor).toFixed(digits);
   }
   $('materialSelect').value=currentMaterial;
   updateSwatches();updateTextureUI();updateMeta();updateDimensions();
@@ -1802,7 +1841,8 @@ function serializeSceneNode(node) {
     scale:[node.scale.x,node.scale.y,node.scale.z],
     rotation:[node.rotation.x,node.rotation.y,node.rotation.z],
     visible:node.visible,style:node.userData.style||null,assetKey:node.userData.assetKey||null,
-    archSize:node.userData.archSize||null,
+    archSize:node.userData.archSize||null,archOpening:node.userData.archOpening||null,
+    polygonSides:node.userData.polygonSides||null,bevelRadius:node.userData.bevelRadius??null,
     children:childRoots
   };
 }
@@ -1817,6 +1857,9 @@ function restoreSceneNode(data,parent=modelRoot) {
   root.userData.designRoot=true;root.userData.designType=type;
   root.userData.isSceneGroup=isGroup;root.userData.style={...style};
   if(architecturalSizeTypes.has(type))root.userData.archSize=(Array.isArray(data.archSize)&&data.archSize.length===3?data.archSize:architecturalSizeDefaults[type]).map((v,i)=>Math.min(200,Math.max(.02,Number.isFinite(Number(v))?Number(v):architecturalSizeDefaults[type][i])));
+  if(type==='wall'){const opening=data.archOpening||{};root.userData.archOpening={type:['door','window'].includes(opening.type)?opening.type:'none',width:Math.max(.2,Number(opening.width)||.9),height:Math.max(.2,Number(opening.height)||2.1)};}
+  if(type==='polygon')root.userData.polygonSides=THREE.MathUtils.clamp(Math.round(Number(data.polygonSides)||6),3,16);
+  if(type==='rectangle'||type==='roundedCube')root.userData.bevelRadius=THREE.MathUtils.clamp(Number(data.bevelRadius??(type==='rectangle'?.055:.12)),0,.7);
   root.position.set(data.position?.[0]??0,data.position?.[1]??0,data.position?.[2]??0);
   root.scale.set(data.scale?.[0]??1,data.scale?.[1]??1,data.scale?.[2]??1);
   root.rotation.set(data.rotation?.[0]??0,data.rotation?.[1]??0,data.rotation?.[2]??0);
