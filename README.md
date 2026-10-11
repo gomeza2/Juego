@@ -25,6 +25,7 @@ La biblioteca contiene productos, dispositivos, muebles, vehículos, formas org�
 - Transformaciones y materiales por objeto.
 - Guardado y recuperación de escenas con objetos, grupos, materiales, vistas y ajustes.
 - Exportación de la escena completa a JSON y de la geometría a GLB.
+- Importación de modelos GLB externos y apertura de proyectos JSON desde el menú **Exportar**.
 
 ### Fase 4 · Medidas y planos de referencia — implementada
 - Unidades mostradas en m, cm, mm y ft.
@@ -32,13 +33,14 @@ La biblioteca contiene productos, dispositivos, muebles, vehículos, formas org�
 - Vistas ortográficas superior, frontal y lateral, además de perspectiva.
 - Exportación de una ficha SVG con las medidas de referencia y datos del objeto.
 - El archivo JSON conserva las transformaciones y la estructura completa de la escena.
+- Importación de proyectos JSON guardados; los modelos generados almacenados en IndexedDB pueden recuperarse en el mismo navegador.
 
 **Importante:** las cotas describen la caja envolvente del objeto. La ficha SVG sirve como referencia conceptual; no es un plano constructivo certificado, no comprueba resistencia estructural, tolerancias, códigos de construcción ni preparación para fabricación.
 
 ### Fase 5 · Asistente de diseño e IA 3D — parcialmente implementada
 El asistente procedural local reconoce familias de objetos y puede componer algunas escenas desde una descripción. Por ejemplo, «mansión con cuatro árboles y una fuente de mármol» crea un conjunto a partir de modelos disponibles. Esto funciona en la publicación estática sin una API externa.
 
-También está preparado el conector para generación real mediante el flujo de dos pasos de [Meshy Text-to-3D API](https://docs.meshy.ai/en/api/text-to-3d): primero genera geometría preliminar y luego crea el modelo texturizado con materiales PBR. El modelo final se importa al visor como GLB y se guarda en IndexedDB del navegador para poder recuperar la escena en ese mismo perfil del navegador.
+También está preparado el conector para generación real mediante el flujo de dos pasos de [Meshy Text-to-3D API](https://docs.meshy.ai/en/api/text-to-3d): primero genera geometría preliminar y luego crea el modelo texturizado con materiales PBR. El modelo final se importa al visor como GLB y se guarda en IndexedDB del navegador para poder recuperar la escena en ese mismo perfil del navegador. También podés importar archivos GLB de otros programas y abrir JSON guardados desde el menú de exportación.
 
 **La generación real no funciona desde GitHub Pages por sí sola.** Pages es estático y no ejecuta la función de servidor de este repositorio. Para activarla, hace falta desplegar el proyecto en un hosting que ejecute funciones Node, configurar las dos variables privadas siguientes y tener una cuenta del proveedor con créditos disponibles:
 - `MESHY_API_KEY`: clave privada del proveedor, únicamente en el servidor.
@@ -48,7 +50,7 @@ El backend está en `api/ai3d.js`. El código de acceso evita que el endpoint qu
 
 #### Activar el endpoint real
 1. Importá este repositorio en un proveedor de hosting compatible con funciones Node, por ejemplo [Vercel](https://vercel.com/).
-2. En la configuración del proyecto, añadí las variables de entorno `MESHY_API_KEY` y `NEXO_AI_ACCESS_CODE) como secretos de producción. Elegí tu propio código de acceso.
+2. En la configuración del proyecto, añadí las variables de entorno `MESHY_API_KEY` y `NEXO_AI_ACCESS_CODE` como secretos de producción. Elegí tu propio código de acceso.
 3. Volvé a desplegar el proyecto. En la URL del hosting, el endpoint `/api/ai3d` se ejecuta en el servidor; en `github.io`, el editor sigue funcionando sin la generación externa.
 4. Abrí el editor desplegado en ese hosting, describí el modelo y pulsá **IA 3D**. El navegador te pedirá el código privado al iniciar la sesión.
 5. Tené en cuenta que generar la geometría y después aplicar texturas utiliza los créditos del proveedor. Revisá sus [documentos de API](https://docs.meshy.ai/en/api/text-to-3d), [guía de inicio](https://docs.meshy.ai/en/api/quick-start) y condiciones de uso antes de activar la función.
