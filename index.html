@@ -1598,12 +1598,17 @@ function renderSceneList() {
   });
 }
 function updateMeta() {
-  const m=meta[currentType]||meta.headphones;
-  $('viewportObject').textContent=m.tag;$('selectedName').textContent=selected?selected.name:m.name;
-  $('selectedType').textContent=m.type;$('selectedThumb').textContent=m.icon;
+  const empty=designObjects.length===0;
+  const m=selected?(meta[currentType]||meta.group):(empty?null:(meta[currentType]||meta.headphones));
+  $('viewportObject').textContent=empty?'Espacio de creación':(m?.tag||'Escena 3D');
+  $('selectedName').textContent=selected?selected.name:(empty?'Escena vacía':(m?.name||'Escena'));
+  $('selectedType').textContent=empty?'LISTO PARA CREAR':(m?.type||'ESCENA · 3D');
+  $('selectedThumb').textContent=empty?'＋':(m?.icon||'◈');
   $('objectCount').textContent=designObjects.length+' '+(designObjects.length===1?'objeto':'objetos');
-  document.querySelectorAll('.category-card').forEach(b=>b.classList.toggle('selected',b.dataset.type===currentType));
-  document.querySelectorAll('.nav-item[data-type]').forEach(b=>b.classList.remove('active'));
+  $('stageEmpty').style.display=empty?'flex':'none';
+  $('archSizePanel').classList.toggle('show',!!selected&&architecturalSizeTypes.has(currentType));
+  document.querySelectorAll('.category-card').forEach(b=>b.classList.toggle('selected',!!selected&&b.dataset.type===currentType));
+  document.querySelectorAll('.nav-item[data-type]').forEach(b=>b.classList.toggle('active',!!selected&&b.dataset.type===currentType));
   renderSceneList();
 }
 function frameBounds(bounds) {
@@ -1700,7 +1705,7 @@ function snapshot() {
     scale:selected?[selected.scale.x,selected.scale.y,selected.scale.z]:[1,1,1],
     rotation:selected?[selected.rotation.x,selected.rotation.y,selected.rotation.z]:[0,0,0],
     objects:designObjects.map(serializeSceneNode),selectedIndex:Math.max(0,designObjects.indexOf(selected)),
-    grid:gridEnabled,snap:snapEnabled,shadows:shadowsEnabled,highlight:highlightEnabled,
+    addMode,grid:gridEnabled,snap:snapEnabled,shadows:shadowsEnabled,highlight:highlightEnabled,
     units:unitSystem,view:activeView,showDimensions,architecturalFloors
   };
 }
@@ -1723,13 +1728,23 @@ function applySnapshot(s) {
   $('snapBtn').classList.toggle('active',snapEnabled);grid.visible=gridEnabled;keyLight.castShadow=shadowsEnabled;
   $('gridSwitch').classList.toggle('on',gridEnabled);$('shadowSwitch').classList.toggle('on',shadowsEnabled);$('highlightSwitch').classList.toggle('on',highlightEnabled);
   clearModels();groupSelection.clear();
-  if(Array.isArray(s.objects)&&s.objects.length){
-    for(const obj of s.objects){const root=restoreSceneNode(obj,modelRoot);designObjects.push(root);}
-    selected=designObjects[Math.min(s.selectedIndex||0,designObjects.length-1)]||designObjects[0];
-    currentType=selected.userData.designType||'group';selectDesign(selected);
-  }else{
-    currentType=s.type||'headphones';
+  addMode=s.addMode!==false;
+  $('addModeBtn').classList.toggle('active',addMode);
+  $('addModeBtn').innerHTML=addMode?'✓ <span>Modo añadir activo</span>':'＋ <span>Añadir piezas</span>';
+  if(Array.isArray(s.objects)){
+    if(s.objects.length){
+      for(const obj of s.objects){const root=restoreSceneNode(obj,modelRoot);designObjects.push(root);}
+      selected=designObjects[Math.min(s.selectedIndex||0,designObjects.length-1)]||designObjects[0];
+      currentType=selected?.userData.designType||'blank';
+      if(selected)selectDesign(selected);
+    }else{
+      selected=null;currentType='blank';
+    }
+  }else if(s.type&&meta[s.type]){
+    currentType=s.type;
     createDesign(currentType,{skipHistory:true,state:{position:s.position,scale:s.scale,rotation:s.rotation,color:currentColor,material:currentMaterial,texture:currentTexture,textureScale}});
+  }else{
+    selected=null;currentType='blank';
   }
   setCameraView(s.view||'perspective');
   scene.traverse(o=>{if(o.isMesh&&o.userData.primary)o.material.wireframe=wireEnabled;});
@@ -2298,7 +2313,7 @@ $('aiGenerateBtn').addEventListener('click',generateWithRealAI);
 function setSwitch(id,value) {$ (id).classList.toggle('on',value);}
 document.querySelectorAll('[data-type]').forEach(btn=>btn.addEventListener('click',()=>{
   const type=btn.dataset.type;if(!meta[type])return;
-  createDesign(type,{keepScene:addMode});
+  createDesign(type,{keepScene:addMode,name:meta[type].name});
   document.querySelectorAll('.nav-item[data-type]').forEach(b=>b.classList.toggle('active',b===btn));
   if(window.innerWidth<=920)$('sidebar').classList.remove('menu-open');
   toast(addMode?meta[type].name+' agregado a la escena.':meta[type].name+' listo para editar.');
@@ -2308,8 +2323,28 @@ document.querySelectorAll('[data-nav]').forEach(btn=>btn.addEventListener('click
   if(btn.dataset.nav==='library')toast('Biblioteca: elegí una categoría para explorar las bases disponibles.');
   else if(btn.dataset.nav==='exports'){$('exportMenu').classList.add('open');toast('Elegí un formato de exportación en el menú superior.');}
 }));
-$('newProject').addEventListener('click',()=>{createDesign('headphones');$('projectName').value='Concepto sin título';currentColor='#c8ff57';setColor(currentColor);$('promptInput').value='';toast('Nuevo espacio de diseño creado.');});
+function startBlankProject(options={}) {
+  if(!options.skipHistory)pushHistory();
+  clearModels();
+  $('projectName').value='Concepto sin título';$('promptInput').value='';
+  currentType='blank';currentColor='#c8ff57';currentMaterial='matte';currentTexture='none';textureScale=2;architecturalFloors=10;
+  addMode=true;$('addModeBtn').classList.add('active');$('addModeBtn').innerHTML='✓ <span>Modo añadir activo</span>';
+  $('quickShapeSelect').value='cube';
+  setCameraView('perspective');
+  camera.position.set(7.5,5.4,7.5);controls.target.set(0,0,0);controls.update();
+  updateSwatches();updateTextureUI();updateMeta();updateDimensions();persist();
+  if(options.notify!==false)toast('Proyecto vacío listo. Agregá formas o describí una escena.');
+}
+$('newProject').addEventListener('click',()=>startBlankProject());
 $('promptSend').addEventListener('click',handlePrompt);
+$('quickAddBtn').addEventListener('click',()=>{
+  const type=$('quickShapeSelect').value;
+  if(!meta[type]){toast('Elegí una forma válida.');return;}
+  addMode=true;$('addModeBtn').classList.add('active');$('addModeBtn').innerHTML='✓ <span>Modo añadir activo</span>';
+  createDesign(type,{keepScene:true,name:meta[type].name});
+  toast(meta[type].name+' agregado.');
+});
+$('emptyPromptBtn').addEventListener('click',()=>{$('promptInput').focus();$('promptInput').scrollIntoView({behavior:'smooth',block:'nearest'});});
 $('promptInput').addEventListener('keydown',e=>{if(e.key==='Enter')handlePrompt();});
 $('addModeBtn').addEventListener('click',()=>{
   addMode=!addMode;$('addModeBtn').classList.toggle('active',addMode);
@@ -2470,10 +2505,11 @@ sidebar.addEventListener('click',e=>{if(window.innerWidth<=920 && !e.target.clos
 let restored=false;
 try {
   const stored=localStorage.getItem('nexo-studio-project');
-  if(stored){const s=JSON.parse(stored);if(s&&s.type&&meta[s.type]){currentColor=s.color||'#c8ff57';currentMaterial=s.material||'matte';applySnapshot(s);restored=true;}}
+  if(stored){const s=JSON.parse(stored);if(s&&s.type&&(meta[s.type]||s.type==='blank')){currentColor=s.color||'#c8ff57';currentMaterial=s.material||'matte';applySnapshot(s);restored=true;}}
 } catch(e) {console.warn('No se pudo restaurar el proyecto local.',e);}
-if(!restored)createDesign('headphones',{skipHistory:true});
+if(!restored)startBlankProject({skipHistory:true,notify:false});
 $('gridBtn').classList.toggle('active',gridEnabled);$('snapBtn').classList.toggle('active',snapEnabled);
+$('addModeBtn').classList.toggle('active',addMode);$('addModeBtn').innerHTML=addMode?'✓ <span>Modo añadir activo</span>':'＋ <span>Añadir piezas</span>';
 updateSwatches();
 </script>
 </body>
