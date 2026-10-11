@@ -1644,7 +1644,7 @@ function selectDesign(root) {
   }
   const factor=unitFactors[unitSystem]||1;
   $('posX').value=(root.position.x*factor).toFixed(2);$('posY').value=(root.position.y*factor).toFixed(2);$('posZ').value=(root.position.z*factor).toFixed(2);
-  const scaleAvg=(root.scale.x+root.scale.y+root.scale.z)/3;
+  const scaleAvg=(Math.abs(root.scale.x)+Math.abs(root.scale.y)+Math.abs(root.scale.z))/3;
   $('scaleRange').value=THREE.MathUtils.clamp(scaleAvg,.05,5);$('scaleValue').textContent=scaleAvg.toFixed(2);$('scaleReadout').textContent=scaleAvg.toFixed(2)+' ×';
   $('scaleX').value=root.scale.x.toFixed(2);$('scaleY').value=root.scale.y.toFixed(2);$('scaleZ').value=root.scale.z.toFixed(2);
   $('arraySpacingUnit').textContent=unitSystem;
@@ -1906,7 +1906,7 @@ function syncTransformInspector(){
   $('scaleX').value=selected.scale.x.toFixed(2);
   $('scaleY').value=selected.scale.y.toFixed(2);
   $('scaleZ').value=selected.scale.z.toFixed(2);
-  const avg=(selected.scale.x+selected.scale.y+selected.scale.z)/3;
+  const avg=(Math.abs(selected.scale.x)+Math.abs(selected.scale.y)+Math.abs(selected.scale.z))/3;
   $('scaleRange').value=THREE.MathUtils.clamp(avg,.05,5);
   $('scaleValue').textContent=avg.toFixed(2);$('scaleReadout').textContent=avg.toFixed(2)+' ×';
   const angles=[selected.rotation.x,selected.rotation.y,selected.rotation.z].map(v=>Math.round(THREE.MathUtils.radToDeg(v)));
@@ -2287,7 +2287,7 @@ function createObjectArray() {
   for(let i=1;i<=count;i++){
     const data={...sourceData,position:[base.x,base.y,base.z]};
     data.position[axisIndex]=base.getComponent(axisIndex)+spacing*i;
-    data.name=source.name+' · '+String(i+1).padStart(2,'0');
+    data.name=source.name+' · '+String(i).padStart(2,'0');
     const copy=restoreSceneNode(data,modelRoot);
     designObjects.push(copy);copies.push(copy);
   }
@@ -3010,7 +3010,7 @@ function applyScaleXYZ() {
   const values=['scaleX','scaleY','scaleZ'].map(id=>parseFloat($(id).value));
   if(values.some(v=>!Number.isFinite(v)||Math.abs(v)<.05||Math.abs(v)>20)){toast('La escala por eje debe estar entre −20 y −0,05 o entre 0,05 y 20.');return;}
   pushHistory();selected.scale.set(values[0],values[1],values[2]);
-  const avg=(values[0]+values[1]+values[2])/3;
+  const avg=(Math.abs(values[0])+Math.abs(values[1])+Math.abs(values[2]))/3;
   $('scaleRange').value=THREE.MathUtils.clamp(avg,.05,5);$('scaleValue').textContent=avg.toFixed(2);$('scaleReadout').textContent=avg.toFixed(2)+' ×';
   if(selectionHelper)selectionHelper.update();updateDimensions();persist();toast('Escala X/Y/Z aplicada.');
 }
