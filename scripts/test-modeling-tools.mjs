@@ -19,7 +19,8 @@ const requiredIds = [
   'scaleX', 'scaleY', 'scaleZ', 'applyScaleXYZBtn',
   'archSizeX', 'archSizeY', 'archSizeZ', 'applyArchSizeBtn',
   'wallOpeningType', 'openingWidth', 'openingHeight',
-  'polygonSides', 'bevelRadius', 'archSizePanel'
+  'polygonSides', 'bevelRadius', 'archSizePanel',
+  'orbitBtn', 'moveBtn', 'rotateBtn', 'scaleBtn'
 ];
 for (const id of requiredIds) assert.equal(ids.filter(value => value === id).length, 1, 'Expected exactly one #' + id);
 
@@ -34,6 +35,16 @@ for (const type of ['space','disk','triangle','rectangle','polygon','roundedCube
   assert.ok(html.includes("type==='" + type + "'"), 'Missing geometry builder for ' + type);
 }
 assert.ok(html.includes('selected.scale.set(values[0],values[1],values[2])'), 'XYZ scale must apply independently');
+assert.ok(html.includes("import { TransformControls } from 'three/addons/controls/TransformControls.js';"), 'Interactive TransformControls module must be imported');
+assert.ok(html.includes('new TransformControls(camera,renderer.domElement)'), 'The 3D manipulation gizmo must attach to the active camera and viewport');
+assert.ok(html.includes("transformGizmo.setMode(transformMode==='orbit'?'translate':transformMode)"), 'Transform tool mode must initialize correctly');
+assert.ok(html.includes('transformGizmo.translationSnap=snapEnabled?snapStep:null'), 'Grid snapping must apply to interactive movement');
+assert.ok(html.includes("$('moveBtn').addEventListener('click',()=>setTransformTool('translate'))"), 'Move button must change transform mode');
+assert.ok(html.includes("$('rotateBtn').addEventListener('click',()=>setTransformTool('rotate'))"), 'Rotate button must change transform mode');
+assert.ok(html.includes("$('scaleBtn').addEventListener('click',()=>setTransformTool('scale'))"), 'Scale button must change transform mode');
+assert.ok(html.includes("['g','r','s'].includes(e.key.toLowerCase())"), 'G/R/S keyboard shortcuts must be available');
+assert.ok(html.includes("transformGizmo.addEventListener('dragging-changed'"), 'Orbiting must pause during gizmo dragging and history must update');
+assert.ok(html.includes('rebuildTransformGizmo();'), 'Manipulator must be rebuilt when switching camera views');
 assert.ok(html.includes('root.userData.archOpening=opening'), 'Wall aperture settings must be assigned');
 assert.ok(html.includes('archOpening:node.userData.archOpening||null'), 'Wall aperture must serialize');
 assert.ok(html.includes("root.userData.archOpening={type:['door','window'].includes(opening.type)?opening.type:'none'"), 'Wall aperture must restore');
