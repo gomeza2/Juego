@@ -1760,10 +1760,28 @@ function handlePrompt() {
   toast(hasComposition?'Escena procedural creada. Ajustá piezas, medidas y materiales por separado.':'Modelo base creado. Podés agregarlo a una escena y personalizarlo.');
 }
 function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+let aiAccessCodeCache='';
+function getAIAccessCode() {
+  if(aiAccessCodeCache)return aiAccessCodeCache;
+  try{aiAccessCodeCache=sessionStorage.getItem('nexo-ai-access-code')||'';}catch{}
+  if(aiAccessCodeCache)return aiAccessCodeCache;
+  const value=window.prompt('Código privado de acceso a la generación 3D:');
+  if(!value||!value.trim())throw new Error('Para usar IA 3D necesitás el código privado configurado en el servidor.');
+  aiAccessCodeCache=value.trim();
+  try{sessionStorage.setItem('nexo-ai-access-code',aiAccessCodeCache);}catch{}
+  return aiAccessCodeCache;
+}
 async function apiJson(url,options={}) {
-  const response=await fetch(url,{cache:'no-store',...options});
+  const accessCode=getAIAccessCode();
+  const headers={...(options.headers||{}),'X-NEXO-ACCESS':accessCode};
+  const response=await fetch(url,{...options,headers,cache:'no-store'});
   const raw=await response.text();let payload={};
   try{payload=raw?JSON.parse(raw):{};}catch{payload={};}
+  if(response.status===401){
+    aiAccessCodeCache='';
+    try{sessionStorage.removeItem('nexo-ai-access-code');}catch{}
+    throw new Error('Código de acceso incorrecto. Volvé a intentarlo.');
+  }
   if(!response.ok)throw new Error(payload.error||'La API de IA no está disponible.');
   return payload;
 }
@@ -1838,7 +1856,7 @@ async function restoreGeneratedAsset(root,key) {
     persist();
   }catch(error){console.warn('Could not restore generated asset:',error);toast('No se pudo restaurar un modelo IA guardado.');}
 }
-async function addGeneratedModel(gltf,prompt,bytes) {
+async async function addGeneratedModel(gltf,prompt,bytes) {
   pushHistory();
   if(!addMode)clearModels();
   const root=new THREE.Group();
@@ -1856,7 +1874,7 @@ async function addGeneratedModel(gltf,prompt,bytes) {
   designObjects.push(root);currentType='generated';groupSelection.clear();
   selectDesign(root);updateMeta();updateDimensions();focusScene();persist();
 }
-async function generateWithRealAI() {
+async async function generateWithRealAI() {
   const prompt=$('promptInput').value.trim();
   if(!prompt){$('promptInput').focus();toast('Escribí una descripción para generar un modelo 3D.');return;}
   if(window.location.hostname.endsWith('github.io')){
@@ -1872,7 +1890,7 @@ async function generateWithRealAI() {
     toast('IA 3D · Aplicando materiales y texturas…');
     const refine=await apiJson('/api/ai3d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'refine',previewTaskId:preview.taskId})});
     await pollAIGeneration(refine.taskId,'IA 3D · Texturas');
-    const response=await fetch('/api/ai3d?id='+encodeURIComponent(refine.taskId)+'&download=1',{cache:'no-store'});
+    const response=await fetch('/api/ai3d?id='+encodeURIComponent(refine.taskId)+'&download=1',{cache:'no-store',headers:{'X-NEXO-ACCESS':getAIAccessCode()}});
     if(!response.ok){let err={};try{err=await response.json();}catch{}throw new Error(err.error||'No se pudo descargar el modelo generado.');}
     const bytes=await response.arrayBuffer();
     const loader=new GLTFLoader();
