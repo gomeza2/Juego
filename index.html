@@ -15,6 +15,66 @@
 @media(max-width:1180px){.app{grid-template-columns:214px minmax(0,1fr)}.studio-grid{grid-template-columns:minmax(0,1fr) 252px}.sidebar{font-size:12px}.category-card{min-height:72px;padding:8px}.topbar{padding:0 14px}.crumbs{display:none}.canvas-column{padding:11px}}
 @media(max-width:920px){body{overflow:auto;height:auto;min-height:100vh}.app{height:auto;min-height:100vh;grid-template-columns:1fr;display:block}.sidebar{height:auto;position:relative;border-right:0;border-bottom:1px solid var(--line)}.brand{height:58px}.side-scroll{display:none}.side-foot{display:none}.main{min-height:calc(100vh - 58px)}.topbar{height:58px;position:sticky;top:0;z-index:10}.studio-grid{grid-template-columns:minmax(0,1fr)}.canvas-column{min-height:640px}.stage{min-height:430px}.inspector{border-left:0;border-top:1px solid var(--line);display:none;max-height:none;overflow:visible}.inspector.mobile-open{display:block}.mobile-inspector-toggle{display:inline-flex}.sidebar:after{content:'Diseñá una idea · Elegí una categoría en el panel de propiedades';display:block;padding:0 17px 12px;color:#8290a2;font-size:10px}.canvas-toolbar{height:34px}.bottom-bar{padding:0 2px}.inspector-head{position:relative}.side-scroll{display:block;position:absolute;z-index:8;top:58px;left:0;right:0;background:#0c1119;border-bottom:1px solid var(--line);max-height:58vh;display:none}.sidebar.menu-open .side-scroll{display:block}.sidebar:before{content:'☰  Explorar';position:absolute;right:15px;top:20px;color:#aab6c6;font-size:10px;cursor:pointer;z-index:9}.sidebar.menu-open:before{content:'✕  Cerrar';color:var(--accent)}}
 @media(max-width:560px){.topbar{padding:0 10px}.project-name input{width:110px}.top-actions{gap:5px}.top-actions .btn:not(.btn-primary){display:none}.top-actions .icon-btn{width:30px;height:30px}.btn-primary{height:32px;padding:0 9px}.canvas-column{padding:9px;min-height:580px}.stage{min-height:360px}.viewport-top-right{top:9px;right:9px}.view-pill{padding:6px;font-size:8px}.viewport-top-left{left:9px;top:9px}.viewport-object{font-size:11px}.prompt-bar{gap:7px;padding:7px}.prompt-hint{display:none}.prompt-send{font-size:0;width:35px;padding:0;justify-content:center}.prompt-send span{font-size:15px}.tool-btn{padding:0 7px}.viewport-label{font-size:9px}.bottom-status{gap:7px}.bottom-status span:last-child{display:none}}
+
+/* NEXO STUDIO LIGHT WORKSPACE */
+:root{color-scheme:light;--bg:#f5f7fa;--panel:#fff;--panel2:#f2f5f9;--line:#dfe5ed;--muted:#637187;--text:#182235;--accent:#b7e85b;--accent2:#8fc832;--blue:#427ce0}
+body{background:#f5f7fa;color:#182235}
+.sidebar,.topbar,.inspector{background:#fff}
+.sidebar{border-color:#dfe5ed}
+.brand{border-color:#e3e8f0}
+.brand-sub,.workspace-label,.section-title{color:#7a879b}
+.new-project{background:linear-gradient(135deg,#f8fafc,#edf2f7);border-color:#dbe3ed;color:#172337}
+.new-project:hover{background:#f2f8e8;border-color:#a8cf50}
+.nav-item{color:#59677d}
+.nav-item:hover{background:#f2f5f9;color:#1c2a3e}
+.nav-item.active{background:#edf3e4;color:#1e2a18}
+.nav-item.active .nav-icon{color:#719c24}
+.category-card{background:#f8fafc;border-color:#e0e6ee}
+.category-card:hover{background:#f1f7e8;border-color:#bdd78a}
+.category-card.selected{background:#f1f7e6;border-color:#9ec848}
+.cat-title{color:#243147}.cat-sub{color:#7b899d}
+.side-tip{border-color:#dfe6ee;background:linear-gradient(145deg,#f8fafc,#f0f4f8)}
+.side-tip p{color:#66748a}.tip-top{color:#25334a}.tip-light{background:#87bc2b;box-shadow:0 0 10px #9dc95055}
+.side-foot{border-color:#e2e8ef}
+.avatar{background:#edf3e3;color:#557e1d}.foot-name{color:#263348}.foot-status{color:#75839a}
+.topbar{border-color:#dfe5ed}
+.crumbs{color:#7a879a}.crumbs b{color:#253146}.project-name{color:#202d41}
+.project-name input{color:#202d41}.tiny-save{color:#6d7c91}.tiny-save span{background:#86b936}
+.icon-btn,.btn{background:#fff;border-color:#dce3ec;color:#425168}
+.icon-btn:hover,.btn:hover{border-color:#bac7d7;background:#f2f5f9;color:#1d2b3e}
+.btn-primary{background:#b7e85b;border-color:#a4d747;color:#18250b}
+.btn-primary:hover{background:#c8f47b;border-color:#b6e762;color:#18250b}
+.top-divider,.tool-line{background:#e0e6ee}
+.canvas-column{background:radial-gradient(ellipse at 45% 35%,#ffffff 0%,#f5f7fa 72%)}
+.stage{background:#edf1f6;border-color:#d4dce7}
+.stage-gradient{background:linear-gradient(180deg,rgba(255,255,255,.19),transparent 24%,transparent 82%,rgba(218,225,235,.24))}
+.viewport-tag,.view-pill,.stage-bottom-right button{background:#ffffffeb;border-color:#d3dce7;color:#56657b;box-shadow:0 2px 9px #28374a0c}
+.viewport-object{color:#1e2b40;text-shadow:0 1px 12px #ffffffab}
+.axis-widget .axis{background:#ffffffdf;border-color:#cfd9e5}.axis-label{color:#66758c}
+.tool-btn{color:#647289}.tool-btn:hover{background:#e9eef5;color:#1a283e}.tool-btn.active{background:#eaf3d9;border-color:#d6e7af;color:#557c17}
+.viewport-label{color:#718096}.live-dot,.status-dot{background:#7cae31}
+.prompt-bar{background:#fff;border-color:#dce4ed;box-shadow:0 8px 28px #25324a08}
+.prompt-spark{background:#edf4df;color:#628e1f}
+.prompt-copy input{color:#253249}.prompt-copy input::placeholder{color:#8a97a9}.prompt-hint{color:#7c899d}
+.prompt-send{background:#b7e85b;color:#18250b}.prompt-send:hover{background:#c8f47b}
+.bottom-bar{color:#7d899b}
+.inspector{border-color:#dfe5ed}
+.inspector-head{background:#ffffffed;border-color:#e2e7ef}
+.inspector-title{color:#253146}.inspector-kicker{color:#76849a}
+.selected-summary{border-color:#e0e6ee;background:#f7f9fc}
+.selected-thumb{background:linear-gradient(145deg,#eef2f7,#dce4ee)}
+.selected-title{color:#253146}.selected-type{color:#77859a}.selected-status{border-color:#c5dba4;color:#618821;background:#f5faeb}
+.prop-title{color:#37465b}.prop-label{color:#66758b}.prop-label strong{color:#3b4960}
+.axis-field label,.select-control{background:#f8fafc;border-color:#dce4ed;color:#65758b}
+.axis-field input{color:#29384d}.axis-field.x label{border-color:#e2b8b9}.axis-field.y label{border-color:#b8d4b9}.axis-field.z label{border-color:#b7cce9}
+.range-val{color:#46556c}.range-line input[type=range]{accent-color:#8dbb35}
+.custom-color{border-color:#d2dbe7}
+.switch{background:#e1e6ed;border-color:#d0d8e3}.switch:after{background:#8997aa}
+.switch.on{background:#e4f1ce;border-color:#b9d88c}.switch.on:after{background:#83ad31}
+.inspector-note{border-color:#e0e6ee;background:#f7f9fc;color:#68778c}.inspector-note b{color:#37465c}
+.export-menu{background:#fff;border-color:#d8e1eb;box-shadow:0 12px 40px #20304a20}.export-option{color:#37465c}.export-option:hover{background:#f0f5e7;color:#52791b}.export-option small{color:#78869a}
+.toast{border-color:#c8dfa3;background:#f4fae9;color:#3f6416;box-shadow:0 12px 32px #28374a20}
+@media(max-width:920px){.side-scroll{background:#fff;border-color:#e1e7ef}.sidebar:after{color:#68778c}.sidebar:before{color:#526176}}
 </style>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}
@@ -39,12 +99,28 @@
       <button class="category-card" data-type="plane"><span class="cat-icon">✈</span><span><span class="cat-title">Aeronáutica</span><span class="cat-sub">Aviones y vehículos</span></span></button>
       <button class="category-card" data-type="rocket"><span class="cat-icon">♢</span><span><span class="cat-title">Espacial</span><span class="cat-sub">Cohetes y conceptos</span></span></button>
       <button class="category-card" data-type="chair"><span class="cat-icon">▤</span><span><span class="cat-title">Mobiliario</span><span class="cat-sub">Muebles y objetos</span></span></button>
+      <button class="category-card" data-type="car"><span class="cat-icon">🚘</span><span><span class="cat-title">Automoción</span><span class="cat-sub">Autos y transporte</span></span></button>
+      <button class="category-card" data-type="drone"><span class="cat-icon">✣</span><span><span class="cat-title">Robótica</span><span class="cat-sub">Drones y máquinas</span></span></button>
+      <button class="category-card" data-type="camera"><span class="cat-icon">▣</span><span><span class="cat-title">Fotografía</span><span class="cat-sub">Cámaras y equipo</span></span></button>
+      <button class="category-card" data-type="spaceship"><span class="cat-icon">✦</span><span><span class="cat-title">Naves</span><span class="cat-sub">Vehículos futuristas</span></span></button>
+      <button class="category-card" data-type="sofa"><span class="cat-icon">▰</span><span><span class="cat-title">Living</span><span class="cat-sub">Sofás y ambientes</span></span></button>
+      <button class="category-card" data-type="vase"><span class="cat-icon">♙</span><span><span class="cat-title">Decoración</span><span class="cat-sub">Jarrones y arte</span></span></button>
+      <button class="category-card" data-type="speaker"><span class="cat-icon">◉</span><span><span class="cat-title">Sonido</span><span class="cat-sub">Altavoces y equipos</span></span></button>
+      <button class="category-card" data-type="watch"><span class="cat-icon">◷</span><span><span class="cat-title">Wearables</span><span class="cat-sub">Relojes y accesorios</span></span></button>
     </div>
     <div class="section-title">Formas rápidas</div>
     <button class="nav-item" data-type="phone"><span class="nav-icon">▯</span> Smartphone</button>
     <button class="nav-item" data-type="lamp"><span class="nav-icon">♧</span> Lámpara de diseño</button>
     <button class="nav-item" data-type="bottle"><span class="nav-icon">♙</span> Botella</button>
     <button class="nav-item" data-type="table"><span class="nav-icon">▱</span> Mesa minimalista</button>
+    <button class="nav-item" data-type="car"><span class="nav-icon">🚘</span> Auto conceptual</button>
+    <button class="nav-item" data-type="drone"><span class="nav-icon">✣</span> Drone cuadricóptero</button>
+    <button class="nav-item" data-type="camera"><span class="nav-icon">▣</span> Cámara profesional</button>
+    <button class="nav-item" data-type="sofa"><span class="nav-icon">▰</span> Sofá modular</button>
+    <button class="nav-item" data-type="vase"><span class="nav-icon">♙</span> Jarrón decorativo</button>
+    <button class="nav-item" data-type="speaker"><span class="nav-icon">◉</span> Altavoz</button>
+    <button class="nav-item" data-type="watch"><span class="nav-icon">◷</span> Reloj inteligente</button>
+    <button class="nav-item" data-type="spaceship"><span class="nav-icon">✦</span> Nave futurista</button>
     <div class="side-tip"><div class="tip-top"><span class="tip-light"></span> Tu lienzo, tus reglas</div><p>Elegí una base, cambiá sus materiales y proporciones, y orbitá la cámara para verla desde cualquier ángulo.</p></div>
   </div>
   <div class="side-foot"><div class="avatar">N</div><div><div class="foot-name">Creative mode</div><div class="foot-status">Proyecto local</div></div><span class="foot-dot"></span></div>
@@ -118,7 +194,7 @@ const $ = (id) => document.getElementById(id);
 const canvas = $('viewport');
 const stage = $('canvasStage');
 const scene = new THREE.Scene();
-scene.background = new THREE.Color('#0c1420');
+scene.background = new THREE.Color('#eef2f7');
 const camera = new THREE.PerspectiveCamera(43, 1, 0.1, 400);
 camera.position.set(5.5, 4.2, 7.5);
 const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:false, preserveDrawingBuffer:true});
@@ -136,16 +212,16 @@ controls.minDistance = 2.1;
 controls.maxDistance = 22;
 controls.maxPolarAngle = Math.PI * .495;
 scene.add(new THREE.HemisphereLight(0xaec9ed, 0x202633, 2.0));
-const keyLight = new THREE.DirectionalLight(0xfff2d5, 3.1);
+const keyLight = new THREE.DirectionalLight(0xffffff, 3.25);
 keyLight.position.set(4, 8, 5); keyLight.castShadow = true;
 keyLight.shadow.mapSize.set(1024,1024); keyLight.shadow.camera.left=-8;keyLight.shadow.camera.right=8;keyLight.shadow.camera.top=8;keyLight.shadow.camera.bottom=-8;
 scene.add(keyLight);
-const fillLight = new THREE.DirectionalLight(0x789eff, 1.7); fillLight.position.set(-5,3,-4); scene.add(fillLight);
-const rimLight = new THREE.PointLight(0xc8ff57, 18, 10); rimLight.position.set(0,4,-3); scene.add(rimLight);
-const floorMat = new THREE.MeshStandardMaterial({color:0x121b29,roughness:.88,metalness:.05});
+const fillLight = new THREE.DirectionalLight(0xd7e5ff, 1.35); fillLight.position.set(-5,3,-4); scene.add(fillLight);
+const rimLight = new THREE.PointLight(0xc8ff57, 8, 10); rimLight.position.set(0,4,-3); scene.add(rimLight);
+const floorMat = new THREE.MeshStandardMaterial({color:0xf8fafc,roughness:.92,metalness:.02});
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(200,200), floorMat);
 floor.rotation.x=-Math.PI/2; floor.position.y=-.055; floor.receiveShadow=true; scene.add(floor);
-const grid = new THREE.GridHelper(24,48,0x40516a,0x263447); grid.position.y=-.045; scene.add(grid);
+const grid = new THREE.GridHelper(24,48,0xb8c4d4,0xe0e6ef); grid.position.y=-.045; scene.add(grid);
 const modelRoot = new THREE.Group(); scene.add(modelRoot);
 let designObjects = [];
 let selected = null;
@@ -173,7 +249,15 @@ const meta = {
   bottle:{name:'Botella de producto',icon:'♙',type:'PRODUCTO · ENVASE',tag:'Botella · Concepto A'},
   phone:{name:'Smartphone',icon:'▯',type:'TECNOLOGÍA · PRODUCTO',tag:'Smartphone · Concepto A'},
   cube:{name:'Forma cúbica',icon:'▣',type:'FORMA PRIMITIVA · 3D',tag:'Forma · Cubo'},
-  sphere:{name:'Forma esférica',icon:'◉',type:'FORMA PRIMITIVA · 3D',tag:'Forma · Esfera'}
+  sphere:{name:'Forma esférica',icon:'◉',type:'FORMA PRIMITIVA · 3D',tag:'Forma · Esfera'},
+  car:{name:'Auto conceptual',icon:'🚘',type:'TRANSPORTE · AUTOMOCIÓN',tag:'Auto · Concepto A'},
+  drone:{name:'Drone cuadricóptero',icon:'✣',type:'ROBÓTICA · VEHÍCULO',tag:'Drone · Concepto A'},
+  camera:{name:'Cámara profesional',icon:'▣',type:'FOTOGRAFÍA · PRODUCTO',tag:'Cámara · Concepto A'},
+  spaceship:{name:'Nave futurista',icon:'✦',type:'AEROESPACIAL · VEHÍCULO',tag:'Nave · Concepto A'},
+  sofa:{name:'Sofá modular',icon:'▰',type:'MOBILIARIO · INTERIOR',tag:'Sofá · Concepto A'},
+  vase:{name:'Jarrón de diseño',icon:'♙',type:'DECORACIÓN · OBJETO',tag:'Jarrón · Concepto A'},
+  speaker:{name:'Altavoz de diseño',icon:'◉',type:'AUDIO · ELECTRÓNICA',tag:'Altavoz · Concepto A'},
+  watch:{name:'Reloj inteligente',icon:'◷',type:'WEARABLE · PRODUCTO',tag:'Reloj · Concepto A'}
 };
 const materialSettings = {
   matte:{roughness:.82,metalness:.04},
@@ -306,6 +390,110 @@ function addPhone(g) {
   addMesh(g,new THREE.BoxGeometry(.16,.012,.012),'#c8ff57',[0,.19,.07],[1,1,1],[0,0,0],false);
   body.material.color.set(currentColor);
 }
+function addCar(g) {
+  const c=currentColor, dark='#283344', glass='#9cc6de';
+  box(g,c,[0,.43,0],[1.55,.38,2.35],true,{metalness:.35,roughness:.28});
+  addMesh(g,new THREE.BoxGeometry(1.12,.48,1.12),c,[0,.81,-.13],[1,1,1],[0,0,0],true,{metalness:.35,roughness:.28});
+  addMesh(g,new THREE.BoxGeometry(.98,.34,.025),glass,[0,.83,.445],[1,1,1],[-.24,0,0],false,{metalness:.25,roughness:.18});
+  addMesh(g,new THREE.BoxGeometry(.98,.3,.025),glass,[0,.83,-.7],[1,1,1],[.24,0,0],false,{metalness:.25,roughness:.18});
+  box(g,'#f2f0d8',[0,.47,1.19],[.8,.09,.025],false,{emissive:'#9b9b61',emissiveIntensity:.12});
+  box(g,'#f47767',[0,.47,-1.19],[.8,.08,.025],false,{emissive:'#aa3434',emissiveIntensity:.15});
+  [-1,1].forEach(x=>[-.72,.72].forEach(z=>{
+    cyl(g,dark,[x*.76,.31,z],[.2][0],[.2][0],.15,32,false,[0,0,Math.PI/2],{roughness:.8});
+    cyl(g,'#bcc7d3',[x*.76,.31,z],.105,.105,.158,32,false,[0,0,Math.PI/2],{metalness:.8,roughness:.22});
+    cyl(g,'#586779',[x*.76,.31,z],.035,.035,.163,16,false,[0,0,Math.PI/2]);
+  }));
+  box(g,dark,[0,.65,-.11],[.04,.035,.82],false);
+}
+function addDrone(g) {
+  const c=currentColor,dark='#293646';
+  box(g,c,[0,.72,0],[.46,.22,.48],true,{metalness:.45,roughness:.28});
+  addMesh(g,new THREE.SphereGeometry(.17,28,20),c,[0,.73,.18],[1,1,.8],[0,0,0],true);
+  for(const x of [-1,1]) for(const z of [-1,1]){
+    const arm=box(g,c,[x*.62,.72,z*.62],[.92,.075,.095],true,{metalness:.25,roughness:.35});
+    arm.rotation.y=x*z*.2;
+    cyl(g,dark,[x*.99,.77,z*.99],.045,.045,.19,24,false,[Math.PI/2,0,0]);
+    addMesh(g,new THREE.BoxGeometry(.65,.026,.08),c,[x*.99,.83,z*.99],[1,1,1],[0,x*z*.15,0],true);
+    box(g,'#dce6ef',[x*.99,.67,z*.99],[.13,.06,.13],false);
+  }
+  box(g,dark,[0,.48,.25],[.08,.38,.08],false);
+  addMesh(g,new THREE.SphereGeometry(.09,20,16),'#91c3dc',[0,.29,.25],[1,1,1],[0,0,0],false,{emissive:'#4589bd',emissiveIntensity:.4});
+}
+function addCamera(g) {
+  const c=currentColor,dark='#263242';
+  box(g,c,[0,.79,0],[1.22,.76,.52],true,{metalness:.42,roughness:.32});
+  box(g,c,[-.32,1.22,-.03],[.42,.15,.38],true);
+  box(g,'#e8edf4',[.42,1.2,.05],[.28,.08,.32],false);
+  cyl(g,dark,[0,.8,.31],.34,.34,.28,48,false,[Math.PI/2,0,0],{metalness:.52,roughness:.2});
+  cyl(g,'#718ba2',[0,.8,.46],.25,.25,.045,48,false,[Math.PI/2,0,0],{metalness:.68,roughness:.18});
+  cyl(g,'#172333',[0,.8,.49],.18,.18,.035,48,false,[Math.PI/2,0,0],{metalness:.25,roughness:.1});
+  cyl(g,'#5a89b4',[0,.8,.512],.085,.085,.012,32,false,[Math.PI/2,0,0],{metalness:.6,roughness:.12});
+  cyl(g,'#ef7c6e',[-.39,1.2,.14],.045,.045,.02,20,false,[Math.PI/2,0,0]);
+  box(g,dark,[0,.37,-.01],[.46,.1,.42],false);
+}
+function addSpaceship(g) {
+  const c=currentColor,dark='#293749';
+  addMesh(g,new THREE.ConeGeometry(.48,1.8,8),c,[0,.86,0],[1,1,1],[Math.PI/2,0,0],true,{metalness:.5,roughness:.3});
+  cyl(g,c,[0,.86,0],.39,.39,1.35,32,true,[Math.PI/2,0,0],{metalness:.42,roughness:.3});
+  box(g,c,[0,.66,.2],[1.8,.09,.68],true);
+  [-1,1].forEach(s=>{
+    addMesh(g,new THREE.ConeGeometry(.22,.8,5),c,[s*.65,.62,.23],[1,1,1],[0,0,s*-Math.PI/2],true);
+    cyl(g,dark,[s*.25,.72,-.48],.17,.17,.055,32,false,[Math.PI/2,0,0]);
+  });
+  cyl(g,'#a6d4e9',[0,.91,.405],.14,.14,.045,32,false,[Math.PI/2,0,0],{metalness:.55,roughness:.15});
+  cyl(g,'#ef9a61',[0,.07,0],.16,.22,.2,32,false);
+}
+function addSofa(g) {
+  const c=currentColor;
+  box(g,c,[0,.49,0],[2.05,.35,.88],true,{roughness:.85});
+  box(g,c,[0,.94,-.34],[2.05,.72,.2],true,{roughness:.85});
+  box(g,c,[-.91,.7,0],[.23,.52,.9],true,{roughness:.85});
+  box(g,c,[.91,.7,0],[.23,.52,.9],true,{roughness:.85});
+  [-.49,.49].forEach(x=>{
+    box(g,'#e3e8ee',[x,.71,.035],[.82,.12,.64],false,{roughness:.95});
+    box(g,'#edf0f4',[x,.94,-.19],[.82,.42,.12],false,{roughness:.95});
+    box(g,'#a2adba',[x,.97,-.116],[.65,.27,.035],false,{roughness:.95});
+  });
+  [-.78,.78].forEach(x=>[-.28,.28].forEach(z=>box(g,'#303b49',[x,.21,z],[.08,.42,.08],false)));
+}
+function addVase(g) {
+  const points=[
+    new THREE.Vector2(.18,0),new THREE.Vector2(.31,.06),new THREE.Vector2(.4,.25),
+    new THREE.Vector2(.42,.52),new THREE.Vector2(.32,.77),new THREE.Vector2(.19,.94),
+    new THREE.Vector2(.16,1.12),new THREE.Vector2(.19,1.18),new THREE.Vector2(.23,1.18),
+    new THREE.Vector2(.23,1.24),new THREE.Vector2(.15,1.24),new THREE.Vector2(.13,1.15),
+    new THREE.Vector2(.15,.98),new THREE.Vector2(.28,.75),new THREE.Vector2(.35,.52),
+    new THREE.Vector2(.33,.28),new THREE.Vector2(.25,.12),new THREE.Vector2(.18,.08)
+  ];
+  const mesh=addMesh(g,new THREE.LatheGeometry(points,64),currentColor,[0,.1,0],[1,1,1],[0,0,0],true,{roughness:.28,metalness:.3});
+  mesh.material.side=THREE.DoubleSide;
+  [-1,1].forEach(s=>{
+    tube(g,'#6c9272',[[0,1.18,0],[s*.08,1.5,0],[s*.16,1.78,.02]],.018,false);
+    addMesh(g,new THREE.SphereGeometry(.095,18,12),'#83a980',[s*.16,1.73,.02],[.6,1.8,.4],[0,0,s*.3],false);
+  });
+}
+function addSpeaker(g) {
+  const c=currentColor,dark='#263142';
+  box(g,c,[0,.82,0],[.92,1.58,.7],true,{metalness:.25,roughness:.48});
+  for(const [y,r] of [[1.2,.25],[.56,.16]]){
+    cyl(g,dark,[0,y,.37],r*.90,r*.90,.06,48,false,[Math.PI/2,0,0],{metalness:.45,roughness:.25});
+    cyl(g,'#9caab9',[0,y,.412],r*.73,r*.73,.025,48,false,[Math.PI/2,0,0],{metalness:.6,roughness:.25});
+    cyl(g,dark,[0,y,.431],r*.42,r*.42,.018,36,false,[Math.PI/2,0,0],{metalness:.35,roughness:.2});
+  }
+  box(g,'#e5ebf2',[0,1.56,.37],[.08,.025,.018],false);
+  box(g,'#e5ebf2',[0,.21,.37],[.08,.025,.018],false);
+}
+function addWatch(g) {
+  const c=currentColor,dark='#2a3546';
+  box(g,c,[0,.88,0],[.48,.73,.12],true,{metalness:.55,roughness:.24});
+  box(g,c,[0,1.43,0],[.3,.56,.12],true,{metalness:.45,roughness:.35});
+  box(g,c,[0,.33,0],[.3,.4,.12],true,{metalness:.45,roughness:.35});
+  box(g,dark,[0,.88,.071],[.38,.55,.02],false,{metalness:.25,roughness:.17});
+  addMesh(g,new THREE.BoxGeometry(.32,.49,.015),'#172232',[0,.88,.085],[1,1,1],[0,0,0],false,{metalness:.15,roughness:.1});
+  addMesh(g,new THREE.BoxGeometry(.21,.025,.015),'#b7e85b',[0,1.03,.096],[1,1,1],[0,0,0],false);
+  addMesh(g,new THREE.BoxGeometry(.13,.025,.015),'#d9e4ef',[0,.94,.096],[1,1,1],[0,0,0],false);
+  cyl(g,dark,[.27,.94,0],.045,.045,.12,16,false,[0,0,Math.PI/2]);
+}
 function addPrimitive(g,type) {
   if(type==='cube') addMesh(g,new THREE.BoxGeometry(1.4,1.4,1.4),currentColor,[0,.72,0],[1,1,1],[0,0,0],true,{metalness:.22,roughness:.32});
   if(type==='sphere') addMesh(g,new THREE.SphereGeometry(.83,64,48),currentColor,[0,.83,0],[1,1,1],[0,0,0],true,{metalness:.22,roughness:.25});
@@ -320,6 +508,14 @@ function build(type,g) {
   else if(type==='lamp') addLamp(g);
   else if(type==='bottle') addBottle(g);
   else if(type==='phone') addPhone(g);
+  else if(type==='car') addCar(g);
+  else if(type==='drone') addDrone(g);
+  else if(type==='camera') addCamera(g);
+  else if(type==='spaceship') addSpaceship(g);
+  else if(type==='sofa') addSofa(g);
+  else if(type==='vase') addVase(g);
+  else if(type==='speaker') addSpeaker(g);
+  else if(type==='watch') addWatch(g);
   else addPrimitive(g,type);
 }
 function applyPrimaryMaterial(root) {
@@ -550,6 +746,14 @@ function handlePrompt() {
   else if(/l[aá]mpara|lampara|luz|luminaria/.test(text))type='lamp';
   else if(/botella|envase|termo/.test(text))type='bottle';
   else if(/celular|tel[eé]fono|smartphone|m[oó]vil/.test(text))type='phone';
+  else if(/auto|coche|carro|autom[oó]vil|veh[ií]culo/.test(text))type='car';
+  else if(/drone|dron|cuadric[oó]ptero/.test(text))type='drone';
+  else if(/c[aá]mara|fotograf[ií]a/.test(text))type='camera';
+  else if(/nave|spaceship|ovni|platillo/.test(text))type='spaceship';
+  else if(/sof[aá]|sofa|living/.test(text))type='sofa';
+  else if(/jarr[oó]n|florero|vase/.test(text))type='vase';
+  else if(/altavoz|parlante|bocina|speaker/.test(text))type='speaker';
+  else if(/reloj|smartwatch|wearable/.test(text))type='watch';
   else if(/esfera|bola|sphere/.test(text))type='sphere';
   else if(/cubo|bloque|caja|cube/.test(text))type='cube';
   $('projectName').value=raw.length>42?raw.slice(0,42)+'…':raw.charAt(0).toUpperCase()+raw.slice(1);
@@ -606,7 +810,7 @@ $('resetTransform').addEventListener('click',()=>{
 });
 $('lightRange').addEventListener('input',e=>{
   if(e.target.dataset.historyStarted!=='1'){pushHistory();e.target.dataset.historyStarted='1';}
-  lightLevel=parseInt(e.target.value,10)/100;keyLight.intensity=3.1*lightLevel/.72;fillLight.intensity=1.7*lightLevel/.72;rimLight.intensity=18*lightLevel/.72;
+  lightLevel=parseInt(e.target.value,10)/100;keyLight.intensity=3.25*lightLevel/.72;fillLight.intensity=1.35*lightLevel/.72;rimLight.intensity=8*lightLevel/.72;
   $('lightValue').textContent=e.target.value+'%';$('lightReadout').textContent=e.target.value+'%';persist();
 });
 $('lightRange').addEventListener('change',e=>{e.target.dataset.historyStarted='0';});
