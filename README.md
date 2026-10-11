@@ -44,7 +44,12 @@ La biblioteca contiene productos, dispositivos, muebles, vehículos, formas org�
 - Acción «Centrar y apoyar en el suelo» para recentrar una pieza en X/Z y llevar la base a Y = 0.
 - La restauración de modelos guardados enfoca únicamente la pieza seleccionada, sin saltar a otra mientras se recuperan varios assets.
 
-### Fase 6 · Asistente de diseño e IA 3D — parcialmente implementada
+### Fase 6 · Productividad en la escena — implementada
+- Renombrar cada objeto para organizar composiciones grandes, con el nombre visible en la jerarquía y conservado en el proyecto.
+- Atajos: **Ctrl/Cmd + D** para duplicar, **F** para enfocar la pieza seleccionada, además de los atajos existentes para deshacer, rehacer y crear un proyecto.
+- Los atajos de edición no se disparan mientras el usuario escribe en campos de texto, número o listas desplegables.
+
+### Fase 7 · Asistente de diseño e IA 3D — parcialmente implementada
 El asistente procedural local reconoce familias de objetos y puede componer algunas escenas desde una descripción. Por ejemplo, «mansión con cuatro árboles y una fuente de mármol» crea un conjunto a partir de modelos disponibles. Esto funciona en la publicación estática sin una API externa.
 
 También está preparado el conector para generación real mediante el flujo de dos pasos de [Meshy Text-to-3D API](https://docs.meshy.ai/en/api/text-to-3d): primero genera geometría preliminar y luego crea el modelo texturizado con materiales PBR. El modelo final se importa al visor como GLB y se guarda en IndexedDB del navegador para poder recuperar la escena en ese mismo perfil del navegador. También podés importar archivos GLB de otros programas y abrir JSON guardados desde el menú de exportación.
