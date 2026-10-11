@@ -1,45 +1,47 @@
 # NEXO Studio
 
-Editor 3D en el navegador para explorar y personalizar conceptos de productos, interiores, formas orgánicas y estructuras arquitectónicas.
+Editor 3D en el navegador para explorar conceptos de productos, interiores, arquitectura y formas orgánicas.
 
-## Lo que ya está implementado
+## Funciones actuales
 
-- Interfaz clara y adaptable a pantallas pequeñas.
-- Visor 3D en tiempo real con órbita, zoom, enfoque y cuadrícula.
-- Modelos de partida para productos, mobiliario, vehículos y decoración.
-- Biblioteca arquitectónica: mansión de dos plantas, rascacielos con niveles y ventanas, castillo con torres cilíndricas y techos cónicos, villa moderna con grandes paños vidriados, pabellón con cúpula y puente arqueado.
-- Sólidos y formas menos cuadradas: toroide, cono, cilindro, cápsula, nudo toroidal y jarrón con geometría de revolución.
-- Detalles arquitectónicos procedurales como tejados a dos aguas, ventanas arqueadas, columnas, cúpulas, molduras, terrazas y escalones.
-- Ajustes de color, acabado, iluminación, escala, rotación y posición.
-- Duplicar, eliminar, deshacer y rehacer cambios básicos.
-- Guardado automático en el navegador.
-- Exportar modelo GLB, captura PNG y parámetros del proyecto JSON.
-- Campo de texto que interpreta términos de algunas categorías para crear una base aproximada.
-- Verificación de sintaxis JavaScript y despliegue automático con GitHub Actions.
+- Visor 3D con cámara orbital, zoom y enfoque del modelo.
+- Interfaz clara y adaptable.
+- Biblioteca de productos, muebles, vehículos, formas orgánicas y estructuras arquitectónicas: mansión, rascacielos, castillo, villa, pabellón, puente, arco, cúpula, escalera, columna, pirámide, árbol, roca y fuente, entre otras.
+- Acabados mate, satín, brillante y metálico.
+- **Texturas procedurales** generadas en el navegador: madera, mármol, hormigón, tela, metal rayado, fibra de carbono, terrazo, ladrillo, piedra natural y baldosas.
+- Mapas de color, rugosidad y relieve para dar más lectura a las superficies.
+- Ambiente de estudio para producir reflejos más naturales en metales y materiales brillantes.
+- Tres niveles de calidad gráfica: estándar, alta y ultra, con distintos límites de resolución y tamaño de sombras.
+- Escala de textura ajustable.
+- Ajustes de color, escala, rotación, posición e iluminación.
+- Duplicación, eliminación, deshacer y rehacer cambios básicos.
+- Guardado automático local, exportación GLB, captura PNG y parámetros JSON.
+- El campo de ideas reconoce nombres de modelos, algunos colores y varios materiales.
+- GitHub Actions comprueba la sintaxis JavaScript del módulo antes de la publicación.
 
-## Fases de desarrollo
+## Fases
 
-**Fase 1 · Editor base — implementada.** Visor 3D, cámara, materiales, iluminación, controles básicos y exportación.
+**Fase 1 · Editor base:** implementada.
 
-**Fase 2 · Volúmenes y arquitectura — implementada en esta versión.** Formas orgánicas y varios modelos grandes con geometrías compuestas, tejados, arcos, ventanas y cúpulas.
+**Fase 2 · Formas y arquitectura:** implementada como biblioteca de estructuras y componentes con geometría procedural.
 
-**Fase 3 · Composición de escenas — siguiente.** Añadir distintas piezas sin reemplazar el diseño actual, seleccionar objetos de una escena, agruparlos y moverlos de forma independiente.
+**Fase 3 · Composición de escenas:** siguiente. Permitir agregar varios objetos a una escena sin reemplazar lo que ya existe, seleccionarlos de forma independiente, agruparlos y moverlos por separado.
 
-**Fase 4 · Medidas y documentación — planificada.** Unidades reales, cotas, guías, vistas ortográficas y planos básicos. Para uso de construcción real hará falta validar los diseños con profesionales y herramientas adecuadas.
+**Fase 4 · Medidas y planos:** planificada. Incluir unidades reales, cotas, guías y vistas ortográficas.
 
-**Fase 5 · Generación 3D con IA — planificada.** Conectar un servicio de generación de modelos desde descripciones o referencias. La integración debe hacerse en un backend seguro y no debe exponer claves de API en el navegador.
+**Fase 5 · IA generativa:** planificada. La generación arbitraria de modelos desde texto requiere conectar un servicio de IA 3D a un backend seguro; la función actual elige un modelo base a partir de palabras clave.
 
 ## Publicar
 
 1. Abrí [Settings → Pages](https://github.com/gomeza2/Juego/settings/pages).
-2. En **Build and deployment → Source**, seleccioná **GitHub Actions** y guardá. Es la configuración inicial de GitHub Pages.
-3. Abrí [Actions](https://github.com/gomeza2/Juego/actions) y revisá el flujo **Deploy NEXO Studio to GitHub Pages**.
-4. Cuando el flujo termine en verde, abrí https://gomeza2.github.io/Juego/
+2. En **Build and deployment → Source**, elegí **GitHub Actions** si todavía no está seleccionado.
+3. Revisá el flujo [Actions](https://github.com/gomeza2/Juego/actions).
+4. Cuando el despliegue termine correctamente, abrí https://gomeza2.github.io/Juego/
 
-## Alcance actual
+## Alcance y rendimiento
 
-Los modelos son geometría procedural de partida, personalizable y exportable; no son planos de obra certificados. El texto elige un modelo base mediante palabras clave, no es todavía un generador que construya cualquier objeto mediante IA. Las piezas dentro de cada estructura arquitectónica son actualmente parte de un modelo agrupado; la composición libre entre modelos distintos está contemplada para la fase 3.
+Las texturas se generan dentro del navegador, no se descargan imágenes de material. La opción Ultra aumenta la resolución de salida y de las sombras, por lo que puede requerir más memoria y potencia gráfica. Los modelos arquitectónicos son conceptos visuales y no planos certificados para construcción.
 
 ## Tecnología
 
-HTML, CSS, JavaScript y Three.js 0.169.0. Three.js y la tipografía se cargan desde CDNs, por lo que se necesita conexión a internet para iniciar el editor.
+HTML, CSS, JavaScript y Three.js 0.169.0, con OrbitControls, GLTFExporter y RoomEnvironment. Three.js y la tipografía se cargan desde CDN, así que se necesita conexión a internet.
