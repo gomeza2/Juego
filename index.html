@@ -326,17 +326,18 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
     <button class="nav-item" data-type="star"><span class="nav-icon">✦</span> Estrella sólida</button>
     <button class="nav-item" data-type="octahedron"><span class="nav-icon">◇</span> Octaedro facetado</button>
     <div class="phase-board">
-      <div class="phase-board-title">FASES DE DESARROLLO <span>09–10 / 10</span></div>
+      <div class="phase-board-title">FASES DE DESARROLLO <span>10–11 / 11</span></div>
       <div class="phase-row done"><span class="phase-num">✓</span><div><b>01 · Editor base</b><small>Visor, materiales y exportación</small></div></div>
       <div class="phase-row done"><span class="phase-num">✓</span><div><b>02 · Formas y gráficos</b><small>Geometría, texturas y calidad</small></div></div>
       <div class="phase-row done"><span class="phase-num">✓</span><div><b>03 · Composición</b><small>Escenas, jerarquía y grupos</small></div></div>
       <div class="phase-row done"><span class="phase-num">✓</span><div><b>04 · Medidas y planos</b><small>Unidades, cotas y vistas ortográficas</small></div></div>
       <div class="phase-row done"><span class="phase-num">✓</span><div><b>05 · Arquitectura</b><small>Paredes, pisos, puertas y ventanas</small></div></div>
       <div class="phase-row done"><span class="phase-num">✓</span><div><b>06 · Diseño paramétrico</b><small>Medidas editables y escenas JSON</small></div></div>
-      <div class="phase-row done"><span class="phase-num">✓</span><div><b>07 · Sólidos nuevos</b><small>Engranajes, tubos, rampas y prismas</small></div></div>
+      <div class="phase-row done"><span class="phase-num">✓</span><div><b>07 · Biblioteca geométrica</b><small>Prismas, engranajes, tubos y rampas</small></div></div>
       <div class="phase-row done"><span class="phase-num">✓</span><div><b>08 · Lienzo vacío</b><small>Crear desde cero y añadir por separado</small></div></div>
-      <div class="phase-row done"><span class="phase-num">✓</span><div><b>09 · Constructor local</b><small>Varios objetos, cantidades y medidas</small></div></div>
-      <div class="phase-row current"><span class="phase-num">10</span><div><b>10 · IA generativa</b><small>El proveedor externo requiere configurar el servidor</small></div></div>
+      <div class="phase-row done"><span class="phase-num">✓</span><div><b>09 · Constructor local</b><small>Descripciones, cantidades y materiales</small></div></div>
+      <div class="phase-row done"><span class="phase-num">✓</span><div><b>10 · Modelado editable</b><small>Escala XYZ, bisel, polígonos y aberturas</small></div></div>
+      <div class="phase-row current"><span class="phase-num">11</span><div><b>11 · IA generativa</b><small>El proveedor externo requiere configurar el servidor</small></div></div>
     </div>
     <div class="side-tip"><div class="tip-top"><span class="tip-light"></span> Tu lienzo, tus reglas</div><p>Elegí una base, cambiá sus materiales y proporciones, y orbitá la cámara para verla desde cualquier ángulo.</p></div>
   </div>
@@ -2941,7 +2942,16 @@ sidebar.addEventListener('click',e=>{if(window.innerWidth<=920 && !e.target.clos
 let restored=false;
 try {
   const stored=localStorage.getItem('nexo-studio-project');
-  if(stored){const s=JSON.parse(stored);if(s&&s.type&&(meta[s.type]||s.type==='blank')){currentColor=s.color||'#c8ff57';currentMaterial=s.material||'matte';applySnapshot(s);restored=true;}}
+  if(stored){
+    const s=JSON.parse(stored);
+    const legacyStarter=s?.type==='headphones'&&s.name==='Concepto sin título'&&Array.isArray(s.objects)&&s.objects.length===1&&s.objects[0]?.type==='headphones'&&s.objects[0]?.name==='Auriculares conceptuales';
+    if(legacyStarter){
+      startBlankProject({skipHistory:true,notify:false});
+      restored=true;
+    }else if(s&&s.type&&(meta[s.type]||s.type==='blank')){
+      currentColor=s.color||'#c8ff57';currentMaterial=s.material||'matte';applySnapshot(s);restored=true;
+    }
+  }
 } catch(e) {console.warn('No se pudo restaurar el proyecto local.',e);}
 if(!restored)startBlankProject({skipHistory:true,notify:false});
 $('gridBtn').classList.toggle('active',gridEnabled);$('snapBtn').classList.toggle('active',snapEnabled);
