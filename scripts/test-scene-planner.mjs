@@ -38,4 +38,14 @@ assert.ok(Math.abs(windowSize[0] - 1.2) < 1e-9, 'Window width conversion');
 assert.ok(Math.abs(windowSize[1] - 0.9) < 1e-9, 'Window height conversion');
 
 assert.equal(p.parsePromptCount('', 'cubos'), 2, 'Plural with no quantity should make two objects');
-console.log('Scene planner tests passed: counts, object-specific colors/textures and metric dimensions.');
+
+const disk = p.promptEntityCatalog.find(item => item.type === 'disk');
+const triangle = p.promptEntityCatalog.find(item => item.type === 'triangle');
+assert.ok(disk && triangle, 'Flat and extruded shape aliases should exist');
+const geometryPrompt = p.normalizePrompt('2 círculos y un triángulo');
+assert.equal(p.countPromptEntities(geometryPrompt, disk.aliases), 2, 'Circle aliases should resolve');
+assert.equal(p.countPromptEntities(geometryPrompt, triangle.aliases), 1, 'Triangle aliases should resolve');
+assert.equal(p.detectPromptType('un triángulo extruido'), 'triangle', 'Triangle prompt should pick geometry');
+assert.equal(p.detectPromptType('círculo'), 'disk', 'Circle prompt should pick disk geometry');
+assert.equal(p.detectPromptType('espacio interior abierto'), 'space', 'Interior prompt should pick open room geometry');
+console.log('Scene planner tests passed: object counts, per-object colors/textures, dimensions and new modeling shapes.');
