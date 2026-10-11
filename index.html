@@ -1196,7 +1196,7 @@ function addParametricArchitecturalPiece(type,g) {
   const w=Math.max(.02,dims[0]),h=Math.max(.02,dims[1]),d=Math.max(.02,dims[2]);
   if(type==='wall'){
     box(g,currentColor,[0,h/2,0],[w,h,d],true,{roughness:.76,metalness:.02});
-    box(g,'#eef0f2',[0,h-.025,0],[w+.015,.05,d+.015],false,{roughness:.68});
+    box(g,'#eef0f2',[0,h-.025,0],[w,.05,d],false,{roughness:.68});
     return;
   }
   if(type==='floor'){
@@ -1213,7 +1213,7 @@ function addParametricArchitecturalPiece(type,g) {
     box(g,currentColor,[0,leafH/2,-d*.08],[leafW,leafH,Math.max(.025,d*.72)],true,{roughness:.6});
     const panelW=leafW*.68,panelH=leafH*.72;
     box(g,'#d4d9df',[0,h*.56,d*.22],[panelW,panelH,Math.max(.018,d*.12)],false,{roughness:.64});
-    cyl(g,'#c5a56a',[leafW*.36,Math.min(h*.5,h-.12),d*.48],.035,.035,.025,14,false,[Math.PI/2,0,0],{metalness:.72,roughness:.25});
+    cyl(g,'#c5a56a',[leafW*.36,Math.min(h*.5,h-.12),d*.38],.035,.035,.025,14,false,[Math.PI/2,0,0],{metalness:.72,roughness:.25});
     return;
   }
   if(type==='window'){
