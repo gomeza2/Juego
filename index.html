@@ -305,12 +305,17 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
     <button class="nav-item" data-type="wedge"><span class="nav-icon">◢</span> Cuña / rampa</button>
     <button class="nav-item" data-type="pipe"><span class="nav-icon">◎</span> Tubo hueco</button>
     <div class="phase-board">
-      <div class="phase-board-title">FASES DE DESARROLLO <span>03–04 / 05</span></div>
+      <div class="phase-board-title">FASES DE DESARROLLO <span>09–10 / 10</span></div>
       <div class="phase-row done"><span class="phase-num">✓</span><div><b>01 · Editor base</b><small>Visor, materiales y exportación</small></div></div>
       <div class="phase-row done"><span class="phase-num">✓</span><div><b>02 · Formas y gráficos</b><small>Geometría, texturas y calidad</small></div></div>
       <div class="phase-row done"><span class="phase-num">✓</span><div><b>03 · Composición</b><small>Escenas, jerarquía y grupos</small></div></div>
       <div class="phase-row done"><span class="phase-num">✓</span><div><b>04 · Medidas y planos</b><small>Unidades, cotas y vistas ortográficas</small></div></div>
-      <div class="phase-row current"><span class="phase-num">05</span><div><b>05 · Asistente 3D</b><small>Composición procedural; API IA externa pendiente</small></div></div>
+      <div class="phase-row done"><span class="phase-num">✓</span><div><b>05 · Arquitectura</b><small>Paredes, pisos, puertas y ventanas</small></div></div>
+      <div class="phase-row done"><span class="phase-num">✓</span><div><b>06 · Diseño paramétrico</b><small>Medidas editables y escenas JSON</small></div></div>
+      <div class="phase-row done"><span class="phase-num">✓</span><div><b>07 · Sólidos nuevos</b><small>Engranajes, tubos, rampas y prismas</small></div></div>
+      <div class="phase-row done"><span class="phase-num">✓</span><div><b>08 · Lienzo vacío</b><small>Crear desde cero y añadir por separado</small></div></div>
+      <div class="phase-row done"><span class="phase-num">✓</span><div><b>09 · Constructor local</b><small>Varios objetos, cantidades y medidas</small></div></div>
+      <div class="phase-row current"><span class="phase-num">10</span><div><b>10 · IA generativa</b><small>El proveedor externo requiere configurar el servidor</small></div></div>
     </div>
     <div class="side-tip"><div class="tip-top"><span class="tip-light"></span> Tu lienzo, tus reglas</div><p>Elegí una base, cambiá sus materiales y proporciones, y orbitá la cámara para verla desde cualquier ángulo.</p></div>
   </div>
@@ -2177,16 +2182,43 @@ function promptArchitecturalSize(type,text) {
   return base.map(v=>Math.max(.02,Math.min(200,v)));
 }
 function promptColor(text) {
-  if(/\b(rojo|roja|coral|naranja)\b/.test(text))return '#f28b72';
-  if(/\b(azul|azulada|azulado|celeste)\b/.test(text))return '#82a9ff';
-  if(/\b(violeta|lila|lavanda|purpura)\b/.test(text))return '#c79cff';
-  if(/\b(blanco|blanca|hielo|marfil)\b/.test(text))return '#e8edf5';
-  if(/\b(negro|negra|grafito|oscuro)\b/.test(text))return '#242b38';
-  if(/\b(verde|lima)\b/.test(text))return '#c8ff57';
-  if(/\b(madera clara|roble|beige|arena|marron|marron claro)\b/.test(text))return '#c3a982';
-  if(/\b(concreto|cemento|gris|hormigon)\b/.test(text))return '#a0a6ad';
-  if(/\b(dorado|dorada|oro)\b/.test(text))return '#d6b45c';
+  if(/\b(rojo|roja|rojos|rojas|coral|naranja|naranjas)\b/.test(text))return '#f28b72';
+  if(/\b(azul|azulada|azulado|azules|celeste|celestes)\b/.test(text))return '#82a9ff';
+  if(/\b(violeta|lila|lavanda|purpura|purpuras)\b/.test(text))return '#c79cff';
+  if(/\b(blanco|blanca|blancos|blancas|hielo|marfil)\b/.test(text))return '#e8edf5';
+  if(/\b(negro|negra|negros|negras|grafito|oscuro|oscuros)\b/.test(text))return '#242b38';
+  if(/\b(verde|verdes|lima)\b/.test(text))return '#78a969';
+  if(/\b(amarillo|amarilla|amarillos|amarillas)\b/.test(text))return '#e6bf50';
+  if(/\b(madera clara|roble|beige|arena|marron|marrones|marron claro)\b/.test(text))return '#c3a982';
+  if(/\b(concreto|cemento|gris|grises|hormigon)\b/.test(text))return '#a0a6ad';
+  if(/\b(dorado|dorada|dorados|doradas|oro)\b/.test(text))return '#d6b45c';
   return '#c8ff57';
+}
+function promptFinish(text) {
+  if(/\b(metalico|metalica|metalicos|metalicas|metal|acero|cromo|aluminio)\b/.test(text))return 'metal';
+  if(/\b(brillante|brillantes|pulido|pulida|pulidos|pulidas|glossy)\b/.test(text))return 'glossy';
+  if(/\b(satin|saten|satinado|satinada)\b/.test(text))return 'satin';
+  return 'matte';
+}
+function promptColorForEntity(text,aliases,fallback) {
+  const colors=[
+    ['rojo|roja|rojos|rojas|coral|naranja|naranjas','#f28b72'],
+    ['azul|azulada|azulado|azules|celeste|celestes','#82a9ff'],
+    ['violeta|lila|lavanda|purpura','#c79cff'],
+    ['blanco|blanca|blancos|blancas|hielo|marfil','#e8edf5'],
+    ['negro|negra|negros|negras|grafito|oscuro|oscuros','#242b38'],
+    ['verde|verdes|lima','#78a969'],
+    ['amarillo|amarilla|amarillos|amarillas','#e6bf50'],
+    ['marron|marrones|roble|beige|arena','#c3a982'],
+    ['gris|grises|cemento|hormigon','#a0a6ad'],
+    ['dorado|dorada|dorados|doradas|oro','#d6b45c']
+  ];
+  for(const item of colors){
+    const before=new RegExp('(?:\\b\\d+\\s+)?(?:'+aliases+')\\s+(?:de\\s+)?(?:muy\\s+)?(?:'+item[0]+')\\b');
+    const after=new RegExp('(?:\\b\\d+\\s+)?(?:'+item[0]+')\\s+(?:'+aliases+')\\b');
+    if(before.test(text)||after.test(text))return item[1];
+  }
+  return fallback;
 }
 function promptTexture(text) {
   if(/madera|roble|parquet|wood/.test(text))return 'wood';
@@ -2221,25 +2253,27 @@ function handlePrompt() {
   const raw=$('promptInput').value.trim();
   if(!raw){$('promptInput').focus();toast('Describí qué querés construir. Podés pedir varios objetos y medidas.');return;}
   const text=normalizePrompt(raw);
-  const pickedColor=promptColor(text),pickedTexture=promptTexture(text);
-  const explicitColor=/\b(rojo|roja|coral|naranja|azul|azulada|azulado|celeste|violeta|lila|lavanda|purpura|blanco|blanca|hielo|marfil|negro|negra|grafito|oscuro|verde|lima|madera clara|roble|beige|arena|marron|gris|concreto|cemento|dorado|dorada|oro)\b/.test(text);
+  const pickedColor=promptColor(text),pickedTexture=promptTexture(text),pickedFinish=promptFinish(text);
+  const explicitColor=/\b(rojo|roja|rojos|rojas|coral|naranja|naranjas|azul|azulada|azulado|azules|celeste|celestes|violeta|lila|lavanda|purpura|blanco|blanca|blancos|blancas|hielo|marfil|negro|negra|negros|negras|grafito|oscuro|oscuros|verde|verdes|lima|amarillo|amarilla|amarillos|amarillas|madera clara|roble|beige|arena|marron|marrones|gris|grises|concreto|cemento|dorado|dorada|oro)\b/.test(text);
   const explicitTexture=pickedTexture!==null;
   const hasBuilding=/\b(casa|mansion|residencia|palacete|rascacielos|edificio|torre de oficinas|castillo|villa|pabellon|puente|habitacion|dormitorio|salon|living|cocina|interior|hogar)\b/.test(text);
   const primaryType=detectPromptType(text);
   const entities=promptEntityCatalog.map(spec=>({...spec,count:countPromptEntities(text,spec.aliases,spec.type==='tree'?16:24)})).filter(spec=>spec.count>0);
   architecturalFloors=THREE.MathUtils.clamp(parseInt(text.match(/\b(\d{1,2})\s*(?:pisos?|plantas?|niveles?)\b/)?.[1]||'10',10),3,40);
-  $('projectName').value=raw.length>50?raw.slice(0,50)+'…':raw.charAt(0).toUpperCase()+raw.slice(1);
   pushHistory();
+  $('projectName').value=raw.length>50?raw.slice(0,50)+'…':raw.charAt(0).toUpperCase()+raw.slice(1);
   const keepExisting=addMode&&designObjects.length>0;
+  currentMaterial=pickedFinish;
   if(!addMode)clearModels();
   const origin=keepExisting?placementOffsets[designObjects.length%placementOffsets.length]:[0,0,0];
   const created=[];
   const makePiece=(type,position,name,instance=0)=>{
-    let color=explicitColor?pickedColor:promptDefaultColor(type);
-    if(type==='tree'&&!explicitColor&&/autumn|otono/.test(text))color='#d28a4b';
+    const color=explicitColor?promptColorForEntity(text,promptEntityCatalog.find(item=>item.type===type)?.aliases||type,pickedColor):promptDefaultColor(type);
+    if(type==='tree'&&!explicitColor&&/autumn|otono/.test(text))currentColor='#d28a4b';
+    else currentColor=color;
     let texture=explicitTexture?pickedTexture:promptDefaultTexture(type);
     if(type==='tree'||type==='window'||type==='gear'||type==='pipe')texture=explicitTexture?pickedTexture:'none';
-    currentColor=color;currentTexture=texture;
+    currentTexture=texture;
     const options={keepScene:true,skipHistory:true,position,name,focus:false};
     if(architecturalSizeTypes.has(type))options.archSize=promptArchitecturalSize(type,text);
     const root=createDesign(type,options);
