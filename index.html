@@ -344,6 +344,10 @@ const floor = new THREE.Mesh(new THREE.PlaneGeometry(200,200), floorMat);
 floor.rotation.x=-Math.PI/2; floor.position.y=-.055; floor.receiveShadow=true; scene.add(floor);
 const grid = new THREE.GridHelper(24,48,0xb8c4d4,0xe0e6ef); grid.position.y=-.045; scene.add(grid);
 const modelRoot = new THREE.Group(); scene.add(modelRoot);
+const dimensionGuideGroup = new THREE.Group();scene.add(dimensionGuideGroup);
+const dimensionAnchors = [];
+const groupSelection = new Set();
+const unitFactors = {m:1,cm:100,mm:1000,ft:3.28084};
 let designObjects = [];
 let selected = null;
 let addMode = false;
@@ -1234,6 +1238,75 @@ function makeHelper() {
   selectionHelper=new THREE.BoxHelper(selected,0xc8ff57);
   selectionHelper.material.transparent=true; selectionHelper.material.opacity=.7; selectionHelper.material.depthTest=false;
   scene.add(selectionHelper);
+}
+function formatDimension(value) {
+  const factor=unitFactors[unitSystem]||1;
+  const shown=Math.abs(value*factor);
+  const digits=unitSystem==='mm'?0:unitSystem==='cm'?1:2;
+  return shown.toFixed(digits)+' '+unitSystem;
+}
+function addDimensionLine(a,b,color) {
+  const geometry=new THREE.BufferGeometry().setFromPoints([a,b]);
+  const line=new THREE.Line(geometry,new THREE.LineBasicMaterial({color,depthTest:false,transparent:true,opacity:.88}));
+  line.renderOrder=999;dimensionGuideGroup.add(line);
+}
+function updateDimensions() {
+  const overlay=$('dimensionOverlay');
+  clearDimensionHelpers();
+  if(!selected){
+    if(overlay)overlay.classList.remove('active');
+    $('measureWidth').textContent='—';$('measureHeight').textContent='—';$('measureDepth').textContent='—';
+    return;
+  }
+  const bounds=new THREE.Box3().setFromObject(selected);
+  if(bounds.isEmpty()){
+    if(overlay)overlay.classList.remove('active');
+    $('measureWidth').textContent='—';$('measureHeight').textContent='—';$('measureDepth').textContent='—';
+    return;
+  }
+  const size=bounds.getSize(new THREE.Vector3());
+  $('measureWidth').textContent=formatDimension(size.x);
+  $('measureHeight').textContent=formatDimension(size.y);
+  $('measureDepth').textContent=formatDimension(size.z);
+  $('measureNote').textContent='Volumen envolvente · unidad base: metro · vista: '+({perspective:'perspectiva',top:'superior',front:'frontal',side:'lateral'}[activeView]||'perspectiva')+'.';
+  if(!showDimensions){
+    if(overlay)overlay.classList.remove('active');
+    return;
+  }
+  overlay.classList.add('active');
+  const sizeMax=Math.max(size.x,size.y,size.z,1);
+  const lift=sizeMax*.12,side=sizeMax*.14;
+  const x1=new THREE.Vector3(bounds.min.x,bounds.min.y-lift,bounds.max.z+side);
+  const x2=new THREE.Vector3(bounds.max.x,bounds.min.y-lift,bounds.max.z+side);
+  const xExt1=new THREE.Vector3(bounds.min.x,bounds.min.y,bounds.max.z);
+  const xExt2=new THREE.Vector3(bounds.max.x,bounds.min.y,bounds.max.z);
+  addDimensionLine(x1,x2,0x377fe8);addDimensionLine(x1,xExt1,0x377fe8);addDimensionLine(x2,xExt2,0x377fe8);
+  const y1=new THREE.Vector3(bounds.max.x+side,bounds.min.y,bounds.min.z);
+  const y2=new THREE.Vector3(bounds.max.x+side,bounds.max.y,bounds.min.z);
+  const yExt1=new THREE.Vector3(bounds.max.x,bounds.min.y,bounds.min.z);
+  const yExt2=new THREE.Vector3(bounds.max.x,bounds.max.y,bounds.min.z);
+  addDimensionLine(y1,y2,0x29945a);addDimensionLine(y1,yExt1,0x29945a);addDimensionLine(y2,yExt2,0x29945a);
+  const z1=new THREE.Vector3(bounds.min.x-side,bounds.min.y-lift,bounds.min.z);
+  const z2=new THREE.Vector3(bounds.min.x-side,bounds.min.y-lift,bounds.max.z);
+  const zExt1=new THREE.Vector3(bounds.min.x,bounds.min.y,bounds.min.z);
+  const zExt2=new THREE.Vector3(bounds.min.x,bounds.min.y,bounds.max.z);
+  addDimensionLine(z1,z2,0xe37b62);addDimensionLine(z1,zExt1,0xe37b62);addDimensionLine(z2,zExt2,0xe37b62);
+  dimensionAnchors.push({id:'dimX',position:x1.clone().add(x2).multiplyScalar(.5),text:'X · '+formatDimension(size.x)});
+  dimensionAnchors.push({id:'dimY',position:y1.clone().add(y2).multiplyScalar(.5),text:'Y · '+formatDimension(size.y)});
+  dimensionAnchors.push({id:'dimZ',position:z1.clone().add(z2).multiplyScalar(.5),text:'Z · '+formatDimension(size.z)});
+  updateDimensionScreenPositions();
+}
+function updateDimensionScreenPositions() {
+  if(!showDimensions||!selected)return;
+  const w=stage.clientWidth,h=stage.clientHeight;
+  for(const anchor of dimensionAnchors){
+    const el=$(anchor.id);if(!el)continue;
+    el.textContent=anchor.text;
+    const p=anchor.position.clone().project(camera);
+    const x=(p.x*.5+.5)*w,y=(-p.y*.5+.5)*h;
+    el.style.left=x+'px';el.style.top=y+'px';
+    el.style.visibility=p.z>-1&&p.z<1&&x>-50&&x<w+50&&y>-30&&y<h+30?'visible':'hidden';
+  }
 }
 function renderSceneList() {
   const list=$('sceneObjectList');if(!list)return;
