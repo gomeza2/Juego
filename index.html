@@ -1402,7 +1402,7 @@ function serializeSceneNode(node) {
     position:[node.position.x,node.position.y,node.position.z],
     scale:[node.scale.x,node.scale.y,node.scale.z],
     rotation:[node.rotation.x,node.rotation.y,node.rotation.z],
-    visible:node.visible,style:node.userData.style||null,
+    visible:node.visible,style:node.userData.style||null,assetKey:node.userData.assetKey||null,
     children:childRoots
   };
 }
@@ -1423,6 +1423,9 @@ function restoreSceneNode(data,parent=modelRoot) {
   parent.add(root);
   if(isGroup){
     for(const childData of data.children||[])restoreSceneNode(childData,root);
+  }else if(type==='generated'){
+    if(data.assetKey)restoreGeneratedAsset(root,data.assetKey);
+    else toast('Este JSON referencia un modelo IA que no está guardado en este navegador. Exportá el proyecto como GLB para transportarlo.');
   }else{
     build(type,root);applyPrimaryMaterial(root);
   }
@@ -1768,31 +1771,76 @@ async function pollAIGeneration(taskId,label) {
   }
   throw new Error('La generación tardó más de lo esperado. Volvé a intentar más tarde; la tarea puede seguir disponible en el proveedor.');
 }
-function addGeneratedModel(gltf,prompt) {
+function openAssetDatabase() {
+  return new Promise((resolve,reject)=>{
+    if(!window.indexedDB){reject(new Error('Este navegador no permite guardar modelos IA localmente.'));return;}
+    const request=indexedDB.open('nexo-studio-assets',1);
+    request.onupgradeneeded=()=>{const db=request.result;if(!db.objectStoreNames.contains('models'))db.createObjectStore('models');};
+    request.onsuccess=()=>resolve(request.result);
+    request.onerror=()=>reject(request.error||new Error('No se pudo abrir el almacenamiento local.'));
+  });
+}
+async function storeGeneratedAsset(key,blob) {
+  const db=await openAssetDatabase();
+  try{
+    await new Promise((resolve,reject)=>{
+      const tx=db.transaction('models','readwrite');
+      tx.objectStore('models').put(blob,key);
+      tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error||new Error('No se pudo guardar el modelo IA.'));
+      tx.onabort=()=>reject(tx.error||new Error('Se canceló el guardado del modelo IA.'));
+    });
+  }finally{db.close();}
+}
+async function loadGeneratedAsset(key) {
+  const db=await openAssetDatabase();
+  try{
+    return await new Promise((resolve,reject)=>{
+      const tx=db.transaction('models','readonly'),request=tx.objectStore('models').get(key);
+      request.onsuccess=()=>resolve(request.result||null);
+      request.onerror=()=>reject(request.error||new Error('No se pudo leer el modelo IA guardado.'));
+    });
+  }finally{db.close();}
+}
+function attachGeneratedGLTF(root,gltf) {
+  const object=gltf.scene||gltf.scenes?.[0];
+  if(!object)throw new Error('El archivo generado no contiene una escena 3D.');
+  const bounds=new THREE.Box3().setFromObject(object);
+  if(bounds.isEmpty())throw new Error('El modelo generado no contiene geometría visible.');
+  const size=bounds.getSize(new THREE.Vector3()),center=bounds.getCenter(new THREE.Vector3());
+  const scale=2.8/Math.max(size.x,size.y,size.z,.001);
+  object.scale.multiplyScalar(scale);
+  object.position.x-=center.x*scale;object.position.y-=bounds.min.y*scale;object.position.z-=center.z*scale;
+  object.traverse(mesh=>{
+    if(mesh.isMesh){
+      mesh.userData.generatedMesh=true;mesh.castShadow=true;mesh.receiveShadow=true;
+      const mats=Array.isArray(mesh.material)?mesh.material:[mesh.material];mats.forEach(m=>{if(m)m.needsUpdate=true;});
+    }
+  });
+  root.add(object);
+}
+async function restoreGeneratedAsset(root,key) {
+  try{
+    const blob=await loadGeneratedAsset(key);
+    if(!blob){toast('No se encontró el archivo local del modelo IA. Exportá una copia GLB antes de cambiar de navegador.');return;}
+    const bytes=await blob.arrayBuffer(),loader=new GLTFLoader();
+    const gltf=await new Promise((resolve,reject)=>loader.parse(bytes,'',resolve,reject));
+    if(!root.parent)return;
+    attachGeneratedGLTF(root,gltf);
+    if(root===selected){if(selectionHelper)selectionHelper.update();updateDimensions();focusModel();}
+    persist();
+  }catch(error){console.warn('Could not restore generated asset:',error);toast('No se pudo restaurar un modelo IA guardado.');}
+}
+async function addGeneratedModel(gltf,prompt,bytes) {
   pushHistory();
   if(!addMode)clearModels();
   const root=new THREE.Group();
   root.name=prompt.length>42?prompt.slice(0,42)+'…':prompt;
   root.userData.designRoot=true;root.userData.designType='generated';root.userData.generated=true;
   root.userData.style=styleSnapshot();
-  const object=gltf.scene||gltf.scenes?.[0];
-  if(!object)throw new Error('El archivo generado no contiene una escena 3D.');
-  const bounds=new THREE.Box3().setFromObject(object);
-  if(bounds.isEmpty())throw new Error('El modelo generado no contiene geometría visible.');
-  const size=bounds.getSize(new THREE.Vector3()),center=bounds.getCenter(new THREE.Vector3());
-  const longest=Math.max(size.x,size.y,size.z,.001),scale=2.8/longest;
-  object.scale.multiplyScalar(scale);
-  object.position.x-=center.x*scale;
-  object.position.y-=bounds.min.y*scale;
-  object.position.z-=center.z*scale;
-  object.traverse(mesh=>{
-    if(mesh.isMesh){
-      mesh.userData.generatedMesh=true;mesh.castShadow=true;mesh.receiveShadow=true;
-      const mats=Array.isArray(mesh.material)?mesh.material:[mesh.material];
-      mats.forEach(m=>{if(m)m.needsUpdate=true;});
-    }
-  });
-  root.add(object);modelRoot.add(root);
+  root.userData.assetKey='ai-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9);
+  try{await storeGeneratedAsset(root.userData.assetKey,new Blob([bytes],{type:'model/gltf-binary'}));}
+  catch(error){console.warn('Generated model could not be cached locally:',error);root.userData.assetKey=null;}
+  attachGeneratedGLTF(root,gltf);modelRoot.add(root);
   if(addMode&&designObjects.length>0){
     const slot=(designObjects.length-1)%placementOffsets.length,off=placementOffsets[slot];
     root.position.set(off[0],0,off[2]);
@@ -1821,7 +1869,7 @@ async function generateWithRealAI() {
     const bytes=await response.arrayBuffer();
     const loader=new GLTFLoader();
     const gltf=await new Promise((resolve,reject)=>loader.parse(bytes,'',resolve,reject));
-    addGeneratedModel(gltf,prompt);$('promptInput').value='';
+    await addGeneratedModel(gltf,prompt,bytes);$('promptInput').value='';
     toast('Modelo 3D generado y agregado a la escena.');
   }catch(error){
     console.error('NEXO AI generation failed:',error);
