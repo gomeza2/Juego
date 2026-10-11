@@ -1648,6 +1648,8 @@ function selectDesign(root) {
   $('scaleRange').value=THREE.MathUtils.clamp(scaleAvg,.05,5);$('scaleValue').textContent=scaleAvg.toFixed(2);$('scaleReadout').textContent=scaleAvg.toFixed(2)+' ×';
   $('scaleX').value=root.scale.x.toFixed(2);$('scaleY').value=root.scale.y.toFixed(2);$('scaleZ').value=root.scale.z.toFixed(2);
   $('arraySpacingUnit').textContent=unitSystem;
+  $('arraySpacing').min=String(.05*factor);$('arraySpacing').max=String(200*factor);
+  $('arraySpacing').step=unitSystem==='mm'?'10':unitSystem==='cm'?'1':unitSystem==='ft'?'0.05':'0.05';
   const boundsForRepeat=new THREE.Box3().setFromObject(root);
   const repeatSize=boundsForRepeat.getSize(new THREE.Vector3());
   const repeatAxis=$('arrayAxis').value||'x';
@@ -2274,7 +2276,7 @@ function createObjectArray() {
   const spacingShown=Number.parseFloat($('arraySpacing').value);
   if(!Number.isInteger(count)||count<1||count>20){toast('La serie admite entre 1 y 20 copias nuevas.');return;}
   if(!['x','y','z'].includes(axis)){toast('Elegí un eje válido para la serie.');return;}
-  if(!Number.isFinite(spacingShown)||spacingShown<=0||spacingShown>200*factor){toast('La distancia debe ser mayor que cero y no superar 200 '+unitSystem+'.');return;}
+  if(!Number.isFinite(spacingShown)||spacingShown<.05*factor||spacingShown>200*factor){toast('La distancia debe estar entre 0,05 y 200 m, convertida a '+unitSystem+'.');return;}
   const spacing=spacingShown/factor;
   const source=selected;
   const base=source.position.clone();
