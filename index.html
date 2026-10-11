@@ -1520,9 +1520,48 @@ function exportPNG() {
   catch(e){toast('No se pudo crear la captura.');}
 }
 function exportJSON() {
-  const payload={app:'NEXO Studio',version:'0.1.0',exportedAt:new Date().toISOString(),project:snapshot(),note:'Archivo de parámetros del diseño. El modelo 3D se exporta como GLB.'};
+  const payload={app:'NEXO Studio',version:'0.2.0',exportedAt:new Date().toISOString(),project:snapshot(),note:'Archivo editable de toda la escena: objetos, grupos, transformaciones, materiales y ajustes. Para geometría 3D use el formato GLB.'};
   downloadBlob(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),safeFilename($('projectName').value)+'.json');
-  toast('Parámetros del proyecto exportados.');
+  toast('Escena completa exportada en JSON.');
+}
+function exportTechnicalSVG() {
+  if(!selected){toast('Seleccioná un objeto para crear su ficha técnica.');return;}
+  const bounds=new THREE.Box3().setFromObject(selected),size=bounds.getSize(new THREE.Vector3());
+  if(bounds.isEmpty()){toast('El objeto no tiene medidas calculables.');return;}
+  const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const width=size.x,height=size.y,depth=size.z;
+  const card=(x,y,w,h,title,dimA,dimB)=>`
+    <g transform="translate(${x} ${y})">
+      <rect width="320" height="235" rx="10" fill="#ffffff" stroke="#d8e1eb"/>
+      <text x="18" y="26" font-family="Arial,sans-serif" font-size="12" font-weight="700" fill="#26364b">${title}</text>
+      <rect x="${(320-w)/2}" y="${58+(120-h)/2}" width="${w}" height="${h}" fill="#eef3f8" stroke="#53718f" stroke-width="1.5"/>
+      <path d="M ${(320-w)/2} 45 v -8 M ${(320+w)/2} 45 v -8 M ${(320-w)/2} 41 H ${(320+w)/2}" fill="none" stroke="#377fe8" stroke-width="1.2"/>
+      <text x="160" y="37" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#276bc2">${dimA}</text>
+      <path d="M ${(320+w)/2+14} ${58+(120-h)/2} h 8 M ${(320+w)/2+14} ${58+(120+h)/2} h 8 M ${(320+w)/2+18} ${58+(120-h)/2} V ${58+(120+h)/2}" fill="none" stroke="#29945a" stroke-width="1.2"/>
+      <text x="286" y="118" transform="rotate(90 286 118)" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#267841">${dimB}</text>
+      <text x="160" y="213" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#7a8799">Proyección por envolvente · no a escala</text>
+    </g>`;
+  const scaleTo=(v,max)=>Math.max(14,Math.min(175,v/Math.max(max,.0001)*175));
+  const frontW=scaleTo(width,Math.max(width,height,depth)),frontH=scaleTo(height,Math.max(width,height,depth));
+  const topW=scaleTo(width,Math.max(width,height,depth)),topH=scaleTo(depth,Math.max(width,height,depth));
+  const sideW=scaleTo(depth,Math.max(width,height,depth)),sideH=scaleTo(height,Math.max(width,height,depth));
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="650" viewBox="0 0 1120 650">
+    <rect width="100%" height="100%" fill="#f5f7fa"/>
+    <text x="40" y="43" font-family="Arial,sans-serif" font-size="21" font-weight="700" fill="#1e2e43">NEXO STUDIO · FICHA TÉCNICA</text>
+    <text x="40" y="72" font-family="Arial,sans-serif" font-size="14" fill="#5e6f84">${esc(selected.name)} · Unidad de medida: ${unitSystem}</text>
+    <text x="40" y="100" font-family="Arial,sans-serif" font-size="12" fill="#718197">Ancho X: ${formatDimension(width)} · Alto Y: ${formatDimension(height)} · Fondo Z: ${formatDimension(depth)}</text>
+    ${card(40,130,frontW,frontH,'VISTA FRONTAL',formatDimension(width),formatDimension(height))}
+    ${card(400,130,topW,topH,'VISTA SUPERIOR',formatDimension(width),formatDimension(depth))}
+    ${card(760,130,sideW,sideH,'VISTA LATERAL',formatDimension(depth),formatDimension(height))}
+    <rect x="40" y="405" width="1040" height="190" rx="10" fill="#fff" stroke="#d8e1eb"/>
+    <text x="62" y="438" font-family="Arial,sans-serif" font-size="13" font-weight="700" fill="#26364b">DATOS DEL OBJETO</text>
+    <text x="62" y="468" font-family="Arial,sans-serif" font-size="12" fill="#506178">Posición: X ${formatDimension(selected.position.x)}, Y ${formatDimension(selected.position.y)}, Z ${formatDimension(selected.position.z)}</text>
+    <text x="62" y="494" font-family="Arial,sans-serif" font-size="12" fill="#506178">Escala: X ${selected.scale.x.toFixed(2)} · Y ${selected.scale.y.toFixed(2)} · Z ${selected.scale.z.toFixed(2)}</text>
+    <text x="62" y="520" font-family="Arial,sans-serif" font-size="12" fill="#506178">Rotación: X ${THREE.MathUtils.radToDeg(selected.rotation.x).toFixed(1)}° · Y ${THREE.MathUtils.radToDeg(selected.rotation.y).toFixed(1)}° · Z ${THREE.MathUtils.radToDeg(selected.rotation.z).toFixed(1)}°</text>
+    <text x="62" y="563" font-family="Arial,sans-serif" font-size="11" fill="#a25b35">Nota: vistas de envolvente para referencia visual. No es un plano constructivo certificado ni verifica estructura, tolerancias o normativa.</text>
+  </svg>`;
+  downloadBlob(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}),safeFilename(selected.name)+'-ficha-tecnica.svg');
+  toast('Ficha técnica SVG exportada.');
 }
 function addDuplicate() {
   if(!selected)return;
@@ -1714,6 +1753,43 @@ document.querySelectorAll('[data-nav]').forEach(btn=>btn.addEventListener('click
 $('newProject').addEventListener('click',()=>{createDesign('headphones');$('projectName').value='Concepto sin título';currentColor='#c8ff57';setColor(currentColor);$('promptInput').value='';toast('Nuevo espacio de diseño creado.');});
 $('promptSend').addEventListener('click',handlePrompt);
 $('promptInput').addEventListener('keydown',e=>{if(e.key==='Enter')handlePrompt();});
+$('addModeBtn').addEventListener('click',()=>{
+  addMode=!addMode;$('addModeBtn').classList.toggle('active',addMode);
+  $('addModeBtn').innerHTML=addMode?'✓ <span>Modo añadir activo</span>':'＋ <span>Añadir piezas</span>';
+  toast(addMode?'Modo añadir: los modelos nuevos se suman a la escena.':'Modo reemplazo: los modelos nuevos sustituyen la escena.');
+});
+$('dimensionsBtn').addEventListener('click',()=>{
+  showDimensions=!showDimensions;$('dimensionsBtn').classList.toggle('active',showDimensions);
+  updateDimensions();persist();toast(showDimensions?'Cotas activadas.':'Cotas ocultas.');
+});
+$('viewSelect').addEventListener('change',e=>{setCameraView(e.target.value);updateDimensions();persist();});
+$('unitsSelect').addEventListener('change',e=>{
+  unitSystem=unitFactors[e.target.value]?e.target.value:'m';
+  if(selected)selectDesign(selected);else updateDimensions();
+  persist();toast('Unidades de medida: '+unitSystem+'.');
+});
+$('blueprintBtn').addEventListener('click',exportTechnicalSVG);
+$('groupBtn').addEventListener('click',groupSelectedObjects);
+$('ungroupBtn').addEventListener('click',ungroupSelectedObject);
+$('sceneObjectList').addEventListener('click',e=>{
+  const selectBtn=e.target.closest('[data-scene-select]');
+  const eyeBtn=e.target.closest('[data-scene-eye]');
+  if(eyeBtn){
+    const root=designObjects[Number(eyeBtn.dataset.sceneEye)];if(!root)return;
+    pushHistory();root.visible=!root.visible;renderSceneList();updateDimensions();persist();
+    toast(root.visible?'Objeto visible.':'Objeto oculto.');return;
+  }
+  if(selectBtn){
+    const root=designObjects[Number(selectBtn.dataset.sceneSelect)];if(!root)return;
+    selectDesign(root);if(selected.visible)focusModel();
+  }
+});
+$('sceneObjectList').addEventListener('change',e=>{
+  const check=e.target.closest('[data-group-check]');if(!check)return;
+  const root=designObjects[Number(check.dataset.groupCheck)];if(!root)return;
+  if(check.checked)groupSelection.add(root);else groupSelection.delete(root);
+  renderSceneList();
+});
 $('projectName').addEventListener('input',persist);
 $('colorSwatches').addEventListener('click',e=>{const b=e.target.closest('[data-color]');if(b)setColor(b.dataset.color);});
 $('customColor').addEventListener('input',e=>setColor(e.target.value));
@@ -1765,7 +1841,7 @@ $('wireBtn').addEventListener('click',()=>{
 });
 $('shadowSwitch').addEventListener('click',()=>{shadowsEnabled=!shadowsEnabled;keyLight.castShadow=shadowsEnabled;modelRoot.traverse(o=>{if(o.isMesh)o.castShadow=shadowsEnabled;});setSwitch('shadowSwitch',shadowsEnabled);persist();});
 $('highlightSwitch').addEventListener('click',()=>{highlightEnabled=!highlightEnabled;if(selectionHelper)scene.remove(selectionHelper);selectionHelper=null;if(highlightEnabled)makeHelper();setSwitch('highlightSwitch',highlightEnabled);});
-$('resetViewBtn').addEventListener('click',()=>{camera.position.set(5.5,4.2,7.5);controls.target.set(0,.65,0);controls.update();focusModel();});
+$('resetViewBtn').addEventListener('click',()=>{setCameraView('perspective');focusScene();});
 $('focusBtn').addEventListener('click',focusModel);
 $('duplicateBtn').addEventListener('click',addDuplicate);
 $('deleteBtn').addEventListener('click',deleteSelected);
@@ -1777,7 +1853,7 @@ $('collapseInspector').addEventListener('click',()=>{if(window.innerWidth<=920)$
 $('exportBtn').addEventListener('click',()=>$('exportMenu').classList.toggle('open'));
 document.querySelectorAll('[data-export]').forEach(btn=>btn.addEventListener('click',()=>{
   $('exportMenu').classList.remove('open');
-  if(btn.dataset.export==='glb')exportGLB();else if(btn.dataset.export==='png')exportPNG();else exportJSON();
+  if(btn.dataset.export==='glb')exportGLB();else if(btn.dataset.export==='png')exportPNG();else if(btn.dataset.export==='svg')exportTechnicalSVG();else exportJSON();
 }));
 document.addEventListener('click',e=>{if(!e.target.closest('.export-wrap'))$('exportMenu').classList.remove('open');});
 canvas.addEventListener('pointerdown',e=>{
