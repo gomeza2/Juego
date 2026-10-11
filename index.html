@@ -1373,10 +1373,10 @@ function addParametricArchitecturalPiece(type,g) {
   }
   if(type==='space'){
     const t=Math.min(.16,Math.max(.08,Math.min(w,d)*.035),h*.18);
-    boxPart('#c3c8ce',[0,t/2,0],[w,t,d],true,{roughness:.75});
-    boxPart(currentColor,[0,h/2,-d/2+t/2],[w,h,t],true,{roughness:.76});
-    boxPart(currentColor,[-w/2+t/2,h/2,0],[t,h,d],true,{roughness:.76});
-    boxPart(currentColor,[w/2-t/2,h/2,0],[t,h,d],true,{roughness:.76});
+    boxPart('#c3c8ce',[0,t/2,0],[w,t,d],true,{roughness:.75,side:THREE.DoubleSide});
+    boxPart(currentColor,[0,h/2,-d/2+t/2],[w,h,t],true,{roughness:.76,side:THREE.DoubleSide});
+    boxPart(currentColor,[-w/2+t/2,h/2,0],[t,h,d],true,{roughness:.76,side:THREE.DoubleSide});
+    boxPart(currentColor,[w/2-t/2,h/2,0],[t,h,d],true,{roughness:.76,side:THREE.DoubleSide});
     const baseboard=Math.min(.09,h*.08);
     boxPart('#e4e7eb',[0,t+baseboard/2,-d/2+t],[w-2*t,baseboard,t*.5],false,{roughness:.6});
     return;
