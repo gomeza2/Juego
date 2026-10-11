@@ -1480,7 +1480,7 @@ function updateSwatches() {
 function setColor(color) {
   pushHistory();currentColor=color;
   if(selected)applyPrimaryMaterial(selected);
-  updateSwatches();persist();
+  updateSwatches();updateDimensions();persist();
 }
 function setMaterial(value) {
   pushHistory();currentMaterial=value;
@@ -1495,8 +1495,9 @@ function setTexture(value) {
 function setPositionFromInputs() {
   if(!selected)return;
   pushHistory();
-  selected.position.set(parseFloat($('posX').value)||0,parseFloat($('posY').value)||0,parseFloat($('posZ').value)||0);
-  if(selectionHelper)selectionHelper.update();persist();
+  const factor=unitFactors[unitSystem]||1;
+  selected.position.set((parseFloat($('posX').value)||0)/factor,(parseFloat($('posY').value)||0)/factor,(parseFloat($('posZ').value)||0)/factor);
+  if(selectionHelper)selectionHelper.update();updateDimensions();persist();
 }
 function downloadBlob(blob,filename) {
   const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200);
@@ -1527,22 +1528,58 @@ function exportJSON() {
 function addDuplicate() {
   if(!selected)return;
   pushHistory();
-  const type=selected.userData.designType;
-  const state={position:[selected.position.x+.65,selected.position.y,selected.position.z+.45],scale:[selected.scale.x,selected.scale.y,selected.scale.z],rotation:[selected.rotation.x,selected.rotation.y,selected.rotation.z],color:currentColor,material:currentMaterial};
-  const copy=new THREE.Group();copy.name=selected.name+' · copia';copy.userData.designType=type;modelRoot.add(copy);designObjects.push(copy);
-  build(type,copy);copy.position.set(...state.position);copy.scale.set(...state.scale);copy.rotation.set(...state.rotation);
-  applyPrimaryMaterial(copy);selected=copy;
-  if(selectionHelper)scene.remove(selectionHelper);makeHelper();updateMeta();selectDesign(copy);persist();toast('Se duplicó el concepto.');
+  const data=serializeSceneNode(selected);
+  data.name=selected.name+' · copia';
+  data.position=[selected.position.x+.65,selected.position.y,selected.position.z+.45];
+  const copy=restoreSceneNode(data,modelRoot);
+  designObjects.push(copy);groupSelection.clear();
+  currentType=copy.userData.designType||'group';selectDesign(copy);updateMeta();focusScene();persist();toast('Se duplicó el objeto.');
+}
+function groupSelectedObjects() {
+  const chosen=designObjects.filter(root=>groupSelection.has(root));
+  if(chosen.length<2){toast('Marcá al menos dos objetos para agrupar.');return;}
+  pushHistory();
+  const firstIndex=Math.min(...chosen.map(root=>designObjects.indexOf(root)));
+  const group=new THREE.Group();group.name='Grupo '+String(groupSequence++).padStart(2,'0');
+  group.userData.designRoot=true;group.userData.designType='group';group.userData.isSceneGroup=true;
+  group.userData.style={...(chosen[0].userData.style||styleSnapshot())};
+  modelRoot.add(group);
+  chosen.forEach(root=>group.attach(root));
+  designObjects=designObjects.filter(root=>!chosen.includes(root));
+  designObjects.splice(Math.min(firstIndex,designObjects.length),0,group);
+  groupSelection.clear();selectDesign(group);updateMeta();focusScene();persist();
+  toast(chosen.length+' objetos agrupados.');
+}
+function ungroupSelectedObject() {
+  if(!selected||!selected.userData.isSceneGroup){toast('Seleccioná un grupo para separarlo.');return;}
+  pushHistory();
+  const group=selected,index=designObjects.indexOf(group);
+  const children=group.children.filter(child=>child.userData.designRoot);
+  children.forEach(child=>modelRoot.attach(child));
+  modelRoot.remove(group);
+  designObjects.splice(index,1,...children);
+  groupSelection.clear();
+  selected=children[0]||designObjects[0]||null;
+  if(selected){currentType=selected.userData.designType||'group';selectDesign(selected);}
+  updateMeta();updateDimensions();focusScene();persist();
+  toast('Grupo separado en objetos independientes.');
 }
 function deleteSelected() {
   if(!selected)return;
   pushHistory();
   const idx=designObjects.indexOf(selected);if(idx<0)return;
-  modelRoot.remove(selected);
-  selected.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});
-  designObjects.splice(idx,1);if(selectionHelper)scene.remove(selectionHelper);selectionHelper=null;
-  if(!designObjects.length){createDesign('cube',{skipHistory:true});toast('Objeto eliminado. Se creó una forma base nueva.');}
-  else {selected=designObjects[Math.max(0,idx-1)];currentType=selected.userData.designType||'cube';selectDesign(selected);updateMeta();persist();toast('Objeto eliminado.');}
+  const removed=selected;
+  modelRoot.remove(removed);disposeTree(removed);
+  designObjects.splice(idx,1);groupSelection.delete(removed);
+  if(selectionHelper)scene.remove(selectionHelper);selectionHelper=null;
+  selected=null;
+  if(!designObjects.length){
+    createDesign('cube',{skipHistory:true});
+    toast('Objeto eliminado. Se creó una forma base nueva.');
+  }else{
+    selected=designObjects[Math.min(idx,designObjects.length-1)];
+    currentType=selected.userData.designType||'group';selectDesign(selected);updateMeta();persist();toast('Objeto eliminado.');
+  }
 }
 function handlePrompt() {
   const raw=$('promptInput').value.trim();
@@ -1612,10 +1649,10 @@ function handlePrompt() {
 function setSwitch(id,value) {$ (id).classList.toggle('on',value);}
 document.querySelectorAll('[data-type]').forEach(btn=>btn.addEventListener('click',()=>{
   const type=btn.dataset.type;if(!meta[type])return;
-  createDesign(type);
+  createDesign(type,{keepScene:addMode});
   document.querySelectorAll('.nav-item[data-type]').forEach(b=>b.classList.toggle('active',b===btn));
-  if(window.innerWidth<=920) $('sidebar').classList.remove('menu-open');
-  toast(meta[type].name+' listo para editar.');
+  if(window.innerWidth<=920)$('sidebar').classList.remove('menu-open');
+  toast(addMode?meta[type].name+' agregado a la escena.':meta[type].name+' listo para editar.');
 }));
 document.querySelectorAll('[data-nav]').forEach(btn=>btn.addEventListener('click',()=>{
   document.querySelectorAll('[data-nav]').forEach(b=>b.classList.toggle('active',b===btn));
