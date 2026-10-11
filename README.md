@@ -76,6 +76,14 @@ Si el endpoint no está configurado, el asistente local y todas las herramientas
 - Las acciones se integran con deshacer/rehacer y guardado automático.
 - La alineación usa las cajas envolventes visibles en el modelo, por lo que sirve para composición y referencia, no para tolerancias de fabricación.
 
+### Fase 9 · Componentes arquitectónicos paramétricos — implementada
+- Biblioteca nueva con pared modular, piso/losa, puerta y ventana.
+- Medidas editables X/Y/Z desde el panel de propiedades; para los pisos, Y representa el espesor y Z el fondo.
+- Unidades compatibles con m, cm, mm y ft. Los componentes guardan sus dimensiones personalizadas en escenas JSON y se incluyen en la exportación GLB.
+- Puertas con marco, hoja y manija; ventanas con marco y panel de vidrio; paredes y losas como volúmenes independientes que admiten acabados y texturas.
+- El prompt local reconoce pedidos simples de pared, piso, puerta y ventana, además de la biblioteca visual.
+- Son elementos conceptuales independientes: la ventana no perfora automáticamente una pared ni se generan uniones constructivas, instalaciones o cálculos estructurales. Para planos de obra hacen falta medidas y validaciones profesionales.
+
 ## Publicación en GitHub Pages
 
 La versión pública está prevista en https://gomeza2.github.io/Juego/
