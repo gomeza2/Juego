@@ -25,6 +25,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+      - name: Validate JavaScript module syntax
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          html = Path("index.html").read_text(encoding="utf-8")
+          scripts = re.findall(r'<script type="module">(.*?)</script>', html, re.S)
+          if len(scripts) != 1:
+              raise SystemExit(f"Expected one JavaScript module, found {len(scripts)}")
+          Path("/tmp/nexo-studio-check.mjs").write_text(scripts[0], encoding="utf-8")
+          PY
+          node --check /tmp/nexo-studio-check.mjs
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload static site
