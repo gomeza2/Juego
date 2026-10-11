@@ -454,8 +454,8 @@ function makeProceduralTexture(kind) {
   colorMap.colorSpace=THREE.SRGBColorSpace;colorMap.wrapS=THREE.RepeatWrapping;colorMap.wrapT=THREE.RepeatWrapping;
   colorMap.minFilter=THREE.LinearMipmapLinearFilter;colorMap.magFilter=THREE.LinearFilter;colorMap.generateMipmaps=true;
   colorMap.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
-  const roughnessMap=colorMap.clone();roughnessMap.colorSpace=THREE.NoColorSpace;
-  const bumpMap=colorMap.clone();bumpMap.colorSpace=THREE.NoColorSpace;
+  const roughnessMap=colorMap.clone();roughnessMap.colorSpace=THREE.NoColorSpace;roughnessMap.needsUpdate=true;
+  const bumpMap=colorMap.clone();bumpMap.colorSpace=THREE.NoColorSpace;bumpMap.needsUpdate=true;
   const result={map:colorMap,roughnessMap,bumpMap};
   proceduralTextureCache.set(kind,result);
   return result;
@@ -1331,6 +1331,17 @@ function handlePrompt() {
   else if(/\b(negro|negra|grafito)\b/.test(text))currentColor='#242b38';
   else if(/\b(verde|lima)\b/.test(text))currentColor='#c8ff57';
   else currentColor='#c8ff57';
+  if(/madera|wood|parquet/.test(text))currentTexture='wood';
+  else if(/m[aá]rmol|marble/.test(text))currentTexture='marble';
+  else if(/hormig[oó]n|cemento|concrete/.test(text))currentTexture='concrete';
+  else if(/tela|tejido|tapizado|fabric/.test(text))currentTexture='fabric';
+  else if(/fibra de carbono|carbono/.test(text))currentTexture='carbon';
+  else if(/ladrillo|brick/.test(text))currentTexture='brick';
+  else if(/piedra natural|piedra r[uú]stica/.test(text))currentTexture='stone';
+  else if(/baldosa|cer[aá]mica|azulejo/.test(text))currentTexture='tile';
+  else if(/terrazo|terrazzo/.test(text))currentTexture='terrazzo';
+  else if(/metal rayado|metal cepillado|acero cepillado/.test(text))currentTexture='brushed';
+  else if(/sin textura|liso|smooth/.test(text))currentTexture='none';
   createDesign(type);
   $('promptInput').value='';
   toast('Concepto base creado. Personalizalo en Propiedades.');
