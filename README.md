@@ -37,7 +37,14 @@ La biblioteca contiene productos, dispositivos, muebles, vehículos, formas org�
 
 **Importante:** las cotas describen la caja envolvente del objeto. La ficha SVG sirve como referencia conceptual; no es un plano constructivo certificado, no comprueba resistencia estructural, tolerancias, códigos de construcción ni preparación para fabricación.
 
-### Fase 5 · Asistente de diseño e IA 3D — parcialmente implementada
+### Fase 5 · Edición de precisión y espacio claro — implementada
+- Interfaz de trabajo con fondo claro y paneles blancos, manteniendo el visor 3D en tonos neutros.
+- Rotación numérica independiente alrededor de X, Y y Z, además del control rápido de giro sobre Y.
+- Ajuste de posición a una cuadrícula de 0,5 m, guardado con el proyecto y respetando las unidades visibles.
+- Acción «Centrar y apoyar en el suelo» para recentrar una pieza en X/Z y llevar la base a Y = 0.
+- La restauración de modelos guardados enfoca únicamente la pieza seleccionada, sin saltar a otra mientras se recuperan varios assets.
+
+### Fase 6 · Asistente de diseño e IA 3D — parcialmente implementada
 El asistente procedural local reconoce familias de objetos y puede componer algunas escenas desde una descripción. Por ejemplo, «mansión con cuatro árboles y una fuente de mármol» crea un conjunto a partir de modelos disponibles. Esto funciona en la publicación estática sin una API externa.
 
 También está preparado el conector para generación real mediante el flujo de dos pasos de [Meshy Text-to-3D API](https://docs.meshy.ai/en/api/text-to-3d): primero genera geometría preliminar y luego crea el modelo texturizado con materiales PBR. El modelo final se importa al visor como GLB y se guarda en IndexedDB del navegador para poder recuperar la escena en ese mismo perfil del navegador. También podés importar archivos GLB de otros programas y abrir JSON guardados desde el menú de exportación.
