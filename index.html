@@ -399,7 +399,7 @@ function addCar(g) {
   box(g,'#f2f0d8',[0,.47,1.19],[.8,.09,.025],false,{emissive:'#9b9b61',emissiveIntensity:.12});
   box(g,'#f47767',[0,.47,-1.19],[.8,.08,.025],false,{emissive:'#aa3434',emissiveIntensity:.15});
   [-1,1].forEach(x=>[-.72,.72].forEach(z=>{
-    cyl(g,dark,[x*.76,.31,z],[.2][0],[.2][0],.15,32,false,[0,0,Math.PI/2],{roughness:.8});
+    cyl(g,dark,[x*.76,.31,z],.2,.2,.15,32,false,[0,0,Math.PI/2],{roughness:.8});
     cyl(g,'#bcc7d3',[x*.76,.31,z],.105,.105,.158,32,false,[0,0,Math.PI/2],{metalness:.8,roughness:.22});
     cyl(g,'#586779',[x*.76,.31,z],.035,.035,.163,16,false,[0,0,Math.PI/2]);
   }));
@@ -738,8 +738,8 @@ function handlePrompt() {
   if(!raw){$('promptInput').focus();toast('Escribí una idea para empezar.');return;}
   const text=raw.toLowerCase();
   let type='headphones';
-  if(/habitaci|casa|living|sal[oó]n|interior|dormitorio|cocina|decoraci|hogar/.test(text)) type='room';
-  else if(/cohete|rocket|espacial|nave|orbita/.test(text))type='rocket';
+  if(/habitaci|casa|sal[oó]n|interior|dormitorio|cocina|decoraci|hogar/.test(text)) type='room';
+  else if(/cohete|rocket|espacial|orbita/.test(text))type='rocket';
   else if(/avi[oó]n|avion|aeronave|aircraft|jet/.test(text))type='plane';
   else if(/sill[oó]n|sillon|silla|butaca|sof[aá]|chair/.test(text))type='chair';
   else if(/mesa|escritorio|table/.test(text))type='table';
