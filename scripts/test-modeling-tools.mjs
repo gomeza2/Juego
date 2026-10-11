@@ -20,7 +20,9 @@ const requiredIds = [
   'archSizeX', 'archSizeY', 'archSizeZ', 'applyArchSizeBtn',
   'wallOpeningType', 'openingWidth', 'openingHeight',
   'polygonSides', 'bevelRadius', 'archSizePanel',
-  'orbitBtn', 'moveBtn', 'rotateBtn', 'scaleBtn'
+  'orbitBtn', 'moveBtn', 'rotateBtn', 'scaleBtn',
+  'repeatMirrorPanel', 'arrayAxis', 'arrayCount', 'arraySpacing', 'arraySpacingUnit',
+  'arrayCreateBtn', 'mirrorAxis', 'mirrorCreateBtn'
 ];
 for (const id of requiredIds) assert.equal(ids.filter(value => value === id).length, 1, 'Expected exactly one #' + id);
 
@@ -35,6 +37,16 @@ for (const type of ['space','disk','triangle','rectangle','polygon','roundedCube
   assert.ok(html.includes("type==='" + type + "'"), 'Missing geometry builder for ' + type);
 }
 assert.ok(html.includes('selected.scale.set(values[0],values[1],values[2])'), 'XYZ scale must apply independently');
+assert.ok(html.includes('Math.abs(v)<.05||Math.abs(v)>20'), 'Signed scale values must support reflected objects');
+assert.ok(html.includes("$('arrayCreateBtn').addEventListener('click',createObjectArray)"), 'Array button must invoke the copy generator');
+assert.ok(html.includes('function createObjectArray()'), 'Object array generator must exist');
+assert.ok(html.includes('for(let i=1;i<=count;i++)'), 'Object array must create the requested number of additional copies');
+assert.ok(html.includes("data.position[axisIndex]=base.getComponent(axisIndex)+spacing*i"), 'Array copies must use predictable center-to-center axis spacing');
+assert.ok(html.includes("$('mirrorCreateBtn').addEventListener('click',createMirroredCopy)"), 'Mirror button must invoke the reflection generator');
+assert.ok(html.includes('function createMirroredCopy()'), 'Mirror copy generator must exist');
+assert.ok(html.includes('reflection.clone().multiply(originalRotation).multiply(reflection)'), 'Mirror must reflect both position and orientation across the chosen plane');
+assert.ok(html.includes('data.scale[axisIndex]*=-1'), 'Mirror copy must reverse scale along the reflected axis');
+assert.ok(html.includes("$('arraySpacingUnit').textContent=unitSystem"), 'Array spacing must follow the selected measurement system');
 assert.ok(html.includes("import { TransformControls } from 'three/addons/controls/TransformControls.js';"), 'Interactive TransformControls module must be imported');
 assert.ok(html.includes('new TransformControls(camera,renderer.domElement)'), 'The 3D manipulation gizmo must attach to the active camera and viewport');
 assert.ok(html.includes("transformGizmo.setMode(transformMode==='orbit'?'translate':transformMode)"), 'Transform tool mode must initialize correctly');
@@ -53,4 +65,4 @@ assert.ok(html.includes('bevelRadius:node.userData.bevelRadius??null'), 'Bevel r
 assert.ok(html.includes('if(!restored)startBlankProject({skipHistory:true,notify:false})'), 'First launch must use a blank scene');
 assert.ok(html.includes('function startBlankProject(options={})'), 'New-project action must create a blank scene');
 
-console.log('Modeling tools tests passed: unique IDs, UI references, parametric shapes, XYZ scaling, wall apertures, save/restore and blank startup.');
+console.log('Modeling tools tests passed: unique IDs, parametric shapes, transform gizmo, arrays, mirror copies, wall openings, save/restore and blank startup.');
