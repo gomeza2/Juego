@@ -38,6 +38,7 @@ jobs:
           PY
           node --check /tmp/nexo-studio-check.mjs
           node --check api/ai3d.js
+          node scripts/test-scene-planner.mjs
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload static site
