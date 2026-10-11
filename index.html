@@ -1107,12 +1107,19 @@ function applyPrimaryMaterial(root) {
   }
   root.traverse(o=>{
     if(o.isMesh&&o.userData.generatedMesh){
+      const base=o.userData.generatedBaseMaterials;
+      if(currentTexture==='none'&&base){
+        o.material=Array.isArray(base)?base.map(m=>m.clone()):base.clone();
+      }
       const materials=Array.isArray(o.material)?o.material:[o.material];
       materials.forEach(m=>{
         if(!m)return;
+        if(currentTexture!=='none'&&tex&&profile){
+          m.map=tex.map;m.roughnessMap=tex.roughnessMap;m.bumpMap=tex.bumpMap;m.bumpScale=profile.bump;
+        }
         m.color.set(currentColor);
-        m.roughness=Math.max(.12,Math.min(.98,(finish.roughness+(textureProfile[currentTexture]?.roughness??finish.roughness))/2));
-        m.metalness=(finish.metalness+(textureProfile[currentTexture]?.metalness??finish.metalness))/2;
+        m.roughness=Math.max(.12,Math.min(.98,(finish.roughness+(currentTexture==='none'?finish.roughness:(textureProfile[currentTexture]?.roughness??finish.roughness)))/2));
+        m.metalness=(finish.metalness+(currentTexture==='none'?finish.metalness:(textureProfile[currentTexture]?.metalness??finish.metalness)))/2;
         m.wireframe=wireEnabled;m.needsUpdate=true;
       });
       o.castShadow=shadowsEnabled;o.receiveShadow=true;
@@ -1813,6 +1820,7 @@ function attachGeneratedGLTF(root,gltf) {
   object.traverse(mesh=>{
     if(mesh.isMesh){
       mesh.userData.generatedMesh=true;mesh.castShadow=true;mesh.receiveShadow=true;
+      mesh.userData.generatedBaseMaterials=Array.isArray(mesh.material)?mesh.material.map(m=>m.clone()):mesh.material.clone();
       const mats=Array.isArray(mesh.material)?mesh.material:[mesh.material];mats.forEach(m=>{if(m)m.needsUpdate=true;});
     }
   });
@@ -1826,7 +1834,7 @@ async function restoreGeneratedAsset(root,key) {
     const gltf=await new Promise((resolve,reject)=>loader.parse(bytes,'',resolve,reject));
     if(!root.parent)return;
     attachGeneratedGLTF(root,gltf);
-    if(root===selected){if(selectionHelper)selectionHelper.update();updateDimensions();focusModel();}
+    if(selected){if(selectionHelper)selectionHelper.update();updateDimensions();focusModel();}
     persist();
   }catch(error){console.warn('Could not restore generated asset:',error);toast('No se pudo restaurar un modelo IA guardado.');}
 }
