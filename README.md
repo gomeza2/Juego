@@ -111,6 +111,14 @@ Si el endpoint no está configurado, el asistente local y todas las herramientas
 - El manipulador se reconstruye al cambiar entre perspectiva y vistas ortográficas para seguir usando la cámara activa.
 - Esta fase agrega transformación de objetos completos. Todavía no incluye edición libre de vértices/caras ni operaciones booleanas arbitrarias.
 
+
+### Fase 13 · Repetición y simetría — implementada
+- Herramienta para crear una serie de entre 1 y 20 copias adicionales de la pieza o grupo seleccionado, con eje X/Y/Z y distancia entre centros configurable en las unidades activas.
+- Cada copia queda como objeto independiente: conserva geometría, dimensiones paramétricas, materiales, posición relativa y jerarquía de grupos; después se puede mover, renombrar, editar o borrar por separado.
+- Herramienta **Espejar copia** para reflejar un objeto o un grupo a través de uno de los planos globales YZ, XZ o XY que pasan por el origen. Se refleja la posición y la orientación y se utiliza escala con signo negativo para obtener una reflexión geométrica real; el objeto original permanece sin cambios.
+- La escala por eje admite valores negativos para manejar objetos reflejados y se conserva en los proyectos JSON y en la estructura exportada.
+- La separación predeterminada de la serie se estima con el tamaño del objeto en el eje activo, más un margen; se puede ajustar manualmente antes de generar copias.
+
 ## Publicación en GitHub Pages
 
 La versión pública está prevista en https://gomeza2.github.io/Juego/
