@@ -1749,6 +1749,88 @@ function handlePrompt() {
   $('promptInput').value='';
   toast(hasComposition?'Escena procedural creada. Ajustá piezas, medidas y materiales por separado.':'Modelo base creado. Podés agregarlo a una escena y personalizarlo.');
 }
+function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+async function apiJson(url,options={}) {
+  const response=await fetch(url,{cache:'no-store',...options});
+  const raw=await response.text();let payload={};
+  try{payload=raw?JSON.parse(raw):{};}catch{payload={};}
+  if(!response.ok)throw new Error(payload.error||'La API de IA no está disponible.');
+  return payload;
+}
+async function pollAIGeneration(taskId,label) {
+  for(let attempt=0;attempt<180;attempt++){
+    const task=await apiJson('/api/ai3d?id='+encodeURIComponent(taskId));
+    if(task.status==='SUCCEEDED')return task;
+    if(task.status==='FAILED'||task.status==='CANCELED')throw new Error(task.error||'El proveedor no pudo terminar el modelo.');
+    const progress=Math.max(0,Math.min(100,Number(task.progress)||0));
+    toast(label+' · '+progress+'%');
+    await sleep(3000);
+  }
+  throw new Error('La generación tardó más de lo esperado. Volvé a intentar más tarde; la tarea puede seguir disponible en el proveedor.');
+}
+function addGeneratedModel(gltf,prompt) {
+  pushHistory();
+  if(!addMode)clearModels();
+  const root=new THREE.Group();
+  root.name=prompt.length>42?prompt.slice(0,42)+'…':prompt;
+  root.userData.designRoot=true;root.userData.designType='generated';root.userData.generated=true;
+  root.userData.style=styleSnapshot();
+  const object=gltf.scene||gltf.scenes?.[0];
+  if(!object)throw new Error('El archivo generado no contiene una escena 3D.');
+  const bounds=new THREE.Box3().setFromObject(object);
+  if(bounds.isEmpty())throw new Error('El modelo generado no contiene geometría visible.');
+  const size=bounds.getSize(new THREE.Vector3()),center=bounds.getCenter(new THREE.Vector3());
+  const longest=Math.max(size.x,size.y,size.z,.001),scale=2.8/longest;
+  object.scale.multiplyScalar(scale);
+  object.position.x-=center.x*scale;
+  object.position.y-=bounds.min.y*scale;
+  object.position.z-=center.z*scale;
+  object.traverse(mesh=>{
+    if(mesh.isMesh){
+      mesh.userData.generatedMesh=true;mesh.castShadow=true;mesh.receiveShadow=true;
+      const mats=Array.isArray(mesh.material)?mesh.material:[mesh.material];
+      mats.forEach(m=>{if(m)m.needsUpdate=true;});
+    }
+  });
+  root.add(object);modelRoot.add(root);
+  if(addMode&&designObjects.length>0){
+    const slot=(designObjects.length-1)%placementOffsets.length,off=placementOffsets[slot];
+    root.position.set(off[0],0,off[2]);
+  }
+  designObjects.push(root);currentType='generated';groupSelection.clear();
+  selectDesign(root);updateMeta();updateDimensions();focusScene();persist();
+}
+async function generateWithRealAI() {
+  const prompt=$('promptInput').value.trim();
+  if(!prompt){$('promptInput').focus();toast('Escribí una descripción para generar un modelo 3D.');return;}
+  if(window.location.hostname.endsWith('github.io')){
+    toast('La IA real necesita un servidor privado. Abrí el README para desplegar el endpoint seguro; el asistente local sigue disponible.');
+    return;
+  }
+  const btn=$('aiGenerateBtn');
+  btn.disabled=true;btn.textContent='Generando…';
+  try{
+    toast('IA 3D · Generando la geometría preliminar…');
+    const preview=await apiJson('/api/ai3d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'generate',prompt})});
+    await pollAIGeneration(preview.taskId,'IA 3D · Geometría');
+    toast('IA 3D · Aplicando materiales y texturas…');
+    const refine=await apiJson('/api/ai3d',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'refine',previewTaskId:preview.taskId})});
+    await pollAIGeneration(refine.taskId,'IA 3D · Texturas');
+    const response=await fetch('/api/ai3d?id='+encodeURIComponent(refine.taskId)+'&download=1',{cache:'no-store'});
+    if(!response.ok){let err={};try{err=await response.json();}catch{}throw new Error(err.error||'No se pudo descargar el modelo generado.');}
+    const bytes=await response.arrayBuffer();
+    const loader=new GLTFLoader();
+    const gltf=await new Promise((resolve,reject)=>loader.parse(bytes,'',resolve,reject));
+    addGeneratedModel(gltf,prompt);$('promptInput').value='';
+    toast('Modelo 3D generado y agregado a la escena.');
+  }catch(error){
+    console.error('NEXO AI generation failed:',error);
+    toast(error.message||'No se pudo generar el modelo. Comprobá la configuración de la API.');
+  }finally{
+    btn.disabled=false;btn.textContent='✦ IA 3D';
+  }
+}
+$('aiGenerateBtn').addEventListener('click',generateWithRealAI);
 function setSwitch(id,value) {$ (id).classList.toggle('on',value);}
 document.querySelectorAll('[data-type]').forEach(btn=>btn.addEventListener('click',()=>{
   const type=btn.dataset.type;if(!meta[type])return;
@@ -1886,6 +1968,7 @@ $('redoBtn').addEventListener('click',()=>{
   undoStack.push(snapshot());const s=redoStack.pop();applySnapshot(s);persist();toast('Cambio rehecho.');
 });
 window.addEventListener('keydown',e=>{
+  if(e.key==='Delete'&&selected&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)){e.preventDefault();deleteSelected();}
   const mac=/Mac|iPhone|iPad/.test(navigator.platform);const mod=mac?e.metaKey:e.ctrlKey;
   if(mod && e.key.toLowerCase()==='z'){e.preventDefault();(e.shiftKey?$('redoBtn'):$('undoBtn')).click();}
   if(mod && e.key.toLowerCase()==='y'){e.preventDefault();$('redoBtn').click();}
