@@ -1658,11 +1658,16 @@ function selectDesign(root) {
       $('wallOpeningType').value=o.type||'none';
       $('openingWidth').value=(o.width*factor).toFixed(digits);
       $('openingHeight').value=(o.height*factor).toFixed(digits);
+      $('openingWidth').min=String(.2*factor);$('openingHeight').min=String(.2*factor);
       $('openingWidth').max=String(Math.max(.2,dims[0]*.8*factor));
       $('openingHeight').max=String(Math.max(.2,dims[1]*.92*factor));
     }
     if(currentType==='polygon')$('polygonSides').value=String(root.userData.polygonSides||6);
-    if(currentType==='rectangle'||currentType==='roundedCube')$('bevelRadius').value=((root.userData.bevelRadius??.12)*factor).toFixed(digits);
+    if(currentType==='rectangle'||currentType==='roundedCube'){
+      $('bevelRadius').value=((root.userData.bevelRadius??.12)*factor).toFixed(digits);
+      $('bevelRadius').min='0';$('bevelRadius').max=String(Math.min(...dims)*.22*factor);
+      $('bevelRadius').step=unitSystem==='mm'?'1':unitSystem==='cm'?'0.1':'0.01';
+    }
   }
   $('materialSelect').value=currentMaterial;
   updateSwatches();updateTextureUI();updateMeta();updateDimensions();
