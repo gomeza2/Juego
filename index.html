@@ -225,6 +225,15 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
 .scene-quick-add .select-control{height:32px;min-width:0;font-size:10px;padding:0 7px}
 .scene-quick-add .btn{height:32px;padding:0 10px;font-size:10px;white-space:nowrap}
 
+
+.scale-fields{margin-top:8px}
+.wall-opening-controls,.shape-extra-control{display:none}
+.wall-opening-controls.show,.shape-extra-control.show{display:block;margin-top:11px}
+.opening-heading{font-size:9px;font-weight:800;color:#56677f;letter-spacing:.8px;text-transform:uppercase;margin:0 0 7px}
+.wall-opening-controls .select-control{height:32px;width:100%;margin-bottom:8px;font-size:10px}
+.opening-size-grid{margin-bottom:4px}
+.shape-extra-control .arch-size-field{max-width:180px}
+
 </style>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}
@@ -281,6 +290,15 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
       <button class="category-card" data-type="floor"><span class="cat-icon">▱</span><span><span class="cat-title">Piso / losa</span><span class="cat-sub">Superficie por medidas</span></span></button>
       <button class="category-card" data-type="door"><span class="cat-icon">▯</span><span><span class="cat-title">Puerta</span><span class="cat-sub">Marco y hoja</span></span></button>
       <button class="category-card" data-type="window"><span class="cat-icon">▦</span><span><span class="cat-title">Ventana</span><span class="cat-sub">Vidrio y carpintería</span></span></button>
+    </div>
+    <div class="section-title">Formas editables · 2D y 3D</div>
+    <div class="category-grid">
+      <button class="category-card" data-type="disk"><span class="cat-icon">●</span><span><span class="cat-title">Círculo / disco</span><span class="cat-sub">Diámetro y espesor</span></span></button>
+      <button class="category-card" data-type="triangle"><span class="cat-icon">△</span><span><span class="cat-title">Triángulo</span><span class="cat-sub">Perfil con extrusión</span></span></button>
+      <button class="category-card" data-type="rectangle"><span class="cat-icon">▰</span><span><span class="cat-title">Rectángulo</span><span class="cat-sub">Placa con bordes suaves</span></span></button>
+      <button class="category-card" data-type="polygon"><span class="cat-icon">⬡</span><span><span class="cat-title">Polígono editable</span><span class="cat-sub">3 a 16 lados</span></span></button>
+      <button class="category-card" data-type="roundedCube"><span class="cat-icon">▣</span><span><span class="cat-title">Cubo biselado</span><span class="cat-sub">Redondeo editable</span></span></button>
+      <button class="category-card" data-type="space"><span class="cat-icon">⌂</span><span><span class="cat-title">Espacio interior</span><span class="cat-sub">Piso y tres paredes</span></span></button>
     </div>
     <div class="section-title">Formas rápidas · curvas y sólidos</div>
     <button class="nav-item" data-type="phone"><span class="nav-icon">▯</span> Smartphone</button>
@@ -377,7 +395,7 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
           <div class="scene-actions"><button class="btn" id="groupBtn" title="Agrupar objetos marcados">Agrupar marcados</button><button class="btn" id="ungroupBtn" title="Separar el grupo seleccionado">Separar grupo</button></div>
           <div class="scene-quick-add">
             <select class="select-control" id="quickShapeSelect" aria-label="Elegir forma para agregar">
-              <option value="cube">Cubo</option><option value="sphere">Esfera</option><option value="cylinder">Cilindro</option><option value="cone">Cono</option><option value="torus">Toroide</option><option value="capsule">Cápsula</option><option value="hexagon">Prisma hexagonal</option><option value="star">Estrella sólida</option><option value="octahedron">Octaedro</option><option value="gear">Engranaje</option><option value="wedge">Cuña / rampa</option><option value="pipe">Tubo hueco</option><option value="pyramid">Pirámide</option><option value="knot">Nudo</option><option value="wall">Pared</option><option value="floor">Piso / losa</option><option value="door">Puerta</option><option value="window">Ventana</option><option value="column">Columna</option><option value="arch">Arco</option><option value="tree">Árbol</option><option value="rock">Roca</option><option value="fountain">Fuente</option>
+              <option value="cube">Cubo</option><option value="sphere">Esfera</option><option value="cylinder">Cilindro</option><option value="cone">Cono</option><option value="torus">Toroide</option><option value="capsule">Cápsula</option><option value="hexagon">Prisma hexagonal</option><option value="disk">Círculo / disco</option><option value="triangle">Triángulo</option><option value="rectangle">Rectángulo</option><option value="polygon">Polígono editable</option><option value="roundedCube">Cubo biselado</option><option value="space">Espacio interior</option><option value="star">Estrella sólida</option><option value="octahedron">Octaedro</option><option value="gear">Engranaje</option><option value="wedge">Cuña / rampa</option><option value="pipe">Tubo hueco</option><option value="pyramid">Pirámide</option><option value="knot">Nudo</option><option value="wall">Pared</option><option value="floor">Piso / losa</option><option value="door">Puerta</option><option value="window">Ventana</option><option value="column">Columna</option><option value="arch">Arco</option><option value="tree">Árbol</option><option value="rock">Roca</option><option value="fountain">Fuente</option>
             </select>
             <button class="btn" id="quickAddBtn" type="button">＋ Agregar</button>
           </div>
@@ -398,18 +416,34 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
           <div class="scene-footnote">Activá “Añadir piezas” para sumar modelos sin reemplazar el diseño actual. Las piezas marcadas sirven para agruparlas o ajustar su distribución.</div>
         </div>
         <div class="prop-section arch-size-panel" id="archSizePanel">
-          <div class="prop-title">Dimensiones paramétricas <span class="arch-unit-tag" id="archSizeUnitTag">m</span></div>
+          <div class="prop-title" id="archSizeTitle">Dimensiones de geometría <span class="arch-unit-tag" id="archSizeUnitTag">m</span></div>
           <div class="arch-size-grid">
             <label class="arch-size-field">X · Ancho<input id="archSizeX" type="number" min="0.02" max="200" step="0.1" value="4" /></label>
             <label class="arch-size-field"><span id="archSizeYLabel">Y · Alto</span><input id="archSizeY" type="number" min="0.02" max="200" step="0.1" value="2.8" /></label>
             <label class="arch-size-field"><span id="archSizeZLabel">Z · Profundidad</span><input id="archSizeZ" type="number" min="0.02" max="200" step="0.1" value="0.18" /></label>
           </div>
+          <div class="wall-opening-controls" id="wallOpeningControls">
+            <div class="opening-heading">Abertura real en la pared</div>
+            <select id="wallOpeningType" class="select-control" aria-label="Tipo de abertura"><option value="none">Pared cerrada</option><option value="door">Hueco para puerta</option><option value="window">Hueco para ventana</option></select>
+            <div class="arch-size-grid opening-size-grid">
+              <label class="arch-size-field">Ancho del hueco<input id="openingWidth" type="number" min="0.1" max="20" step="0.1" value="0.9" /></label>
+              <label class="arch-size-field">Alto del hueco<input id="openingHeight" type="number" min="0.1" max="20" step="0.1" value="2.1" /></label>
+            </div>
+            <div class="arch-size-help">La abertura atraviesa toda la pared; no es solo una textura.</div>
+          </div>
+          <div class="shape-extra-control" id="polygonControls">
+            <label class="arch-size-field">Lados del polígono<input id="polygonSides" type="number" min="3" max="16" step="1" value="6" /></label>
+          </div>
+          <div class="shape-extra-control" id="bevelControls">
+            <label class="arch-size-field">Radio de bisel<input id="bevelRadius" type="number" min="0" max="0.7" step="0.02" value="0.12" /></label>
+          </div>
           <div class="arch-size-help" id="archSizeHelp">Medidas en la unidad visible. Cada pieza conserva sus dimensiones al guardar o exportar.</div>
-          <button class="btn arch-apply-btn" id="applyArchSizeBtn" type="button">Aplicar dimensiones</button>
+          <button class="btn arch-apply-btn" id="applyArchSizeBtn" type="button">Aplicar cambios de geometría</button>
         </div>
         <div class="prop-section"><div class="prop-title">Transformación <button id="resetTransform">RESTABLECER</button></div>
           <div class="prop-row"><div class="prop-label"><span>Posición</span><strong>XYZ</strong></div><div class="axis-fields"><div class="axis-field x"><label>X <input id="posX" type="number" step=".1" value="0"></label></div><div class="axis-field y"><label>Y <input id="posY" type="number" step=".1" value="0"></label></div><div class="axis-field z"><label>Z <input id="posZ" type="number" step=".1" value="0"></label></div></div></div>
-          <div class="prop-row"><div class="prop-label"><span>Escala</span><strong id="scaleReadout">1.00 ×</strong></div><div class="range-line"><input type="range" min=".35" max="2.5" step=".05" value="1" id="scaleRange"><span class="range-val" id="scaleValue">1.00</span></div></div>
+          <div class="prop-row"><div class="prop-label"><span>Escala uniforme</span><strong id="scaleReadout">1.00 ×</strong></div><div class="range-line"><input type="range" min=".05" max="5" step=".05" value="1" id="scaleRange"><span class="range-val" id="scaleValue">1.00</span></div></div>
+          <div class="prop-row"><div class="prop-label"><span>Escala independiente</span><strong>XYZ</strong></div><div class="axis-fields scale-fields"><div class="axis-field x"><label>X × <input id="scaleX" type="number" min=".05" max="20" step=".05" value="1" aria-label="Escala independiente en X"></label></div><div class="axis-field y"><label>Y × <input id="scaleY" type="number" min=".05" max="20" step=".05" value="1" aria-label="Escala independiente en Y"></label></div><div class="axis-field z"><label>Z × <input id="scaleZ" type="number" min=".05" max="20" step=".05" value="1" aria-label="Escala independiente en Z"></label></div></div><div class="arch-size-help">Estirá cada eje de forma independiente.</div><button class="btn" id="applyScaleXYZBtn" type="button">Aplicar escala XYZ</button></div>
           <div class="prop-row"><div class="prop-label"><span>Rotación Y</span><strong id="rotationValue">0°</strong></div><div class="range-line"><input type="range" min="-180" max="180" step="5" value="0" id="rotationRange"><span class="range-val" id="rotationReadout">0°</span></div><div class="axis-fields rotation-fields"><div class="axis-field x"><label>X° <input id="rotX" type="number" step="5" value="0" aria-label="Rotación eje X en grados"></label></div><div class="axis-field y"><label>Y° <input id="rotY" type="number" step="5" value="0" aria-label="Rotación eje Y en grados"></label></div><div class="axis-field z"><label>Z° <input id="rotZ" type="number" step="5" value="0" aria-label="Rotación eje Z en grados"></label></div></div><button class="btn center-support-btn" id="centerSupportBtn" type="button" title="Centrar en X/Z y apoyar la parte inferior en Y=0">Centrar y apoyar en el suelo</button></div>
         </div>
         <div class="prop-section">
@@ -506,7 +540,13 @@ const architecturalSizeDefaults = {
   wall:[4,2.8,.18],
   floor:[4,.15,4],
   door:[.95,2.1,.12],
-  window:[1.4,1.2,.12]
+  window:[1.4,1.2,.12],
+  space:[5,2.8,5],
+  disk:[2,.18,2],
+  triangle:[2,2,.35],
+  rectangle:[2,.16,1.5],
+  polygon:[2,1.8,2],
+  roundedCube:[1.6,1.6,1.6]
 };
 const architecturalSizeTypes = new Set(Object.keys(architecturalSizeDefaults));
 let designObjects = [];
@@ -575,6 +615,12 @@ const meta = {
   pipe:{name:'Tubo hueco',icon:'◎',type:'MECÁNICA · TUBERÍA',tag:'Pieza · Tubo'},
   star:{name:'Estrella sólida',icon:'✦',type:'SÓLIDO GEOMÉTRICO · 3D',tag:'Forma · Estrella'},
   octahedron:{name:'Octaedro facetado',icon:'◇',type:'SÓLIDO GEOMÉTRICO · 3D',tag:'Forma · Octaedro'},
+  disk:{name:'Disco circular',icon:'●',type:'GEOMETRÍA PLANA · VOLUMEN',tag:'Forma · Círculo'},
+  triangle:{name:'Triángulo extruido',icon:'△',type:'GEOMETRÍA PLANA · VOLUMEN',tag:'Forma · Triángulo'},
+  rectangle:{name:'Rectángulo biselado',icon:'▰',type:'GEOMETRÍA PLANA · VOLUMEN',tag:'Forma · Rectángulo'},
+  polygon:{name:'Polígono extruido',icon:'⬡',type:'GEOMETRÍA PARAMÉTRICA · 3D',tag:'Forma · Polígono'},
+  roundedCube:{name:'Cubo con bisel',icon:'▣',type:'SÓLIDO PARAMÉTRICO · 3D',tag:'Forma · Bisel editable'},
+  space:{name:'Espacio interior abierto',icon:'⌂',type:'ARQUITECTURA · INTERIOR',tag:'Espacio · Tres paredes'},
   arch:{name:'Arco clásico',icon:'∩',type:'ARQUITECTURA · DETALLE',tag:'Detalle · Arco'},
   dome:{name:'Cúpula arquitectónica',icon:'◠',type:'ARQUITECTURA · CUBIERTA',tag:'Detalle · Cúpula'},
   stairs:{name:'Escalera de diseño',icon:'▥',type:'ARQUITECTURA · CIRCULACIÓN',tag:'Detalle · Escalera'},
