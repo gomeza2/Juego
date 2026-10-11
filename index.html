@@ -1172,7 +1172,7 @@ function clearModels() {
   while(modelRoot.children.length) {
     const obj=modelRoot.children[0];modelRoot.remove(obj);disposeTree(obj);
   }
-  designObjects=[];selected=null;
+  designObjects=[];selected=null;groupSelection.clear();
   if($('dimensionOverlay'))$('dimensionOverlay').classList.remove('active');
 }
 const placementOffsets=[[3.1,0,1.7],[-3.1,0,1.7],[3.1,0,-1.7],[-3.1,0,-1.7],[0,0,4.1],[0,0,-4.1],[5.2,0,.1],[-5.2,0,.1]];
@@ -1455,7 +1455,6 @@ function applySnapshot(s) {
     createDesign(currentType,{skipHistory:true,state:{position:s.position,scale:s.scale,rotation:s.rotation,color:currentColor,material:currentMaterial,texture:currentTexture,textureScale}});
   }
   setCameraView(s.view||'perspective');
-  applyPrimaryMaterial(selected||modelRoot);
   scene.traverse(o=>{if(o.isMesh&&o.userData.primary)o.material.wireframe=wireEnabled;});
   updateMeta();updateDimensions();applyingState=false;
 }
@@ -1581,55 +1580,61 @@ function deleteSelected() {
     currentType=selected.userData.designType||'group';selectDesign(selected);updateMeta();persist();toast('Objeto eliminado.');
   }
 }
+function detectPromptType(text) {
+  if(/mans[ií]on|residencia enorme|palacete/.test(text))return 'mansion';
+  if(/rascacielos|edificio|torre de oficinas|skyscraper/.test(text))return 'skyscraper';
+  if(/castillo|fortaleza/.test(text))return 'castle';
+  if(/villa moderna|villa contempor[aá]nea/.test(text))return 'villa';
+  if(/pabell[oó]n|gazebo/.test(text))return 'pavilion';
+  if(/puente|pasarela/.test(text))return 'bridge';
+  if(/c[uú]pula|domo|dome/.test(text))return 'dome';
+  if(/arco|arcada/.test(text))return 'arch';
+  if(/escalera|peldaño|escalinata/.test(text))return 'stairs';
+  if(/columna|pilar/.test(text))return 'column';
+  if(/pir[aá]mide|pyramid/.test(text))return 'pyramid';
+  if(/[aá]rbol|arbol|paisajismo|arbusto/.test(text))return 'tree';
+  if(/roca|piedra irregular|boulder/.test(text))return 'rock';
+  if(/fuente|fontana/.test(text))return 'fountain';
+  if(/habitaci|casa|sal[oó]n|interior|dormitorio|cocina|hogar/.test(text))return 'room';
+  if(/cohete|rocket|orbita/.test(text))return 'rocket';
+  if(/avi[oó]n|aeronave|aircraft|jet/.test(text))return 'plane';
+  if(/sill[oó]n|sillon|silla|butaca|chair/.test(text))return 'chair';
+  if(/mesa|escritorio|table/.test(text))return 'table';
+  if(/l[aá]mpara|lampara|luminaria/.test(text))return 'lamp';
+  if(/botella|envase|termo/.test(text))return 'bottle';
+  if(/celular|tel[eé]fono|smartphone|m[oó]vil/.test(text))return 'phone';
+  if(/auto|coche|carro|autom[oó]vil|veh[ií]culo/.test(text))return 'car';
+  if(/drone|dron|cuadric[oó]ptero/.test(text))return 'drone';
+  if(/c[aá]mara|fotograf[ií]a/.test(text))return 'camera';
+  if(/nave|spaceship|ovni|platillo/.test(text))return 'spaceship';
+  if(/sof[aá]|sofa|living/.test(text))return 'sofa';
+  if(/jarr[oó]n|florero|vase/.test(text))return 'vase';
+  if(/altavoz|parlante|bocina|speaker/.test(text))return 'speaker';
+  if(/reloj|smartwatch|wearable/.test(text))return 'watch';
+  if(/anillo|toroide|torus/.test(text))return 'torus';
+  if(/c[aá]psula|capsule/.test(text))return 'capsule';
+  if(/cono|cone/.test(text))return 'cone';
+  if(/cilindro|cylinder/.test(text))return 'cylinder';
+  if(/nudo|knot/.test(text))return 'knot';
+  if(/esfera|bola|sphere/.test(text))return 'sphere';
+  if(/cubo|bloque|caja|cube/.test(text))return 'cube';
+  if(/auricular|audio|producto|gadget/.test(text))return 'headphones';
+  return 'headphones';
+}
 function handlePrompt() {
   const raw=$('promptInput').value.trim();
-  if(!raw){$('promptInput').focus();toast('Escribí una idea para empezar.');return;}
+  if(!raw){$('promptInput').focus();toast('Describí el objeto o la escena que querés construir.');return;}
   const text=raw.toLowerCase();
-  let type='headphones';
-  if(/mans[ií]on|mansión|residencia enorme|palacete/.test(text)) type='mansion';
-  else if(/arco|arcada/.test(text))type='arch';
-  else if(/c[uú]pula|domo|dome/.test(text))type='dome';
-  else if(/escalera|peldaño|escalinata/.test(text))type='stairs';
-  else if(/columna|pilar/.test(text))type='column';
-  else if(/pir[aá]mide|pyramid/.test(text))type='pyramid';
-  else if(/[aá]rbol|arbol|paisajismo|arbusto/.test(text))type='tree';
-  else if(/roca|piedra irregular|boulder/.test(text))type='rock';
-  else if(/fuente|fontana/.test(text))type='fountain';
-  else if(/rascacielos|edificio|torre de oficinas|skyscraper/.test(text))type='skyscraper';
-  else if(/castillo|fortaleza/.test(text))type='castle';
-  else if(/villa moderna|villa contempor[aá]nea/.test(text))type='villa';
-  else if(/pabell[oó]n|gazebo|c[uú]pula/.test(text))type='pavilion';
-  else if(/puente|pasarela/.test(text))type='bridge';
-  else if(/habitaci|casa|sal[oó]n|interior|dormitorio|cocina|decoraci|hogar/.test(text)) type='room';
-  else if(/cohete|rocket|espacial|orbita/.test(text))type='rocket';
-  else if(/avi[oó]n|avion|aeronave|aircraft|jet/.test(text))type='plane';
-  else if(/sill[oó]n|sillon|silla|butaca|sof[aá]|chair/.test(text))type='chair';
-  else if(/mesa|escritorio|table/.test(text))type='table';
-  else if(/l[aá]mpara|lampara|luz|luminaria/.test(text))type='lamp';
-  else if(/botella|envase|termo/.test(text))type='bottle';
-  else if(/celular|tel[eé]fono|smartphone|m[oó]vil/.test(text))type='phone';
-  else if(/auto|coche|carro|autom[oó]vil|veh[ií]culo/.test(text))type='car';
-  else if(/drone|dron|cuadric[oó]ptero/.test(text))type='drone';
-  else if(/c[aá]mara|fotograf[ií]a/.test(text))type='camera';
-  else if(/nave|spaceship|ovni|platillo/.test(text))type='spaceship';
-  else if(/sof[aá]|sofa|living/.test(text))type='sofa';
-  else if(/jarr[oó]n|florero|vase/.test(text))type='vase';
-  else if(/altavoz|parlante|bocina|speaker/.test(text))type='speaker';
-  else if(/reloj|smartwatch|wearable/.test(text))type='watch';
-  else if(/anillo|toroide|torus/.test(text))type='torus';
-  else if(/c[aá]psula|capsule/.test(text))type='capsule';
-  else if(/cono|cone/.test(text))type='cone';
-  else if(/cilindro|cylinder/.test(text))type='cylinder';
-  else if(/nudo|knot/.test(text))type='knot';
-  else if(/esfera|bola|sphere/.test(text))type='sphere';
-  else if(/cubo|bloque|caja|cube/.test(text))type='cube';
-  $('projectName').value=raw.length>42?raw.slice(0,42)+'…':raw.charAt(0).toUpperCase()+raw.slice(1);
+  const type=detectPromptType(text);
+  $('projectName').value=raw.length>50?raw.slice(0,50)+'…':raw.charAt(0).toUpperCase()+raw.slice(1);
   if(/\b(rojo|roja|coral|naranja)\b/.test(text))currentColor='#f28b72';
-  else if(/\b(azul|celeste)\b/.test(text))currentColor='#82a9ff';
-  else if(/\b(violeta|lila|lavanda|lila)\b/.test(text))currentColor='#c79cff';
-  else if(/\b(blanco|blanca|hielo)\b/.test(text))currentColor='#e8edf5';
-  else if(/\b(negro|negra|grafito)\b/.test(text))currentColor='#242b38';
+  else if(/\b(azul|celeste|azulada)\b/.test(text))currentColor='#82a9ff';
+  else if(/\b(violeta|lila|lavanda)\b/.test(text))currentColor='#c79cff';
+  else if(/\b(blanco|blanca|hielo|marfil)\b/.test(text))currentColor='#e8edf5';
+  else if(/\b(negro|negra|grafito|oscuro)\b/.test(text))currentColor='#242b38';
   else if(/\b(verde|lima)\b/.test(text))currentColor='#c8ff57';
+  else if(/\b(madera clara|roble|beige|arena)\b/.test(text))currentColor='#c3a982';
+  else if(/\b(concreto|cemento|gris)\b/.test(text))currentColor='#a0a6ad';
   else currentColor='#c8ff57';
   if(/madera|wood|parquet/.test(text))currentTexture='wood';
   else if(/m[aá]rmol|marble/.test(text))currentTexture='marble';
@@ -1642,9 +1647,56 @@ function handlePrompt() {
   else if(/terrazo|terrazzo/.test(text))currentTexture='terrazzo';
   else if(/metal rayado|metal cepillado|acero cepillado/.test(text))currentTexture='brushed';
   else if(/sin textura|liso|smooth/.test(text))currentTexture='none';
-  createDesign(type);
+  architecturalFloors=THREE.MathUtils.clamp(parseInt(text.match(/\b(\d{1,2})\s*(?:pisos?|plantas?|niveles?)\b/)?.[1]||'10',10),3,40);
+  const hasComposition=/\b(con|y|junto|rodead[oa]s?|alrededor|jard[ií]n|patio|parque|composici[oó]n|escena)\b/.test(text);
+  const keepScene=addMode||hasComposition;
+  const base=createDesign(type,{keepScene});
+  const addPiece=(piece,pos,name)=>{
+    const root=createDesign(piece,{keepScene:true,position:pos,focus:false});
+    if(name)root.name=name;
+    return root;
+  };
+  if(hasComposition){
+    const countFor=(re,fallback,max=10)=>{
+      const match=text.match(new RegExp('\\b(\\d{1,2})\\s*(?:'+re+')\\b'));
+      return Math.min(max,Math.max(1,parseInt(match?.[1]||String(fallback),10)));
+    };
+    if(/\b(\d{1,2})\s*(?:pisos?|plantas?|niveles?)\b/.test(text)&&type==='skyscraper'){
+      // The selected model uses this count when it is constructed; the value also persists for the next tower.
+      architecturalFloors=THREE.MathUtils.clamp(parseInt(text.match(/\b(\d{1,2})\s*(?:pisos?|plantas?|niveles?)\b/)[1],10),3,40);
+    }
+    if(/\b(arbol|árbol|arboles|árboles|arbusto|arbustos)\b/.test(text)){
+      const count=countFor('(?:arboles?|árboles?|arbustos?)',/jard[ií]n/.test(text)?4:2,12);
+      const color=currentColor,texture=currentTexture;
+      for(let i=0;i<count;i++){
+        currentColor='#7ea66c';currentTexture='none';
+        const angle=(Math.PI*2*i)/count;
+        addPiece('tree',[Math.cos(angle)*4.8,0,Math.sin(angle)*4.1+1.7],'Árbol '+(i+1));
+      }
+      currentColor=color;currentTexture=texture;
+    }
+    if(/fuente|fontana/.test(text))addPiece('fountain',[0,0,4.5],'Fuente ornamental');
+    if(/columnas?|pilares?/.test(text)){
+      const count=countFor('(?:columnas?|pilares?)',4,12);
+      for(let i=0;i<count;i++){
+        const x=count===1?0:-1.8+(3.6*i)/(count-1);
+        addPiece('column',[x,0,2.4],'Columna '+(i+1));
+      }
+    }
+    if(/escalera|escalinata|peldaños/.test(text))addPiece('stairs',[0,0,2.7],'Escalinata');
+    if(/arcos?|arcadas?/.test(text))addPiece('arch',[2.8,0,2.6],'Arco decorativo');
+    if(/c[uú]pula|domo/.test(text)&&type!=='dome'&&type!=='pavilion')addPiece('dome',[0,0,-3.5],'Cúpula auxiliar');
+    if(/rocas?|piedras? naturales/.test(text)){
+      const count=countFor('(?:rocas?|piedras?)',3,10),color=currentColor,texture=currentTexture;
+      currentColor='#9b9b91';currentTexture='stone';
+      for(let i=0;i<count;i++)addPiece('rock',[-3+i*1.2,0,3.3],'Roca '+(i+1));
+      currentColor=color;currentTexture=texture;
+    }
+  }
+  currentType=selected?.userData.designType||type;
+  selectDesign(selected||base);updateMeta();focusScene();persist();
   $('promptInput').value='';
-  toast('Concepto base creado. Personalizalo en Propiedades.');
+  toast(hasComposition?'Escena procedural creada. Ajustá piezas, medidas y materiales por separado.':'Modelo base creado. Podés agregarlo a una escena y personalizarlo.');
 }
 function setSwitch(id,value) {$ (id).classList.toggle('on',value);}
 document.querySelectorAll('[data-type]').forEach(btn=>btn.addEventListener('click',()=>{
