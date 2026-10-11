@@ -1773,11 +1773,14 @@ function updateMeta() {
   $('objectCount').textContent=designObjects.length+' '+(designObjects.length===1?'objeto':'objetos');
   $('stageEmpty').style.display=empty?'flex':'none';
   $('archSizePanel').classList.toggle('show',!!selected&&architecturalSizeTypes.has(currentType));
-  const objectControls=['posX','posY','posZ','scaleRange','rotationRange','rotX','rotY','rotZ','resetTransform','centerSupportBtn','renameBtn','duplicateBtn','deleteBtn','blueprintBtn','dimensionsBtn'];
+  $('wallOpeningControls').classList.toggle('show',!!selected&&currentType==='wall');
+  $('polygonControls').classList.toggle('show',!!selected&&currentType==='polygon');
+  $('bevelControls').classList.toggle('show',!!selected&&(currentType==='rectangle'||currentType==='roundedCube'));
+  const objectControls=['posX','posY','posZ','scaleRange','scaleX','scaleY','scaleZ','applyScaleXYZBtn','rotationRange','rotX','rotY','rotZ','resetTransform','centerSupportBtn','renameBtn','duplicateBtn','deleteBtn','blueprintBtn','dimensionsBtn','applyArchSizeBtn','wallOpeningType','openingWidth','openingHeight','polygonSides','bevelRadius'];
   objectControls.forEach(id=>{const el=$(id);if(el)el.disabled=empty;});
   if(empty){
     $('posX').value='0';$('posY').value='0';$('posZ').value='0';
-    $('scaleRange').value=1;$('scaleValue').textContent='1.00';$('scaleReadout').textContent='1.00 ×';
+    $('scaleRange').value=1;$('scaleValue').textContent='1.00';$('scaleReadout').textContent='1.00 ×';$('scaleX').value=1;$('scaleY').value=1;$('scaleZ').value=1;
     $('rotationRange').value=0;$('rotationValue').textContent='0°';$('rotationReadout').textContent='0°';
     $('rotX').value=0;$('rotY').value=0;$('rotZ').value=0;
   }
