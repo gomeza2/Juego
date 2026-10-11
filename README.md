@@ -1,50 +1,72 @@
 # NEXO Studio
 
-Editor 3D en el navegador para explorar conceptos de productos, interiores, arquitectura y formas orgánicas.
+Editor 3D en el navegador para crear conceptos de productos, interiores, formas orgánicas y arquitectura. Está construido con HTML, CSS, JavaScript y Three.js.
 
-## Funciones actuales
+## Fases del proyecto
 
-- Visor 3D con cámara orbital, zoom y enfoque del modelo.
-- Interfaz clara y adaptable.
-- Biblioteca de productos, muebles, vehículos, formas orgánicas y estructuras arquitectónicas: mansión, rascacielos, castillo, villa, pabellón, puente, arco, cúpula, escalera, columna, pirámide, árbol, roca y fuente, entre otras.
+### Fase 1 · Editor y materiales — implementada
+- Visor 3D con órbita, zoom y enfoque.
+- Iluminación de estudio, reflejos de entorno y sombras.
 - Acabados mate, satín, brillante y metálico.
-- **Texturas procedurales** generadas en el navegador: madera, mármol, hormigón, tela, metal rayado, fibra de carbono, terrazo, ladrillo, piedra natural y baldosas.
-- Mapas de color, rugosidad y relieve para dar más lectura a las superficies.
-- Modelos con aristas redondeadas para mejorar el acabado de smartphones, cámaras, altavoces, drones y mobiliario.
-- Ambiente de estudio para producir reflejos más naturales en metales y materiales brillantes.
-- Tres niveles de calidad gráfica: estándar, alta y ultra, con distintos límites de resolución y tamaño de sombras.
-- Iluminación de estudio con entorno de reflejos para mejorar el aspecto de superficies metálicas y brillantes.
-- Escala de textura ajustable y reconocimiento de materiales descritos en el campo de ideas.
-- Escala de textura ajustable.
-- Ajustes de color, escala, rotación, posición e iluminación.
-- Duplicación, eliminación, deshacer y rehacer cambios básicos.
-- Guardado automático local, exportación GLB, captura PNG y parámetros JSON.
-- El campo de ideas reconoce nombres de modelos, algunos colores y varios materiales.
-- GitHub Actions comprueba la sintaxis JavaScript del módulo antes de la publicación.
+- Texturas procedurales: madera, mármol, hormigón, tela, metal rayado, fibra de carbono, terrazo, ladrillo, piedra y baldosas.
+- Tres niveles gráficos: estándar, alta y ultra.
+- Color, escala, rotación, posición, duplicación y eliminación.
+- Guardado automático local y deshacer/rehacer cambios.
 
-## Fases
+### Fase 2 · Formas y arquitectura — implementada
+La biblioteca contiene productos, dispositivos, muebles, vehículos, formas orgánicas y modelos de arquitectura: mansión, rascacielos, castillo, villa, pabellón, puente, arco, cúpula, escalera, columna, pirámide, árbol, roca y fuente, entre otros. Se generan con geometría procedural, no con capturas estáticas.
 
-**Fase 1 · Editor base:** implementada.
+### Fase 3 · Composición de escenas — implementada
+- Modo **Añadir piezas** para mantener lo existente al incorporar otro modelo.
+- Jerarquía de objetos con selección independiente.
+- Mostrar/ocultar objetos.
+- Agrupar varios objetos seleccionados y separar grupos.
+- Duplicación y borrado de objetos.
+- Transformaciones y materiales por objeto.
+- Guardado y recuperación de escenas con objetos, grupos, materiales, vistas y ajustes.
+- Exportación de la escena completa a JSON y de la geometría a GLB.
 
-**Fase 2 · Formas y arquitectura:** implementada como biblioteca de estructuras y componentes con geometría procedural.
+### Fase 4 · Medidas y planos de referencia — implementada
+- Unidades mostradas en m, cm, mm y ft.
+- Dimensiones X/Y/Z del volumen envolvente y cotas visuales.
+- Vistas ortográficas superior, frontal y lateral, además de perspectiva.
+- Exportación de una ficha SVG con las medidas de referencia y datos del objeto.
+- El archivo JSON conserva las transformaciones y la estructura completa de la escena.
 
-**Fase 3 · Composición de escenas:** siguiente. Permitir agregar varios objetos a una escena sin reemplazar lo que ya existe, seleccionarlos de forma independiente, agruparlos y moverlos por separado.
+**Importante:** las cotas describen la caja envolvente del objeto. La ficha SVG sirve como referencia conceptual; no es un plano constructivo certificado, no comprueba resistencia estructural, tolerancias, códigos de construcción ni preparación para fabricación.
 
-**Fase 4 · Medidas y planos:** planificada. Incluir unidades reales, cotas, guías y vistas ortográficas.
+### Fase 5 · Asistente de diseño e IA 3D — parcialmente implementada
+El asistente procedural local reconoce familias de objetos y puede componer algunas escenas desde una descripción. Por ejemplo, «mansión con cuatro árboles y una fuente de mármol» crea un conjunto a partir de modelos disponibles. Esto funciona en la publicación estática sin una API externa.
 
-**Fase 5 · IA generativa:** planificada. La generación arbitraria de modelos desde texto requiere conectar un servicio de IA 3D a un backend seguro; la función actual elige un modelo base a partir de palabras clave.
+También está preparado el conector para generación real mediante el flujo de dos pasos de [Meshy Text-to-3D API](https://docs.meshy.ai/en/api/text-to-3d): primero genera geometría preliminar y luego crea el modelo texturizado con materiales PBR. El modelo final se importa al visor como GLB y se guarda en IndexedDB del navegador para poder recuperar la escena en ese mismo perfil del navegador.
 
-## Publicar
+**La generación real no funciona desde GitHub Pages por sí sola.** Pages es estático y no ejecuta la función de servidor de este repositorio. Para activarla, hace falta desplegar el proyecto en un hosting que ejecute funciones Node, configurar las dos variables privadas siguientes y tener una cuenta del proveedor con créditos disponibles:
+- `MESHY_API_KEY`: clave privada del proveedor, únicamente en el servidor.
+- `NEXO_AI_ACCESS_CODE`: código privado que elegís y que la web solicitará al usar el botón **IA 3D**.
 
-1. Abrí [Settings → Pages](https://github.com/gomeza2/Juego/settings/pages).
-2. En **Build and deployment → Source**, elegí **GitHub Actions** si todavía no está seleccionado.
-3. Revisá el flujo [Actions](https://github.com/gomeza2/Juego/actions).
-4. Cuando el despliegue termine correctamente, abrí https://gomeza2.github.io/Juego/
+El backend está en `api/ai3d.js`. El código de acceso evita que el endpoint quede abierto simplemente por conocer la dirección, pero no reemplaza una protección profesional contra abuso, límites de uso o controles de cuenta al lanzar un servicio público. No pongas estas variables en `index.html`, commits, README ni archivos descargables.
 
-## Alcance y rendimiento
+#### Activar el endpoint real
+1. Importá este repositorio en un proveedor de hosting compatible con funciones Node, por ejemplo [Vercel](https://vercel.com/).
+2. En la configuración del proyecto, añadí las variables de entorno `MESHY_API_KEY` y `NEXO_AI_ACCESS_CODE) como secretos de producción. Elegí tu propio código de acceso.
+3. Volvé a desplegar el proyecto. En la URL del hosting, el endpoint `/api/ai3d` se ejecuta en el servidor; en `github.io`, el editor sigue funcionando sin la generación externa.
+4. Abrí el editor desplegado en ese hosting, describí el modelo y pulsá **IA 3D**. El navegador te pedirá el código privado al iniciar la sesión.
+5. Tené en cuenta que generar la geometría y después aplicar texturas utiliza los créditos del proveedor. Revisá sus [documentos de API](https://docs.meshy.ai/en/api/text-to-3d), [guía de inicio](https://docs.meshy.ai/en/api/quick-start) y condiciones de uso antes de activar la función.
 
-Las texturas se generan dentro del navegador, no se descargan imágenes de material. La opción Ultra aumenta la resolución de salida y de las sombras, por lo que puede requerir más memoria y potencia gráfica. Los modelos arquitectónicos son conceptos visuales y no planos certificados para construcción.
+Si el endpoint no está configurado, el asistente local y todas las herramientas de modelado siguen disponibles; no se simula una respuesta de IA.
 
-## Tecnología
+## Publicación en GitHub Pages
 
-HTML, CSS, JavaScript y Three.js 0.169.0, con OrbitControls, GLTFExporter y RoomEnvironment. Three.js y la tipografía se cargan desde CDN, así que se necesita conexión a internet.
+La versión pública está prevista en https://gomeza2.github.io/Juego/
+
+El workflow `.github/workflows/deploy.yml` comprueba la sintaxis JavaScript del editor y del endpoint antes de publicar el contenido. Para activar o revisar Pages:
+1. Abrí [Settings → Pages](https://github.com/gomeza2/Juego/settings/pages) y seleccioná **GitHub Actions** como fuente.
+2. Revisá las ejecuciones en [Actions](https://github.com/gomeza2/Juego/actions).
+
+## Tecnología y límites
+
+- Three.js 0.169.0, OrbitControls, GLTFExporter, GLTFLoader, RoomEnvironment y geometría procedural.
+- Las bibliotecas se cargan desde CDN; el editor necesita conexión a internet.
+- Los proyectos locales se guardan en el navegador. Los modelos IA cacheados se guardan en IndexedDB en ese perfil de navegador, así que conviene exportar un GLB y un JSON si querés conservar una copia portable.
+- El asistente local elige y combina modelos de la biblioteca; no equivale a un modelo generativo.
+- Los modelos arquitectónicos y las medidas son de diseño conceptual, no documentación lista para construir.
