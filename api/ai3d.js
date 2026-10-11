@@ -1,4 +1,14 @@
+const { timingSafeEqual } = require("crypto");
 const MESHY_API = "https://api.meshy.ai/openapi/v2/text-to-3d";
+
+function isAuthorized(req, expected) {
+  const supplied = String(req.headers["x-nexo-access"] || "");
+  if (!expected || !supplied) return false;
+  const a = Buffer.from(supplied, "utf8");
+  const b = Buffer.from(expected, "utf8");
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
+}
 
 function sendJson(res, status, body) {
   res.statusCode = status;
@@ -51,9 +61,18 @@ module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("X-Content-Type-Options", "nosniff");
   const apiKey = process.env.MESHY_API_KEY;
+  const accessCode = process.env.NEXO_AI_ACCESS_CODE;
+  if (!accessCode) {
+    return sendJson(res, 503, {
+      error: "Falta configurar NEXO_AI_ACCESS_CODE como variable privada del servidor."
+    });
+  }
+  if (!isAuthorized(req, accessCode)) {
+    return sendJson(res, 401, { error: "Código de acceso a IA incorrecto." });
+  }
   if (!apiKey) {
     return sendJson(res, 503, {
-      error: "IA 3D todavía no está configurada en el servidor. Desplegá la app con un secreto MESHY_API_KEY."
+      error: "IA 3D todavía no está configurada en el servidor. Definí la variable privada MESHY_API_KEY."
     });
   }
 
