@@ -12,16 +12,17 @@ Un espacio de diseño 3D en el navegador, creado con HTML, CSS y Three.js.
 - Deshacer y rehacer cambios comunes.
 - Exportación de modelo 3D en GLB, imagen PNG y parámetros del proyecto en JSON.
 - Interfaz adaptable a pantallas pequeñas.
+- Flujo de publicación automática con GitHub Actions.
 
-## Publicar en GitHub Pages
+## Publicar la web
 
-1. Abrí **Settings** de este repositorio.
-2. Entrá en **Pages**.
-3. En **Build and deployment**, elegí **Deploy from a branch**.
-4. Seleccioná la rama **main** y la carpeta **/ (root)**, y guardá.
-5. Esperá a que GitHub Pages termine la publicación. La dirección del sitio aparecerá en esa misma sección.
+1. Abrí la pestaña **Settings** de este repositorio.
+2. En la barra lateral, entrá en **Pages**.
+3. En **Build and deployment → Source**, elegí **GitHub Actions**.
+4. Entrá en la pestaña **Actions** del repositorio y verificá que termine correctamente el flujo **Deploy NEXO Studio to GitHub Pages**.
+5. Cuando el despliegue termine, abrí: https://gomeza2.github.io/Juego/
 
-El archivo de entrada es `index.html`. No hace falta instalar dependencias ni ejecutar un servidor local: Three.js se carga desde jsDelivr mediante módulos del navegador.
+El flujo se ejecuta en cada cambio de la rama `main`. El archivo principal es `index.html`; no hace falta instalar dependencias ni ejecutar un servidor local. Three.js se carga desde jsDelivr mediante módulos del navegador.
 
 ## Importante
 
