@@ -213,7 +213,7 @@ body{background:#f5f7fa;color:#182235}
       <button class="icon-btn" id="redoBtn" title="Rehacer (Ctrl+Y)" aria-label="Rehacer">↷</button>
       <span class="top-divider"></span>
       <button class="btn" id="viewInspectorBtn" title="Mostrar propiedades">☷ <span>Propiedades</span></button>
-      <div class="export-wrap"><button class="btn btn-primary" id="exportBtn">Exportar <span>↗</span></button><div class="export-menu" id="exportMenu"><button class="export-option" data-export="glb">Modelo 3D (.glb)<small>Para Blender y otros editores 3D</small></button><button class="export-option" data-export="png">Captura de pantalla (.png)<small>Imagen de tu vista actual</small></button><button class="export-option" data-export="json">Proyecto editable (.json)<small>Guarda todos los objetos y materiales</small></button><button class="export-option" data-export="svg">Ficha técnica (.svg)<small>Vistas y dimensiones referenciales</small></button></div></div>
+      <div class="export-wrap"><button class="btn btn-primary" id="exportBtn">Exportar <span>↗</span></button><div class="export-menu" id="exportMenu"><button class="export-option" data-export="glb">Modelo 3D (.glb)<small>Para Blender y otros editores 3D</small></button><button class="export-option" data-export="png">Captura de pantalla (.png)<small>Imagen de tu vista actual</small></button><button class="export-option" data-export="json">Proyecto editable (.json)<small>Guarda todos los objetos y materiales</small></button><button class="export-option" data-export="svg">Ficha técnica (.svg)<small>Vistas y dimensiones referenciales</small></button><button class="export-option" data-export="import-glb">Importar modelo 3D (.glb)<small>Añadí un modelo de otro editor</small></button><button class="export-option" data-export="import-json">Abrir proyecto (.json)<small>Restaurá una escena guardada</small></button></div></div>
     </div>
   </header>
   <div class="studio-grid">
@@ -297,6 +297,8 @@ body{background:#f5f7fa;color:#182235}
 </main>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<input id="modelImportInput" type="file" accept=".glb,model/gltf-binary" hidden>
+<input id="projectImportInput" type="file" accept=".json,application/json" hidden>
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -415,7 +417,8 @@ const meta = {
   rock:{name:'Roca orgánica',icon:'⬟',type:'FORMA ORGÁNICA · 3D',tag:'Forma · Roca'},
   fountain:{name:'Fuente ornamental',icon:'♨',type:'PAISAJISMO · ESTRUCTURA',tag:'Fuente · Jardín'},
   group:{name:'Grupo de objetos',icon:'▣',type:'COMPOSICIÓN · GRUPO',tag:'Grupo · Escena'},
-  generated:{name:'Modelo generado por IA',icon:'✦',type:'IA GENERATIVA · GLB',tag:'Modelo IA · Importado'}
+  generated:{name:'Modelo generado por IA',icon:'✦',type:'IA GENERATIVA · GLB',tag:'Modelo IA · Importado'},
+  imported:{name:'Modelo 3D importado',icon:'▣',type:'MODELO EXTERNO · GLB',tag:'Modelo GLB · Importado'}
 };
 const materialSettings = {
   matte:{roughness:.82,metalness:.04},
@@ -1442,9 +1445,9 @@ function restoreSceneNode(data,parent=modelRoot) {
   parent.add(root);
   if(isGroup){
     for(const childData of data.children||[])restoreSceneNode(childData,root);
-  }else if(type==='generated'){
+  }else if(type==='generated'||type==='imported'){
     if(data.assetKey)restoreGeneratedAsset(root,data.assetKey);
-    else toast('Este JSON referencia un modelo IA que no está guardado en este navegador. Exportá el proyecto como GLB para transportarlo.');
+    else toast('Este JSON referencia un modelo 3D que no está guardado en este navegador. Importá su GLB por separado.');
   }else{
     build(type,root);applyPrimaryMaterial(root);
   }
@@ -1559,6 +1562,40 @@ function exportJSON() {
   downloadBlob(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),safeFilename($('projectName').value)+'.json');
   toast('Escena completa exportada en JSON.');
 }
+async function importGLBFile(file) {
+  if(!file)return;
+  if(!file.name.toLowerCase().endsWith('.glb')){
+    toast('Por ahora se admite GLB binario. Convertí GLTF con sus recursos a GLB antes de importarlo.');return;
+  }
+  if(file.size>100*1024*1024){toast('El modelo supera el límite local de 100 MB.');return;}
+  try{
+    toast('Leyendo modelo GLB…');
+    const bytes=await file.arrayBuffer(),loader=new GLTFLoader();
+    const gltf=await new Promise((resolve,reject)=>loader.parse(bytes,'',resolve,reject));
+    const filename=file.name.replace(/\.glb$/i,'').replace(/[_-]+/g,' ').trim()||'Modelo GLB';
+    await addGeneratedModel(gltf,filename,bytes,'imported');
+    toast('Modelo GLB importado a la escena.');
+  }catch(error){console.error('GLB import failed:',error);toast('No se pudo importar este GLB. Comprobá que el archivo esté completo y sea válido.');}
+}
+async function importProjectJSON(file) {
+  if(!file)return;
+  if(file.size>8*1024*1024){toast('El JSON de proyecto supera el límite de 8 MB.');return;}
+  try{
+    const data=JSON.parse(await file.text());
+    const project=data.project||data;
+    if(!project||(!Array.isArray(project.objects)&&!project.type))throw new Error('El archivo no parece ser un proyecto NEXO.');
+    pushHistory();applySnapshot(project);persist();
+    toast('Proyecto JSON abierto.');
+  }catch(error){console.error('Project import failed:',error);toast(error.message||'No se pudo abrir este proyecto JSON.');}
+}
+$('modelImportInput').addEventListener('change',e=>{
+  const file=e.target.files?.[0];e.target.value='';
+  if(file)importGLBFile(file);
+});
+$('projectImportInput').addEventListener('change',e=>{
+  const file=e.target.files?.[0];e.target.value='';
+  if(file)importProjectJSON(file);
+});
 function exportTechnicalSVG() {
   if(!selected){toast('Seleccioná un objeto para crear su ficha técnica.');return;}
   const bounds=new THREE.Box3().setFromObject(selected),size=bounds.getSize(new THREE.Vector3());
@@ -1868,12 +1905,12 @@ async function restoreGeneratedAsset(root,key) {
     persist();
   }catch(error){console.warn('Could not restore generated asset:',error);toast('No se pudo restaurar un modelo IA guardado.');}
 }
-async function addGeneratedModel(gltf,prompt,bytes) {
+async function addGeneratedModel(gltf,prompt,bytes,type='generated') {
   pushHistory();
   if(!addMode)clearModels();
   const root=new THREE.Group();
   root.name=prompt.length>42?prompt.slice(0,42)+'…':prompt;
-  root.userData.designRoot=true;root.userData.designType='generated';root.userData.generated=true;
+  root.userData.designRoot=true;root.userData.designType=type;root.userData.generated=true;
   root.userData.style=styleSnapshot();
   root.userData.assetKey='ai-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9);
   try{await storeGeneratedAsset(root.userData.assetKey,new Blob([bytes],{type:'model/gltf-binary'}));}
@@ -2033,7 +2070,12 @@ $('collapseInspector').addEventListener('click',()=>{if(window.innerWidth<=920)$
 $('exportBtn').addEventListener('click',()=>$('exportMenu').classList.toggle('open'));
 document.querySelectorAll('[data-export]').forEach(btn=>btn.addEventListener('click',()=>{
   $('exportMenu').classList.remove('open');
-  if(btn.dataset.export==='glb')exportGLB();else if(btn.dataset.export==='png')exportPNG();else if(btn.dataset.export==='svg')exportTechnicalSVG();else exportJSON();
+  if(btn.dataset.export==='glb')exportGLB();
+  else if(btn.dataset.export==='png')exportPNG();
+  else if(btn.dataset.export==='svg')exportTechnicalSVG();
+  else if(btn.dataset.export==='import-glb')$('modelImportInput').click();
+  else if(btn.dataset.export==='import-json')$('projectImportInput').click();
+  else exportJSON();
 }));
 document.addEventListener('click',e=>{if(!e.target.closest('.export-wrap'))$('exportMenu').classList.remove('open');});
 canvas.addEventListener('pointerdown',e=>{
