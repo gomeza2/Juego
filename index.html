@@ -275,7 +275,6 @@ const pmremGenerator = new THREE.PMREMGenerator(renderer);
 const studioEnvironment = new RoomEnvironment();
 const studioEnvironmentTexture = pmremGenerator.fromScene(studioEnvironment, 0.04).texture;
 scene.environment = studioEnvironmentTexture;
-studioEnvironment.dispose();
 pmremGenerator.dispose();
 const floorMat = new THREE.MeshStandardMaterial({color:0xf8fafc,roughness:.92,metalness:.02});
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(200,200), floorMat);
@@ -866,6 +865,108 @@ function addBridge(g) {
   }
   for(const x of [-2.45,2.45])cyl(g,'#9aa8b8',[x,.42,0],.16,.18,.75,20,false);
 }
+function addArchitecturalArch(g) {
+  const shape=new THREE.Shape();
+  shape.moveTo(-1.18,0);shape.lineTo(1.18,0);shape.lineTo(1.18,1.24);
+  shape.absarc(0,1.24,1.18,0,Math.PI,false);
+  shape.lineTo(-1.18,0);shape.closePath();
+  const hole=new THREE.Path();
+  hole.moveTo(-.78,0);hole.lineTo(-.78,1.17);
+  hole.absarc(0,1.17,.78,Math.PI,0,true);
+  hole.lineTo(.78,0);hole.closePath();shape.holes.push(hole);
+  const geo=new THREE.ExtrudeGeometry(shape,{depth:.32,bevelEnabled:true,bevelSegments:3,steps:1,bevelSize:.025,bevelThickness:.025,curveSegments:28});
+  addMesh(g,geo,currentColor,[0,.08,-.16],[1,1,1],[0,0,0],true,{roughness:.72});
+  box(g,'#e5e9ed',[0,.1,.19],[2.54,.12,.46],false);
+}
+function addDome(g) {
+  const body=currentColor,trim='#d2dae3';
+  cyl(g,trim,[0,.16,0],1.52,1.52,.24,64,false,[0,0,0],{roughness:.55});
+  cyl(g,body,[0,.28,0],1.35,1.35,.08,64,true,[0,0,0],{roughness:.36});
+  const dome=addMesh(g,new THREE.SphereGeometry(1.32,64,36,0,Math.PI*2,0,Math.PI/2),body,[0,.32,0],[1,1,1],[0,0,0],true,{roughness:.28,metalness:.18,side:THREE.DoubleSide});
+  dome.material.side=THREE.DoubleSide;
+  cyl(g,trim,[0,1.61,0],.11,.11,.12,24,false,[0,0,0],{roughness:.45});
+  for(let i=0;i<12;i++){
+    const a=i*Math.PI/6;
+    const rib=box(g,trim,[.95*Math.cos(a),.92,.95*Math.sin(a)],[.035,1.14,.035],false);
+    rib.rotation.z=-.22*Math.cos(a);rib.rotation.x=.22*Math.sin(a);
+  }
+}
+function addStairs(g) {
+  const stair=currentColor,edge='#e5eaf0';
+  const count=9, depth=.28, rise=.19, width=2.2;
+  for(let i=0;i<count;i++){
+    box(g,stair,[0,.12+rise*(i+.5),.99-depth*i],[width,rise*(i+1),depth],true,{roughness:.72});
+    box(g,edge,[0,.12+rise*(i+1),.99-depth*i],[width+.035,.035,depth+.015],false);
+  }
+  box(g,stair,[0,.12+rise*count,-1.55],[2.2,.12,.52],true);
+  for(const x of [-1.12,1.12]){
+    const pts=[];
+    for(let i=0;i<=9;i++)pts.push([x,.65+i*rise,.96-i*depth]);
+    tube(g,'#9aa8b8',pts,.025,false);
+  }
+}
+function addClassicalColumn(g) {
+  const c=currentColor,trim='#dfe4ea';
+  const points=[
+    new THREE.Vector2(.42,0),new THREE.Vector2(.46,.05),new THREE.Vector2(.46,.13),
+    new THREE.Vector2(.34,.18),new THREE.Vector2(.29,.28),new THREE.Vector2(.27,.42),
+    new THREE.Vector2(.25,1.62),new THREE.Vector2(.28,1.75),new THREE.Vector2(.34,1.82),
+    new THREE.Vector2(.46,1.88),new THREE.Vector2(.46,1.98),new THREE.Vector2(.4,2.03),
+    new THREE.Vector2(.31,2.03),new THREE.Vector2(.31,1.95),new THREE.Vector2(.34,1.9),
+    new THREE.Vector2(.28,1.83),new THREE.Vector2(.24,1.73),new THREE.Vector2(.23,.4),
+    new THREE.Vector2(.25,.28),new THREE.Vector2(.34,.18),new THREE.Vector2(.42,.13)
+  ];
+  addMesh(g,new THREE.LatheGeometry(points,64),c,[0,.08,0],[1,1,1],[0,0,0],true,{roughness:.48});
+  cyl(g,trim,[0,.16,0],.48,.48,.14,48,false,[0,0,0],{roughness:.5});
+  cyl(g,trim,[0,2.1,0],.52,.52,.16,48,false,[0,0,0],{roughness:.5});
+  cyl(g,c,[0,2.2,0],.58,.58,.08,48,true,[0,0,0],{roughness:.48});
+  for(let i=0;i<12;i++){
+    const a=i*Math.PI/6;
+    cyl(g,trim,[.43*Math.cos(a),1.98,.43*Math.sin(a)],.035,.035,.18,12,false,[0,0,0],{roughness:.5});
+  }
+}
+function addPyramid(g) {
+  const c=currentColor,dark='#c4ccd7';
+  addMesh(g,new THREE.ConeGeometry(1.08,1.8,4),c,[0,.92,0],[1,1,1],[0,Math.PI/4,0],true,{roughness:.58,metalness:.08});
+  box(g,dark,[0,.08,0],[2.35,.16,2.35],false);
+}
+function addTree(g) {
+  const bark='#82634c',foliage=currentColor;
+  cyl(g,bark,[0,.72,0],.12,.18,1.35,20,false,[0,0,-.06],{roughness:.95});
+  cyl(g,bark,[-.13,1.18,0],.065,.09,.74,16,false,[0,0,.55],{roughness:.95});
+  cyl(g,bark,[.1,1.28,.03],.06,.085,.68,16,false,[0,0,-.52],{roughness:.95});
+  addMesh(g,new THREE.IcosahedronGeometry(.59,2),foliage,[-.1,1.68,0],[1,1.1,1],[0,0,0],true,{roughness:.94});
+  addMesh(g,new THREE.IcosahedronGeometry(.5,2),foliage,[.31,1.48,.05],[1,1.1,.9],[0,0,0],true,{roughness:.94});
+  addMesh(g,new THREE.IcosahedronGeometry(.48,2),foliage,[-.38,1.38,.04],[1,1.1,.9],[0,0,0],true,{roughness:.94});
+  addMesh(g,new THREE.IcosahedronGeometry(.42,2),foliage,[0,2.02,-.03],[1,1.1,1],[0,0,0],true,{roughness:.94});
+  cyl(g,'#c8d0d8',[0,.11,0],.54,.54,.12,32,false,[0,0,0],{roughness:.75});
+}
+function addRock(g) {
+  const geo=new THREE.IcosahedronGeometry(.92,3);
+  const positions=geo.attributes.position;
+  for(let i=0;i<positions.count;i++){
+    const x=positions.getX(i),y=positions.getY(i),z=positions.getZ(i);
+    const factor=1+.105*Math.sin(x*8.1+y*4.7)*Math.cos(z*7.3-y*6.1)+.04*Math.sin(z*16+x*6);
+    positions.setXYZ(i,x*factor,y*factor,z*factor);
+  }
+  positions.needsUpdate=true;geo.computeVertexNormals();
+  addMesh(g,geo,currentColor,[0,.58,0],[1.2,.72,.88],[.06,.16,.04],true,{roughness:.9,metalness:.02,flatShading:true});
+  addMesh(g,new THREE.IcosahedronGeometry(.28,1),currentColor,[-.48,.5,.36],[1.2,.75,.9],[.2,0,.2],true,{roughness:.92,flatShading:true});
+}
+function addFountain(g) {
+  const stone=currentColor,water='#9bcfe2';
+  cyl(g,stone,[0,.15,0],1.36,1.36,.26,64,true,[0,0,0],{roughness:.7});
+  cyl(g,stone,[0,.34,0],1.18,1.28,.14,64,true,[0,0,0],{roughness:.65});
+  const basin=new THREE.Mesh(new THREE.CylinderGeometry(1.02,1.12,.18,64,1,true),material(stone,{roughness:.45,side:THREE.DoubleSide}));
+  basin.position.y=.48;basin.castShadow=true;basin.receiveShadow=true;g.add(basin);
+  cyl(g,water,[0,.51,0],.98,.98,.025,64,false,[0,0,0],{roughness:.16,metalness:.28});
+  cyl(g,stone,[0,.73,0],.32,.4,.42,48,true,[0,0,0],{roughness:.6});
+  cyl(g,stone,[0,.98,0],.44,.44,.12,48,true,[0,0,0],{roughness:.55});
+  cyl(g,stone,[0,1.15,0],.18,.26,.24,40,true,[0,0,0],{roughness:.5});
+  cyl(g,stone,[0,1.37,0],.5,.28,.13,48,true,[0,0,0],{roughness:.55});
+  cyl(g,water,[0,1.44,0],.42,.42,.018,48,false,[0,0,0],{roughness:.12,metalness:.3});
+  addMesh(g,new THREE.ConeGeometry(.04,.45,16),water,[0,1.65,0],[1,1,1],[Math.PI,0,0],false,{transparent:true,opacity:.52,roughness:.12});
+}
 function addPrimitive(g,type) {
   if(type==='cube') addMesh(g,new THREE.BoxGeometry(1.4,1.4,1.4),currentColor,[0,.72,0],[1,1,1],[0,0,0],true,{metalness:.22,roughness:.32});
   if(type==='sphere') addMesh(g,new THREE.SphereGeometry(.83,64,48),currentColor,[0,.83,0],[1,1,1],[0,0,0],true,{metalness:.22,roughness:.25});
@@ -874,6 +975,7 @@ function addPrimitive(g,type) {
   if(type==='cylinder') addMesh(g,new THREE.CylinderGeometry(.65,.65,1.55,64),currentColor,[0,.8,0],[1,1,1],[0,0,0],true,{metalness:.2,roughness:.35});
   if(type==='capsule') addMesh(g,new THREE.CapsuleGeometry(.43,.7,8,32),currentColor,[0,.86,0],[1,1,1],[0,0,0],true,{metalness:.2,roughness:.3});
   if(type==='knot') addMesh(g,new THREE.TorusKnotGeometry(.57,.17,160,24,2,3),currentColor,[0,.95,0],[1,1,1],[0,0,0],true,{metalness:.32,roughness:.22});
+  if(type==='pyramid') addPyramid(g);
 }
 function build(type,g) {
   if(type==='headphones') addHeadphones(g);
@@ -899,6 +1001,13 @@ function build(type,g) {
   else if(type==='villa') addVilla(g);
   else if(type==='pavilion') addPavilion(g);
   else if(type==='bridge') addBridge(g);
+  else if(type==='arch') addArchitecturalArch(g);
+  else if(type==='dome') addDome(g);
+  else if(type==='stairs') addStairs(g);
+  else if(type==='column') addClassicalColumn(g);
+  else if(type==='tree') addTree(g);
+  else if(type==='rock') addRock(g);
+  else if(type==='fountain') addFountain(g);
   else addPrimitive(g,type);
 }
 function applyPrimaryMaterial(root) {
@@ -941,6 +1050,7 @@ function updateTextureUI() {
   if($('textureSelect'))$('textureSelect').value=currentTexture;
   if($('textureScaleValue'))$('textureScaleValue').textContent=textureScale.toFixed(1)+'×';
   if($('textureScaleReadout'))$('textureScaleReadout').textContent=textureScale.toFixed(1)+'×';
+  if($('textureScaleRange'))$('textureScaleRange').value=textureScale;
   const qualityNames={standard:'ESTÁNDAR',high:'ALTA',ultra:'ULTRA'};
   if($('qualityValue'))$('qualityValue').textContent=qualityNames[qualityMode]||'ALTA';
   if($('qualitySelect'))$('qualitySelect').value=qualityMode;
@@ -980,6 +1090,7 @@ function createDesign(type, options={}) {
   root.userData.designRoot=true;
   modelRoot.add(root); designObjects.push(root);
   build(type,root);
+  applyPrimaryMaterial(root);
   if(options.state) {
     const s=options.state;
     root.position.set(s.position?.[0]||0,s.position?.[1]||0,s.position?.[2]||0);
@@ -1045,6 +1156,7 @@ function resize() {
   renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
 }
 new ResizeObserver(resize).observe(stage);
+applyGraphicsQuality('high');
 window.addEventListener('resize',resize);
 function animate() {
   requestAnimationFrame(animate);
