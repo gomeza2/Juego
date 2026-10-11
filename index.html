@@ -198,6 +198,16 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
 .scene-arrange-hint{font-size:9px;line-height:1.55;color:#7b899c}
 @media(max-width:1180px){.scene-arrange-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
 
+
+.arch-size-panel{display:none}
+.arch-size-panel.show{display:block}
+.arch-unit-tag{font:10px 'DM Mono',monospace;color:#718198;background:#edf2f7;border-radius:4px;padding:3px 5px}
+.arch-size-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.arch-size-field{display:flex;flex-direction:column;gap:6px;font-size:9px;color:#687a91;min-width:0}
+.arch-size-field input{width:100%;min-width:0;height:32px;border:1px solid #d7e0eb;border-radius:6px;background:#fff;color:#27384d;padding:0 7px;font:11px 'DM Mono',monospace}
+.arch-size-help{font-size:9px;line-height:1.5;color:#7b899c;margin-top:8px}
+.arch-apply-btn{width:100%;justify-content:center;margin-top:9px;background:#eef7df!important;border-color:#cfe5af!important;color:#456a22!important;font-weight:800}
+
 </style>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}
@@ -250,6 +260,11 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
       <button class="category-card" data-type="tree"><span class="cat-icon">♣</span><span><span class="cat-title">Árbol ornamental</span><span class="cat-sub">Paisajismo 3D</span></span></button>
       <button class="category-card" data-type="rock"><span class="cat-icon">⬟</span><span><span class="cat-title">Roca orgánica</span><span class="cat-sub">Superficie irregular</span></span></button>
       <button class="category-card" data-type="fountain"><span class="cat-icon">♨</span><span><span class="cat-title">Fuente</span><span class="cat-sub">Cuencas y agua</span></span></button>
+    </div>
+        <button class="category-card" data-type="wall"><span class="cat-icon">▥</span><span><span class="cat-title">Pared modular</span><span class="cat-sub">Ancho, alto y espesor</span></span></button>
+      <button class="category-card" data-type="floor"><span class="cat-icon">▱</span><span><span class="cat-title">Piso / losa</span><span class="cat-sub">Superficie por medidas</span></span></button>
+      <button class="category-card" data-type="door"><span class="cat-icon">▯</span><span><span class="cat-title">Puerta</span><span class="cat-sub">Marco y hoja</span></span></button>
+      <button class="category-card" data-type="window"><span class="cat-icon">▦</span><span><span class="cat-title">Ventana</span><span class="cat-sub">Vidrio y carpintería</span></span></button>
     </div>
     <div class="section-title">Formas rápidas · curvas y sólidos</div>
     <button class="nav-item" data-type="phone"><span class="nav-icon">▯</span> Smartphone</button>
@@ -349,6 +364,16 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
           </div>
           <div class="scene-footnote">Activá “Añadir piezas” para sumar modelos sin reemplazar el diseño actual. Las piezas marcadas sirven para agruparlas o ajustar su distribución.</div>
         </div>
+        <div class="prop-section arch-size-panel" id="archSizePanel">
+          <div class="prop-title">Dimensiones paramétricas <span class="arch-unit-tag" id="archSizeUnitTag">m</span></div>
+          <div class="arch-size-grid">
+            <label class="arch-size-field">X · Ancho<input id="archSizeX" type="number" min="0.02" max="200" step="0.1" value="4" /></label>
+            <label class="arch-size-field"><span id="archSizeYLabel">Y · Alto</span><input id="archSizeY" type="number" min="0.02" max="200" step="0.1" value="2.8" /></label>
+            <label class="arch-size-field"><span id="archSizeZLabel">Z · Profundidad</span><input id="archSizeZ" type="number" min="0.02" max="200" step="0.1" value="0.18" /></label>
+          </div>
+          <div class="arch-size-help" id="archSizeHelp">Medidas en la unidad visible. Cada pieza conserva sus dimensiones al guardar o exportar.</div>
+          <button class="btn arch-apply-btn" id="applyArchSizeBtn" type="button">Aplicar dimensiones</button>
+        </div>
         <div class="prop-section"><div class="prop-title">Transformación <button id="resetTransform">RESTABLECER</button></div>
           <div class="prop-row"><div class="prop-label"><span>Posición</span><strong>XYZ</strong></div><div class="axis-fields"><div class="axis-field x"><label>X <input id="posX" type="number" step=".1" value="0"></label></div><div class="axis-field y"><label>Y <input id="posY" type="number" step=".1" value="0"></label></div><div class="axis-field z"><label>Z <input id="posZ" type="number" step=".1" value="0"></label></div></div></div>
           <div class="prop-row"><div class="prop-label"><span>Escala</span><strong id="scaleReadout">1.00 ×</strong></div><div class="range-line"><input type="range" min=".35" max="2.5" step=".05" value="1" id="scaleRange"><span class="range-val" id="scaleValue">1.00</span></div></div>
@@ -444,6 +469,13 @@ const dimensionGuideGroup = new THREE.Group();scene.add(dimensionGuideGroup);
 const dimensionAnchors = [];
 const groupSelection = new Set();
 const unitFactors = {m:1,cm:100,mm:1000,ft:3.28084};
+const architecturalSizeDefaults = {
+  wall:[4,2.8,.18],
+  floor:[4,.15,4],
+  door:[.95,2.1,.12],
+  window:[1.4,1.2,.12]
+};
+const architecturalSizeTypes = new Set(Object.keys(architecturalSizeDefaults));
 let designObjects = [];
 let selected = null;
 let addMode = false;
@@ -471,6 +503,10 @@ let redoStack = [];
 let applyingState = false;
 const meta = {
   room:{name:'Habitación moderna',icon:'⌂',type:'ESPACIO · INTERIOR',tag:'Espacio arquitectónico'},
+  wall:{name:'Pared modular',icon:'▥',type:'ARQUITECTURA · PARED',tag:'Pared · Medidas editables'},
+  floor:{name:'Piso / losa',icon:'▱',type:'ARQUITECTURA · LOSA',tag:'Losa · Medidas editables'},
+  door:{name:'Puerta arquitectónica',icon:'▯',type:'ARQUITECTURA · ABERTURA',tag:'Puerta · Marco y hoja'},
+  window:{name:'Ventana arquitectónica',icon:'▦',type:'ARQUITECTURA · ABERTURA',tag:'Ventana · Vidrio y marco'},
   headphones:{name:'Auriculares conceptuales',icon:'◖◗',type:'PRODUCTO · AUDIO',tag:'Auriculares · Concepto A'},
   plane:{name:'Avión conceptual',icon:'✈',type:'AERONÁUTICA · CONCEPTO',tag:'Avión · Concepto A'},
   rocket:{name:'Cohete orbital',icon:'♢',type:'AEROESPACIAL · CONCEPTO',tag:'Cohete · Concepto A'},
@@ -1156,6 +1192,43 @@ function addPrimitive(g,type) {
   if(type==='knot') addMesh(g,new THREE.TorusKnotGeometry(.57,.17,160,24,2,3),currentColor,[0,.95,0],[1,1,1],[0,0,0],true,{metalness:.32,roughness:.22});
   if(type==='pyramid') addPyramid(g);
 }
+function addParametricArchitecturalPiece(type,g) {
+  const dims=g.userData.archSize||architecturalSizeDefaults[type];
+  const w=Math.max(.02,dims[0]),h=Math.max(.02,dims[1]),d=Math.max(.02,dims[2]);
+  if(type==='wall'){
+    box(g,currentColor,[0,h/2,0],[w,h,d],true,{roughness:.76,metalness:.02});
+    box(g,'#eef0f2',[0,h-.025,0],[w+.015,.05,d+.015],false,{roughness:.68});
+    return;
+  }
+  if(type==='floor'){
+    box(g,currentColor,[0,d/2,0],[w,d,h],true,{roughness:.8,metalness:.01});
+    box(g,'#e5e9ed',[0,d-.012,0],[w,.024,h],false,{roughness:.76});
+    return;
+  }
+  if(type==='door'){
+    const frame=Math.min(.1,Math.max(.045,w*.075));
+    const leafW=Math.max(.12,w-frame*2),leafH=Math.max(.2,h-frame);
+    box(g,'#e5e8ec',[-w/2+frame/2,h/2,0],[frame,h,d],false,{roughness:.48});
+    box(g,'#e5e8ec',[w/2-frame/2,h/2,0],[frame,h,d],false,{roughness:.48});
+    box(g,'#e5e8ec',[0,h-frame/2,0],[w,frame,d],false,{roughness:.48});
+    box(g,currentColor,[0,leafH/2,-d*.08],[leafW,leafH,Math.max(.025,d*.72)],true,{roughness:.6});
+    const panelW=leafW*.68,panelH=leafH*.72;
+    box(g,'#d4d9df',[0,h*.56,d*.22],[panelW,panelH,Math.max(.018,d*.12)],false,{roughness:.64});
+    cyl(g,'#c5a56a',[leafW*.36,Math.min(h*.5,h-.12),d*.48],.035,.035,.025,14,false,[Math.PI/2,0,0],{metalness:.72,roughness:.25});
+    return;
+  }
+  if(type==='window'){
+    const frame=Math.min(.09,Math.max(.035,Math.min(w,h)*.055));
+    const glassW=Math.max(.1,w-frame*2),glassH=Math.max(.1,h-frame*2),glassD=Math.max(.018,d*.22);
+    box(g,'#86b6d0',[0,h/2,0],[glassW,glassH,glassD],false,{roughness:.2,metalness:.12,transparent:true,opacity:.52});
+    box(g,currentColor,[-w/2+frame/2,h/2,0],[frame,h,d],true,{roughness:.38,metalness:.18});
+    box(g,currentColor,[w/2-frame/2,h/2,0],[frame,h,d],true,{roughness:.38,metalness:.18});
+    box(g,currentColor,[0,h-frame/2,0],[w,frame,d],true,{roughness:.38,metalness:.18});
+    box(g,currentColor,[0,frame/2,0],[w,frame,d],true,{roughness:.38,metalness:.18});
+    box(g,currentColor,[0,h/2,0],[Math.min(frame*.7,.05),glassH,d],true,{roughness:.38,metalness:.18});
+    box(g,currentColor,[0,h/2,0],[glassW,Math.min(frame*.7,.05),d],true,{roughness:.38,metalness:.18});
+  }
+}
 function build(type,g) {
   if(type==='headphones') addHeadphones(g);
   else if(type==='plane') addPlane(g);
@@ -1180,6 +1253,7 @@ function build(type,g) {
   else if(type==='villa') addVilla(g);
   else if(type==='pavilion') addPavilion(g);
   else if(type==='bridge') addBridge(g);
+  else if(architecturalSizeTypes.has(type)) addParametricArchitecturalPiece(type,g);
   else if(type==='arch') addArchitecturalArch(g);
   else if(type==='dome') addDome(g);
   else if(type==='stairs') addStairs(g);
@@ -1320,6 +1394,7 @@ function createDesign(type, options={}) {
   currentType=type;
   const root=new THREE.Group();root.name=meta[type].name;
   root.userData.designType=type;root.userData.designRoot=true;root.userData.style=styleSnapshot();
+  if(architecturalSizeTypes.has(type))root.userData.archSize=[...(options.archSize||architecturalSizeDefaults[type])];
   modelRoot.add(root);designObjects.push(root);
   build(type,root);
   if(options.position)root.position.set(options.position[0]||0,options.position[1]||0,options.position[2]||0);
@@ -1356,6 +1431,19 @@ function selectDesign(root) {
   if(highlightEnabled)makeHelper();
   const m=meta[currentType]||meta.group;
   $('selectedThumb').textContent=m.icon;$('selectedName').textContent=root.name;$('selectedType').textContent=m.type;
+  const archPanel=$('archSizePanel'),isParametric=architecturalSizeTypes.has(currentType);
+  archPanel.classList.toggle('show',isParametric);
+  if(isParametric){
+    const dims=root.userData.archSize||architecturalSizeDefaults[currentType];root.userData.archSize=[...dims];
+    const factor=unitFactors[unitSystem]||1,digits=unitSystem==='mm'?0:unitSystem==='cm'?1:2;
+    $('archSizeX').value=(dims[0]*factor).toFixed(digits);
+    $('archSizeY').value=(dims[1]*factor).toFixed(digits);
+    $('archSizeZ').value=(dims[2]*factor).toFixed(digits);
+    $('archSizeUnitTag').textContent=unitSystem;
+    $('archSizeYLabel').textContent=currentType==='floor'?'Y · Espesor':'Y · Alto';
+    $('archSizeZLabel').textContent=currentType==='floor'?'Z · Fondo':'Z · Profundidad';
+    $('archSizeHelp').textContent=currentType==='floor'?'X = ancho · Y = espesor de losa · Z = fondo. Las medidas se expresan en '+unitSystem+'.':'X = ancho · Y = alto · Z = profundidad. Las medidas se expresan en '+unitSystem+'.';
+  }
   $('materialSelect').value=currentMaterial;
   updateSwatches();updateTextureUI();updateMeta();updateDimensions();
 }
@@ -1520,6 +1608,7 @@ function serializeSceneNode(node) {
     scale:[node.scale.x,node.scale.y,node.scale.z],
     rotation:[node.rotation.x,node.rotation.y,node.rotation.z],
     visible:node.visible,style:node.userData.style||null,assetKey:node.userData.assetKey||null,
+    archSize:node.userData.archSize||null,
     children:childRoots
   };
 }
@@ -1533,6 +1622,7 @@ function restoreSceneNode(data,parent=modelRoot) {
   root.name=data.name||((meta[type]||meta.group).name);
   root.userData.designRoot=true;root.userData.designType=type;
   root.userData.isSceneGroup=isGroup;root.userData.style={...style};
+  if(architecturalSizeTypes.has(type))root.userData.archSize=(Array.isArray(data.archSize)&&data.archSize.length===3?data.archSize:architecturalSizeDefaults[type]).map((v,i)=>Math.min(200,Math.max(.02,Number.isFinite(Number(v))?Number(v):architecturalSizeDefaults[type][i])));
   root.position.set(data.position?.[0]??0,data.position?.[1]??0,data.position?.[2]??0);
   root.scale.set(data.scale?.[0]??1,data.scale?.[1]??1,data.scale?.[2]??1);
   root.rotation.set(data.rotation?.[0]??0,data.rotation?.[1]??0,data.rotation?.[2]??0);
@@ -1623,6 +1713,31 @@ function setTexture(value) {
   pushHistory();currentTexture=textureLabels[value]!==undefined?value:'none';
   if(selected)applyPrimaryMaterial(selected);
   updateTextureUI();persist();
+}
+function applyArchitecturalDimensions() {
+  if(!selected||!architecturalSizeTypes.has(selected.userData.designType)){
+    toast('Seleccioná una pared, piso, puerta o ventana paramétrica.');return;
+  }
+  const factor=unitFactors[unitSystem]||1;
+  const inputValues=['archSizeX','archSizeY','archSizeZ'].map(id=>parseFloat($(id).value));
+  if(inputValues.some(v=>!Number.isFinite(v)||v<=0||v>200)){
+    toast('Ingresá tres medidas positivas, de hasta 200 unidades.');return;
+  }
+  const next=inputValues.map(v=>Math.max(.02,v/factor));
+  if(selected.userData.designType==='door'&&next[1]<.3){
+    toast('La altura de la puerta debe ser de al menos 0,3 unidades.');return;
+  }
+  if(selected.userData.designType==='window'&&(next[0]<.2||next[1]<.2)){
+    toast('La ventana necesita al menos 0,2 unidades de ancho y alto.');return;
+  }
+  pushHistory();
+  const root=selected,type=root.userData.designType;
+  root.userData.archSize=next;
+  while(root.children.length){const child=root.children[0];root.remove(child);disposeTree(child);}
+  build(type,root);
+  applyPrimaryMaterial(root);
+  selectDesign(root);updateMeta();updateDimensions();persist();
+  toast('Dimensiones de '+(meta[type]?.name||'la pieza')+' actualizadas.');
 }
 function setPositionFromInputs() {
   if(!selected)return;
@@ -2151,6 +2266,7 @@ $('unitsSelect').addEventListener('change',e=>{
   persist();toast('Unidades de medida: '+unitSystem+'.');
 });
 $('blueprintBtn').addEventListener('click',exportTechnicalSVG);
+$('applyArchSizeBtn').addEventListener('click',applyArchitecturalDimensions);
 $('groupBtn').addEventListener('click',groupSelectedObjects);
 $('ungroupBtn').addEventListener('click',ungroupSelectedObject);
 $('alignSelectedBtn').addEventListener('click',alignMarkedObjects);
