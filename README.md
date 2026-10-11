@@ -92,6 +92,15 @@ Si el endpoint no está configurado, el asistente local y todas las herramientas
 - Distingue acabados y texturas comunes al generar modelos; cada pieza creada conserva su propio estilo y se puede cambiar individualmente.
 - **Límite de la IA:** el constructor local es un intérprete procedural por reglas, no un modelo de lenguaje ni un generador neuronal. La generación externa real de mallas y texturas requiere desplegar la API de servidor y configurar sus secretos privados; GitHub Pages no la ejecuta por sí solo.
 
+### Fase 11 · Herramientas de modelado editable — implementada
+- Biblioteca visual de círculo/disco, triángulo extruido, rectángulo de bordes suaves, polígono de 3 a 16 lados, cubo con bisel y espacio interior con piso y tres paredes (frente abierto para editar desde dentro).
+- Escala independiente X/Y/Z, además de escala uniforme, posición y rotación. Los cambios permiten estirar o aplanar un objeto sin afectar a los otros ejes.
+- Las paredes pueden llevar un hueco geométrico pasante para puerta o ventana; se configuran el ancho y el alto de la abertura, y el hueco se conserva al guardar el proyecto.
+- Dimensiones paramétricas para las formas nuevas, control del número de lados del polígono y radio de bisel para placas/cubos redondeados.
+- Los proyectos JSON guardan dimensiones, escalas, biseles, cantidad de lados y aberturas; la exportación GLB conserva la geometría generada.
+- Inspirado en herramientas de flujo 3D como mover/rotar/escalar, extrusión y bisel, adaptadas a una interfaz propia más directa. No pretende reemplazar un editor de malla completo tipo Blender: todavía no tiene selección de caras/vértices, cortes libres ni booleanos arbitrarios.
+- El primer arranque migra la plantilla antigua de auriculares al lienzo vacío; los proyectos con nombre/escena propios se siguen restaurando.
+
 ## Publicación en GitHub Pages
 
 La versión pública está prevista en https://gomeza2.github.io/Juego/
