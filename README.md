@@ -84,6 +84,14 @@ Si el endpoint no está configurado, el asistente local y todas las herramientas
 - El prompt local reconoce pedidos simples de pared, piso, puerta y ventana, además de la biblioteca visual.
 - Son elementos conceptuales independientes: la ventana no perfora automáticamente una pared ni se generan uniones constructivas, instalaciones o cálculos estructurales. Para planos de obra hacen falta medidas y validaciones profesionales.
 
+### Fase 10 · Lienzo vacío y constructor de escenas — implementada
+- Un proyecto nuevo arranca en blanco, sin obligarte a borrar un modelo de muestra. Los proyectos anteriores siguen recuperándose desde el almacenamiento local.
+- Agregado rápido desde el panel de escena: cubo, esfera, cilindro, cono, toroide, cápsula, pirámide, prisma hexagonal, engranaje, cuña/rampa, tubo hueco y piezas arquitectónicas.
+- El constructor local ahora puede interpretar pedidos con varios objetos y cantidades en español (por ejemplo, «3 cubos azules y 2 esferas rojas»), acomodarlos en una cuadrícula o en una composición alrededor de un edificio, y elegir colores por objeto.
+- Reconoce medidas explícitas en componentes arquitectónicos, por ejemplo «pared de 4 m de ancho y 3 m de alto» o dimensiones tipo «4x3x0,2».
+- Distingue acabados y texturas comunes al generar modelos; cada pieza creada conserva su propio estilo y se puede cambiar individualmente.
+- **Límite de la IA:** el constructor local es un intérprete procedural por reglas, no un modelo de lenguaje ni un generador neuronal. La generación externa real de mallas y texturas requiere desplegar la API de servidor y configurar sus secretos privados; GitHub Pages no la ejecuta por sí solo.
+
 ## Publicación en GitHub Pages
 
 La versión pública está prevista en https://gomeza2.github.io/Juego/
