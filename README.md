@@ -101,6 +101,16 @@ Si el endpoint no está configurado, el asistente local y todas las herramientas
 - Inspirado en herramientas de flujo 3D como mover/rotar/escalar, extrusión y bisel, adaptadas a una interfaz propia más directa. No pretende reemplazar un editor de malla completo tipo Blender: todavía no tiene selección de caras/vértices, cortes libres ni booleanos arbitrarios.
 - El primer arranque migra la plantilla antigua de auriculares al lienzo vacío; los proyectos con nombre/escena propios se siguen restaurando.
 
+
+### Fase 12 · Manipulación 3D directa — implementada
+- Manipuladores interactivos dentro del visor para mover, rotar y escalar un objeto arrastrando sus ejes y anillos, en lugar de depender únicamente de campos numéricos.
+- Herramientas **Mover**, **Rotar** y **Escalar**, más modo **Orbitar** para esconder el manipulador cuando quieras navegar libremente por la escena.
+- Atajos **G** (mover), **R** (rotar) y **S** (escalar), inspirados en los flujos comunes de edición 3D.
+- El ajuste de posición a la cuadrícula también se aplica al movimiento con el manipulador. La navegación de cámara se pausa mientras arrastrás el gizmo y se reanuda al terminar.
+- Los campos de posición, rotación y escala se sincronizan con el arrastre; la transformación queda en el historial de deshacer/rehacer y en el guardado local.
+- El manipulador se reconstruye al cambiar entre perspectiva y vistas ortográficas para seguir usando la cámara activa.
+- Esta fase agrega transformación de objetos completos. Todavía no incluye edición libre de vértices/caras ni operaciones booleanas arbitrarias.
+
 ## Publicación en GitHub Pages
 
 La versión pública está prevista en https://gomeza2.github.io/Juego/
