@@ -10,8 +10,11 @@ Editor 3D en el navegador para explorar conceptos de productos, interiores, arqu
 - Acabados mate, satín, brillante y metálico.
 - **Texturas procedurales** generadas en el navegador: madera, mármol, hormigón, tela, metal rayado, fibra de carbono, terrazo, ladrillo, piedra natural y baldosas.
 - Mapas de color, rugosidad y relieve para dar más lectura a las superficies.
+- Modelos con aristas redondeadas para mejorar el acabado de smartphones, cámaras, altavoces, drones y mobiliario.
 - Ambiente de estudio para producir reflejos más naturales en metales y materiales brillantes.
 - Tres niveles de calidad gráfica: estándar, alta y ultra, con distintos límites de resolución y tamaño de sombras.
+- Iluminación de estudio con entorno de reflejos para mejorar el aspecto de superficies metálicas y brillantes.
+- Escala de textura ajustable y reconocimiento de materiales descritos en el campo de ideas.
 - Escala de textura ajustable.
 - Ajustes de color, escala, rotación, posición e iluminación.
 - Duplicación, eliminación, deshacer y rehacer cambios básicos.
