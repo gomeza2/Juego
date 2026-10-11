@@ -241,6 +241,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 const $ = (id) => document.getElementById(id);
 const canvas = $('viewport');
@@ -476,6 +477,11 @@ function addMesh(parent, geometry, color, position=[0,0,0], scale=[1,1,1], rotat
 function box(parent, color, pos, size, primary=false, extra={}) {
   return addMesh(parent,new THREE.BoxGeometry(size[0],size[1],size[2]),color,pos,[1,1,1],[0,0,0],primary,extra);
 }
+function roundedBox(parent,color,pos,size,radius=.08,segments=4,primary=false,extra={}) {
+  const maxRadius=Math.min(radius,size[0]*.48,size[1]*.48,size[2]*.48);
+  const geometry=new RoundedBoxGeometry(size[0],size[1],size[2],segments,maxRadius);
+  return addMesh(parent,geometry,color,pos,[1,1,1],[0,0,0],primary,extra);
+}
 function cyl(parent,color,pos,rTop,rBottom,height,segments=32,primary=false,rotation=[0,0,0],extra={}) {
   return addMesh(parent,new THREE.CylinderGeometry(rTop,rBottom,height,segments),color,pos,[1,1,1],rotation,primary,extra);
 }
@@ -578,8 +584,8 @@ function addBottle(g) {
 }
 function addPhone(g) {
   const c=currentColor;
-  const body=addMesh(g,new THREE.BoxGeometry(.83,1.56,.105),c,[0,.84,0],[1,1,1],[0,0,0],true,{metalness:.42,roughness:.28});
-  addMesh(g,new THREE.BoxGeometry(.755,1.42,.012),'#111a29',[0,.84,.059],[1,1,1],[0,0,0],false,{metalness:.22,roughness:.18});
+  const body=roundedBox(g,c,[0,.84,0],[.83,1.56,.105],.085,6,true,{metalness:.42,roughness:.28});
+  roundedBox(g,'#111a29',[0,.84,.059],[.755,1.42,.012],.035,5,false,{metalness:.22,roughness:.18});
   addMesh(g,new THREE.BoxGeometry(.34,.025,.014),'#566579',[0,1.48,.068],[1,1,1],[0,0,0],false);
   cyl(g,'#7f98ad',[.22,1.49,.07],.023,.023,.012,16,false,[Math.PI/2,0,0]);
   addMesh(g,new THREE.BoxGeometry(.16,.012,.012),'#c8ff57',[0,.19,.07],[1,1,1],[0,0,0],false);
@@ -602,7 +608,7 @@ function addCar(g) {
 }
 function addDrone(g) {
   const c=currentColor,dark='#293646';
-  box(g,c,[0,.72,0],[.46,.22,.48],true,{metalness:.45,roughness:.28});
+  roundedBox(g,c,[0,.72,0],[.46,.22,.48],.085,5,true,{metalness:.45,roughness:.28});
   addMesh(g,new THREE.SphereGeometry(.17,28,20),c,[0,.73,.18],[1,1,.8],[0,0,0],true);
   for(const x of [-1,1]) for(const z of [-1,1]){
     const arm=box(g,c,[x*.62,.72,z*.62],[.92,.075,.095],true,{metalness:.25,roughness:.35});
@@ -616,7 +622,7 @@ function addDrone(g) {
 }
 function addCamera(g) {
   const c=currentColor,dark='#263242';
-  box(g,c,[0,.79,0],[1.22,.76,.52],true,{metalness:.42,roughness:.32});
+  roundedBox(g,c,[0,.79,0],[1.22,.76,.52],.10,5,true,{metalness:.42,roughness:.32});
   box(g,c,[-.32,1.22,-.03],[.42,.15,.38],true);
   box(g,'#e8edf4',[.42,1.2,.05],[.28,.08,.32],false);
   cyl(g,dark,[0,.8,.31],.34,.34,.28,48,false,[Math.PI/2,0,0],{metalness:.52,roughness:.2});
@@ -640,12 +646,12 @@ function addSpaceship(g) {
 }
 function addSofa(g) {
   const c=currentColor;
-  box(g,c,[0,.49,0],[2.05,.35,.88],true,{roughness:.85});
+  roundedBox(g,c,[0,.49,0],[2.05,.35,.88],.12,5,true,{roughness:.85});
   box(g,c,[0,.94,-.34],[2.05,.72,.2],true,{roughness:.85});
   box(g,c,[-.91,.7,0],[.23,.52,.9],true,{roughness:.85});
   box(g,c,[.91,.7,0],[.23,.52,.9],true,{roughness:.85});
   [-.49,.49].forEach(x=>{
-    box(g,'#e3e8ee',[x,.71,.035],[.82,.12,.64],false,{roughness:.95});
+    roundedBox(g,'#e3e8ee',[x,.71,.035],[.82,.12,.64],.055,4,false,{roughness:.95});
     box(g,'#edf0f4',[x,.94,-.19],[.82,.42,.12],false,{roughness:.95});
     box(g,'#a2adba',[x,.97,-.116],[.65,.27,.035],false,{roughness:.95});
   });
@@ -669,7 +675,7 @@ function addVase(g) {
 }
 function addSpeaker(g) {
   const c=currentColor,dark='#263142';
-  box(g,c,[0,.82,0],[.92,1.58,.7],true,{metalness:.25,roughness:.48});
+  roundedBox(g,c,[0,.82,0],[.92,1.58,.7],.12,6,true,{metalness:.25,roughness:.48});
   for(const [y,r] of [[1.2,.25],[.56,.16]]){
     cyl(g,dark,[0,y,.37],r*.90,r*.90,.06,48,false,[Math.PI/2,0,0],{metalness:.45,roughness:.25});
     cyl(g,'#9caab9',[0,y,.412],r*.73,r*.73,.025,48,false,[Math.PI/2,0,0],{metalness:.6,roughness:.25});
@@ -680,7 +686,7 @@ function addSpeaker(g) {
 }
 function addWatch(g) {
   const c=currentColor,dark='#2a3546';
-  box(g,c,[0,.88,0],[.48,.73,.12],true,{metalness:.55,roughness:.24});
+  roundedBox(g,c,[0,.88,0],[.48,.73,.12],.08,5,true,{metalness:.55,roughness:.24});
   box(g,c,[0,1.43,0],[.3,.56,.12],true,{metalness:.45,roughness:.35});
   box(g,c,[0,.33,0],[.3,.4,.12],true,{metalness:.45,roughness:.35});
   box(g,dark,[0,.88,.071],[.38,.55,.02],false,{metalness:.25,roughness:.17});
