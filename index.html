@@ -185,6 +185,9 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
 #snapBtn.active{background:#eef7df!important;color:#456a22!important;border-color:#cfe5af!important}
 @media(max-width:920px){.stage{background:#eef2f7!important}}
 
+
+.inspector-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important}
+.inspector-actions .btn{min-width:0;padding-left:6px!important;padding-right:6px!important;font-size:10px!important;white-space:nowrap}
 </style>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}
@@ -352,7 +355,7 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
           <div class="toggle-row"><span>Sombras suaves</span><button class="switch on" id="shadowSwitch" aria-label="Alternar sombras"></button></div>
           <div class="toggle-row"><span>Resaltar selección</span><button class="switch on" id="highlightSwitch" aria-label="Alternar selección"></button></div>
         </div>
-        <div class="inspector-actions"><button class="btn" id="duplicateBtn">▣ Duplicar</button><button class="btn" id="deleteBtn">⌫ Eliminar</button></div>
+        <div class="inspector-actions"><button class="btn" id="renameBtn" title="Cambiar el nombre de la pieza">✎ Renombrar</button><button class="btn" id="duplicateBtn" title="Duplicar (Ctrl+D)">▣ Duplicar</button><button class="btn" id="deleteBtn">⌫ Eliminar</button></div>
         <div class="inspector-note"><b>Materiales nuevos:</b> las texturas se generan dentro del navegador y se aplican al modelo seleccionado. “Ultra” sube la resolución de render y sombras, pero puede bajar el rendimiento en equipos modestos.</div>
       <div class="inspector-note"><b>Consejo:</b> combiná una textura con diferentes acabados y rotá el modelo para observar mejor los relieves y reflejos.</div>
       </div>
@@ -2155,6 +2158,14 @@ $('shadowSwitch').addEventListener('click',()=>{shadowsEnabled=!shadowsEnabled;k
 $('highlightSwitch').addEventListener('click',()=>{highlightEnabled=!highlightEnabled;if(selectionHelper)scene.remove(selectionHelper);selectionHelper=null;if(highlightEnabled)makeHelper();setSwitch('highlightSwitch',highlightEnabled);});
 $('resetViewBtn').addEventListener('click',()=>{setCameraView('perspective');focusScene();});
 $('focusBtn').addEventListener('click',focusModel);
+$('renameBtn').addEventListener('click',()=>{
+  if(!selected)return;
+  const candidate=window.prompt('Nombre para el objeto:',selected.name);
+  if(candidate===null)return;
+  const name=candidate.trim().slice(0,54);
+  if(!name){toast('El nombre no puede estar vacío.');return;}
+  pushHistory();selected.name=name;selectDesign(selected);updateMeta();persist();toast('Objeto renombrado.');
+});
 $('duplicateBtn').addEventListener('click',addDuplicate);
 $('deleteBtn').addEventListener('click',deleteSelected);
 $('viewInspectorBtn').addEventListener('click',()=>{
@@ -2191,11 +2202,14 @@ $('redoBtn').addEventListener('click',()=>{
   undoStack.push(snapshot());const s=redoStack.pop();applySnapshot(s);persist();toast('Cambio rehecho.');
 });
 window.addEventListener('keydown',e=>{
-  if(e.key==='Delete'&&selected&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)){e.preventDefault();deleteSelected();}
+  const typing=['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName);
+  if(e.key==='Delete'&&selected&&!typing){e.preventDefault();deleteSelected();}
   const mac=/Mac|iPhone|iPad/.test(navigator.platform);const mod=mac?e.metaKey:e.ctrlKey;
   if(mod && e.key.toLowerCase()==='z'){e.preventDefault();(e.shiftKey?$('redoBtn'):$('undoBtn')).click();}
   if(mod && e.key.toLowerCase()==='y'){e.preventDefault();$('redoBtn').click();}
   if(mod && e.key.toLowerCase()==='n'){e.preventDefault();$('newProject').click();}
+  if(mod && e.key.toLowerCase()==='d'&&!typing&&selected){e.preventDefault();addDuplicate();}
+  if(!mod&&!typing&&e.key.toLowerCase()==='f'&&selected){e.preventDefault();focusModel();}
   if(e.key==='Escape'){$('exportMenu').classList.remove('open');$('sidebar').classList.remove('menu-open');}
 });
 const sidebar=$('sidebar');
