@@ -86,6 +86,7 @@ body{background:#f5f7fa;color:#182235}
 .inspector-note{border-color:#e0e6ee;background:#f7f9fc;color:#68778c}.inspector-note b{color:#37465c}
 .export-menu{background:#fff;border-color:#d8e1eb;box-shadow:0 12px 40px #20304a20}.export-option{color:#37465c}.export-option:hover{background:#f0f5e7;color:#52791b}.export-option small{color:#78869a}
 .toast{border-color:#c8dfa3;background:#f4fae9;color:#3f6416;box-shadow:0 12px 32px #28374a20}
+.phase-board{box-shadow:0 4px 18px #24324a05}
 @media(max-width:920px){.side-scroll{background:#fff;border-color:#e1e7ef}.sidebar:after{color:#68778c}.sidebar:before{color:#526176}}
 </style>
 <script type="importmap">
@@ -128,6 +129,17 @@ body{background:#f5f7fa;color:#182235}
       <button class="category-card" data-type="villa"><span class="cat-icon">⌂</span><span><span class="cat-title">Villa moderna</span><span class="cat-sub">Vidrio y terrazas</span></span></button>
       <button class="category-card" data-type="pavilion"><span class="cat-icon">◠</span><span><span class="cat-title">Pabellón</span><span class="cat-sub">Columnas y cúpula</span></span></button>
       <button class="category-card" data-type="bridge"><span class="cat-icon">⌒</span><span><span class="cat-title">Puente</span><span class="cat-sub">Arcos estructurales</span></span></button>
+    </div>
+    <div class="section-title">Piezas arquitectónicas</div>
+    <div class="category-grid">
+      <button class="category-card" data-type="arch"><span class="cat-icon">∩</span><span><span class="cat-title">Arco clásico</span><span class="cat-sub">Abertura curva</span></span></button>
+      <button class="category-card" data-type="dome"><span class="cat-icon">◠</span><span><span class="cat-title">Cúpula</span><span class="cat-sub">Media esfera y tambor</span></span></button>
+      <button class="category-card" data-type="stairs"><span class="cat-icon">▥</span><span><span class="cat-title">Escalera</span><span class="cat-sub">Peldaños y descansillo</span></span></button>
+      <button class="category-card" data-type="column"><span class="cat-icon">Ⅱ</span><span><span class="cat-title">Columna clásica</span><span class="cat-sub">Base y capitel</span></span></button>
+      <button class="category-card" data-type="pyramid"><span class="cat-icon">△</span><span><span class="cat-title">Pirámide</span><span class="cat-sub">Volumen facetado</span></span></button>
+      <button class="category-card" data-type="tree"><span class="cat-icon">♣</span><span><span class="cat-title">Árbol ornamental</span><span class="cat-sub">Paisajismo 3D</span></span></button>
+      <button class="category-card" data-type="rock"><span class="cat-icon">⬟</span><span><span class="cat-title">Roca orgánica</span><span class="cat-sub">Superficie irregular</span></span></button>
+      <button class="category-card" data-type="fountain"><span class="cat-icon">♨</span><span><span class="cat-title">Fuente</span><span class="cat-sub">Cuencas y agua</span></span></button>
     </div>
     <div class="section-title">Formas rápidas · curvas y sólidos</div>
     <button class="nav-item" data-type="phone"><span class="nav-icon">▯</span> Smartphone</button>
@@ -205,6 +217,8 @@ body{background:#f5f7fa;color:#182235}
         <div class="prop-section"><div class="prop-title">Apariencia <span style="color:#748398;font:9px 'DM Mono',monospace">01</span></div>
           <div class="prop-row"><div class="prop-label"><span>Color principal</span><strong id="colorValue">VERDE LIMA</strong></div><div class="color-row" id="colorSwatches"><button class="swatch active" data-color="#c8ff57" style="background:#c8ff57" title="Verde lima"></button><button class="swatch" data-color="#e8edf5" style="background:#e8edf5" title="Blanco hielo"></button><button class="swatch" data-color="#242b38" style="background:#242b38" title="Grafito"></button><button class="swatch" data-color="#f28b72" style="background:#f28b72" title="Coral"></button><button class="swatch" data-color="#82a9ff" style="background:#82a9ff" title="Azul eléctrico"></button><button class="swatch" data-color="#c79cff" style="background:#c79cff" title="Lavanda"></button><button class="custom-color" title="Elegir color"><input type="color" id="customColor" value="#c8ff57" aria-label="Elegir color personalizado"></button></div></div>
           <div class="prop-row"><div class="prop-label"><span>Acabado</span></div><select class="select-control" id="materialSelect"><option value="matte">Mate · suave</option><option value="satin">Satín · equilibrado</option><option value="glossy">Brillante · pulido</option><option value="metal">Metal cepillado</option></select></div>
+          <div class="prop-row"><div class="prop-label"><span>Textura procedural</span><strong id="textureValue">SIN TEXTURA</strong></div><select class="select-control" id="textureSelect"><option value="none">Color liso</option><option value="wood">Madera con vetas</option><option value="marble">Mármol veteado</option><option value="concrete">Hormigón / cemento</option><option value="fabric">Tela tejida</option><option value="brushed">Metal rayado</option><option value="carbon">Fibra de carbono</option><option value="terrazzo">Terrazo</option><option value="brick">Ladrillo</option><option value="stone">Piedra natural</option><option value="tile">Baldosas</option></select></div>
+          <div class="prop-row"><div class="prop-label"><span>Calidad gráfica</span><strong id="qualityValue">ALTA</strong></div><select class="select-control" id="qualitySelect"><option value="standard">Estándar · rápida</option><option value="high" selected>Alta · recomendada</option><option value="ultra">Ultra · más detalle</option></select></div>
           <div class="prop-row"><div class="prop-label"><span>Intensidad de luz</span><strong id="lightValue">72%</strong></div><div class="range-line"><input type="range" id="lightRange" min="30" max="100" value="72"><span class="range-val" id="lightReadout">72%</span></div></div>
         </div>
         <div class="prop-section"><div class="prop-title">Escena</div>
@@ -213,7 +227,8 @@ body{background:#f5f7fa;color:#182235}
           <div class="toggle-row"><span>Resaltar selección</span><button class="switch on" id="highlightSwitch" aria-label="Alternar selección"></button></div>
         </div>
         <div class="inspector-actions"><button class="btn" id="duplicateBtn">▣ Duplicar</button><button class="btn" id="deleteBtn">⌫ Eliminar</button></div>
-        <div class="inspector-note"><b>Consejo:</b> arrastrá con el mouse para orbitar, usá la rueda para acercarte y alejarte, y probá diferentes acabados para explorar el concepto.</div>
+        <div class="inspector-note"><b>Materiales nuevos:</b> las texturas se generan dentro del navegador y se aplican al modelo seleccionado. “Ultra” sube la resolución de render y sombras, pero puede bajar el rendimiento en equipos modestos.</div>
+      <div class="inspector-note"><b>Consejo:</b> combiná una textura con diferentes acabados y rotá el modelo para observar mejor los relieves y reflejos.</div>
       </div>
     </aside>
   </div>
@@ -224,6 +239,7 @@ body{background:#f5f7fa;color:#182235}
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 const $ = (id) => document.getElementById(id);
 const canvas = $('viewport');
@@ -303,7 +319,15 @@ const meta = {
   cone:{name:'Cono',icon:'△',type:'SÓLIDO GEOMÉTRICO · 3D',tag:'Forma · Cono'},
   cylinder:{name:'Cilindro',icon:'◯',type:'SÓLIDO GEOMÉTRICO · 3D',tag:'Forma · Cilindro'},
   capsule:{name:'Cápsula redondeada',icon:'▱',type:'FORMA ORGÁNICA · 3D',tag:'Forma · Cápsula'},
-  knot:{name:'Nudo orgánico',icon:'∞',type:'FORMA ORGÁNICA · 3D',tag:'Forma · Nudo'}
+  knot:{name:'Nudo orgánico',icon:'∞',type:'FORMA ORGÁNICA · 3D',tag:'Forma · Nudo'},
+  arch:{name:'Arco clásico',icon:'∩',type:'ARQUITECTURA · DETALLE',tag:'Detalle · Arco'},
+  dome:{name:'Cúpula arquitectónica',icon:'◠',type:'ARQUITECTURA · CUBIERTA',tag:'Detalle · Cúpula'},
+  stairs:{name:'Escalera de diseño',icon:'▥',type:'ARQUITECTURA · CIRCULACIÓN',tag:'Detalle · Escalera'},
+  column:{name:'Columna clásica',icon:'Ⅱ',type:'ARQUITECTURA · COLUMNA',tag:'Detalle · Columna'},
+  pyramid:{name:'Pirámide facetada',icon:'△',type:'SÓLIDO GEOMÉTRICO · 3D',tag:'Forma · Pirámide'},
+  tree:{name:'Árbol ornamental',icon:'♣',type:'PAISAJISMO · NATURALEZA',tag:'Paisajismo · Árbol'},
+  rock:{name:'Roca orgánica',icon:'⬟',type:'FORMA ORGÁNICA · 3D',tag:'Forma · Roca'},
+  fountain:{name:'Fuente ornamental',icon:'♨',type:'PAISAJISMO · ESTRUCTURA',tag:'Fuente · Jardín'}
 };
 const materialSettings = {
   matte:{roughness:.82,metalness:.04},
