@@ -37,6 +37,7 @@ jobs:
           Path("/tmp/nexo-studio-check.mjs").write_text(scripts[0], encoding="utf-8")
           PY
           node --check /tmp/nexo-studio-check.mjs
+          node --check api/ai3d.js
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload static site
