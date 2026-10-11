@@ -1688,8 +1688,7 @@ function handlePrompt() {
   else if(/sin textura|liso|smooth/.test(text))currentTexture='none';
   architecturalFloors=THREE.MathUtils.clamp(parseInt(text.match(/\b(\d{1,2})\s*(?:pisos?|plantas?|niveles?)\b/)?.[1]||'10',10),3,40);
   const hasComposition=/\b(con|y|junto|rodead[oa]s?|alrededor|jard[ií]n|patio|parque|composici[oó]n|escena)\b/.test(text);
-  const keepScene=addMode||hasComposition;
-  const base=createDesign(type,{keepScene});
+  const base=createDesign(type,{keepScene:addMode});
   const addPiece=(piece,pos,name)=>{
     const root=createDesign(piece,{keepScene:true,position:pos,focus:false});
     if(name)root.name=name;
@@ -1813,7 +1812,7 @@ $('scaleRange').addEventListener('input',e=>{
   if(e.target.dataset.historyStarted!=='1'){pushHistory();e.target.dataset.historyStarted='1';}
   const v=parseFloat(e.target.value);selected.scale.set(v,v,v);
   $('scaleValue').textContent=v.toFixed(2);$('scaleReadout').textContent=v.toFixed(2)+' ×';
-  if(selectionHelper)selectionHelper.update();persist();
+  if(selectionHelper)selectionHelper.update();updateDimensions();persist();
 });
 $('scaleRange').addEventListener('change',e=>{e.target.dataset.historyStarted='0';});
 $('rotationRange').addEventListener('input',e=>{
@@ -1821,11 +1820,11 @@ $('rotationRange').addEventListener('input',e=>{
   if(e.target.dataset.historyStarted!=='1'){pushHistory();e.target.dataset.historyStarted='1';}
   const d=parseInt(e.target.value,10)||0;selected.rotation.y=THREE.MathUtils.degToRad(d);
   $('rotationValue').textContent=d+'°';$('rotationReadout').textContent=d+'°';
-  if(selectionHelper)selectionHelper.update();persist();
+  if(selectionHelper)selectionHelper.update();updateDimensions();persist();
 });
 $('rotationRange').addEventListener('change',e=>{e.target.dataset.historyStarted='0';});
 $('resetTransform').addEventListener('click',()=>{
-  if(!selected)return;pushHistory();selected.position.set(0,0,0);selected.scale.set(1,1,1);selected.rotation.set(0,0,0);selectDesign(selected);persist();toast('Transformación restablecida.');
+  if(!selected)return;pushHistory();selected.position.set(0,0,0);selected.scale.set(1,1,1);selected.rotation.set(0,0,0);selectDesign(selected);updateDimensions();persist();toast('Transformación restablecida.');
 });
 $('lightRange').addEventListener('input',e=>{
   if(e.target.dataset.historyStarted!=='1'){pushHistory();e.target.dataset.historyStarted='1';}
