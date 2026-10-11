@@ -233,6 +233,9 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
 .wall-opening-controls .select-control{height:32px;width:100%;margin-bottom:8px;font-size:10px}
 .opening-size-grid{margin-bottom:4px}
 .shape-extra-control .arch-size-field{max-width:180px}
+.transform-tool{min-width:62px}
+.transform-tool.active{background:#eaf5d6!important;color:#456a22!important;border-color:#cfe5af!important}
+@media(max-width:850px){.transform-tool{min-width:32px;padding-left:7px;padding-right:7px}.transform-tool span{display:none}}
 
 </style>
 <script type="importmap">
@@ -358,7 +361,10 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
     <section class="canvas-column">
       <div class="canvas-toolbar">
         <div class="tool-group">
-          <button class="tool-btn active" id="orbitBtn" title="Orbitar la cámara">◉ <span>Orbitar</span></button><span class="tool-line"></span>
+          <button class="tool-btn active" id="orbitBtn" title="Orbitar la cámara y ocultar el manipulador">◉ <span>Orbitar</span></button><span class="tool-line"></span>
+          <button class="tool-btn transform-tool" id="moveBtn" title="Mover objeto con ejes interactivos (G)">↔ <span>Mover</span></button>
+          <button class="tool-btn transform-tool" id="rotateBtn" title="Rotar objeto arrastrando los anillos (R)">⟳ <span>Rotar</span></button>
+          <button class="tool-btn transform-tool" id="scaleBtn" title="Escalar objeto con los controles 3D (S)">⤢ <span>Escalar</span></button><span class="tool-line"></span>
           <button class="tool-btn" id="gridBtn" title="Mostrar u ocultar la cuadrícula">▦ Cuadrícula</button>
           <button class="tool-btn" id="wireBtn" title="Alternar vista de malla">⌗ Malla</button>
           <button class="tool-btn" id="addModeBtn" title="Añadir los próximos modelos a la escena">＋ <span>Añadir piezas</span></button>
@@ -485,6 +491,7 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { TransformControls } from 'three/addons/controls/TransformControls.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
@@ -552,6 +559,8 @@ const architecturalSizeDefaults = {
 const architecturalSizeTypes = new Set(Object.keys(architecturalSizeDefaults));
 let designObjects = [];
 let selected = null;
+let transformGizmo = null;
+let transformMode = 'orbit';
 let addMode = true;
 let showDimensions = false;
 let unitSystem = 'm';
@@ -1545,6 +1554,7 @@ function clearDimensionHelpers() {
   dimensionAnchors.length=0;
 }
 function clearModels() {
+  if(transformGizmo)transformGizmo.detach();
   if(selectionHelper)scene.remove(selectionHelper);
   selectionHelper=null;
   clearDimensionHelpers();
@@ -1672,6 +1682,11 @@ function selectDesign(root) {
   }
   $('materialSelect').value=currentMaterial;
   updateSwatches();updateTextureUI();updateMeta();updateDimensions();
+  if(transformGizmo){
+    updateTransformSnap();
+    if(transformMode==='orbit')transformGizmo.detach();
+    else {transformGizmo.setMode(transformMode);transformGizmo.attach(root);}
+  }
 }
 let selectionHelper=null;
 function makeHelper() {
@@ -1823,7 +1838,9 @@ function setCameraView(mode){
   controls=new OrbitControls(camera,renderer.domElement);configureControls();
   const labels={perspective:'PERSPECTIVA',top:'VISTA SUPERIOR',front:'VISTA FRONTAL',side:'VISTA LATERAL'};
   $('viewMode').textContent=labels[activeView];$('viewModePill').innerHTML=activeView==='perspective'?'3D <b>●</b>':'ORTO <b>▦</b>';
-  $('viewSelect').value=activeView;resize();focusScene();
+  $('viewSelect').value=activeView;
+  rebuildTransformGizmo();
+  resize();focusScene();
 }
 function resize(){
   const w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);renderer.setSize(w,h,false);
@@ -1840,6 +1857,62 @@ function animate(){
 }
 resize();
 animate();
+
+function syncTransformInspector(){
+  if(!selected)return;
+  const factor=unitFactors[unitSystem]||1;
+  $('posX').value=(selected.position.x*factor).toFixed(2);
+  $('posY').value=(selected.position.y*factor).toFixed(2);
+  $('posZ').value=(selected.position.z*factor).toFixed(2);
+  $('scaleX').value=selected.scale.x.toFixed(2);
+  $('scaleY').value=selected.scale.y.toFixed(2);
+  $('scaleZ').value=selected.scale.z.toFixed(2);
+  const avg=(selected.scale.x+selected.scale.y+selected.scale.z)/3;
+  $('scaleRange').value=THREE.MathUtils.clamp(avg,.05,5);
+  $('scaleValue').textContent=avg.toFixed(2);$('scaleReadout').textContent=avg.toFixed(2)+' ×';
+  const angles=[selected.rotation.x,selected.rotation.y,selected.rotation.z].map(v=>Math.round(THREE.MathUtils.radToDeg(v)));
+  $('rotX').value=angles[0];$('rotY').value=angles[1];$('rotZ').value=angles[2];
+  $('rotationRange').value=THREE.MathUtils.clamp(angles[1],-180,180);
+  $('rotationValue').textContent=angles[1]+'°';$('rotationReadout').textContent=angles[1]+'°';
+  if(selectionHelper)selectionHelper.update();
+}
+function updateTransformSnap(){
+  if(transformGizmo)transformGizmo.translationSnap=snapEnabled?snapStep:null;
+}
+function setTransformTool(mode,options={}){
+  const validModes=['orbit','translate','rotate','scale'];
+  transformMode=validModes.includes(mode)?mode:'orbit';
+  const buttonByMode={orbit:'orbitBtn',translate:'moveBtn',rotate:'rotateBtn',scale:'scaleBtn'};
+  Object.entries(buttonByMode).forEach(([key,id])=>$(id).classList.toggle('active',transformMode===key));
+  if(transformGizmo){
+    if(transformMode==='orbit'||!selected)transformGizmo.detach();
+    else {transformGizmo.setMode(transformMode);transformGizmo.setSpace('world');updateTransformSnap();transformGizmo.attach(selected);}
+  }
+  if(options.notify!==false){
+    const labels={orbit:'Orbitar la vista',translate:'Mover: arrastrá las flechas de los ejes',rotate:'Rotar: arrastrá los anillos',scale:'Escalar: arrastrá los controles'};
+    toast(labels[transformMode]+(selected?'.':' · elegí una pieza para usar la herramienta.'));
+  }
+}
+function rebuildTransformGizmo(){
+  if(transformGizmo){scene.remove(transformGizmo.getHelper());transformGizmo.dispose();transformGizmo=null;}
+  transformGizmo=new TransformControls(camera,renderer.domElement);
+  transformGizmo.setMode(transformMode==='orbit'?'translate':transformMode);
+  transformGizmo.setSpace('world');transformGizmo.setSize(.85);
+  transformGizmo.addEventListener('dragging-changed',event=>{
+    controls.enabled=!event.value;
+    if(event.value)pushHistory();
+    else {syncTransformInspector();updateDimensions();updateMeta();persist();}
+  });
+  transformGizmo.addEventListener('objectChange',()=>{
+    syncTransformInspector();persist();
+  });
+  scene.add(transformGizmo.getHelper());
+  updateTransformSnap();
+  if(selected&&transformMode!=='orbit')transformGizmo.attach(selected);else transformGizmo.detach();
+  const buttonByMode={orbit:'orbitBtn',translate:'moveBtn',rotate:'rotateBtn',scale:'scaleBtn'};
+  Object.entries(buttonByMode).forEach(([key,id])=>$(id).classList.toggle('active',transformMode===key));
+}
+rebuildTransformGizmo();
 
 function serializeSceneNode(node) {
   const isGroup=!!node.userData.isSceneGroup;
@@ -2747,6 +2820,7 @@ function startBlankProject(options={}) {
   unitSystem='m';showDimensions=false;snapEnabled=false;wireEnabled=false;gridEnabled=true;
   shadowsEnabled=true;highlightEnabled=true;lightLevel=.72;
   addMode=true;$('addModeBtn').classList.add('active');$('addModeBtn').innerHTML='✓ <span>Modo añadir activo</span>';
+  setTransformTool('orbit',{notify:false});
   $('quickShapeSelect').value='cube';$('unitsSelect').value='m';$('materialSelect').value='matte';
   $('dimensionsBtn').classList.remove('active');$('dimensionOverlay').classList.remove('active');
   $('snapBtn').classList.remove('active');$('wireBtn').classList.remove('active');
@@ -2859,10 +2933,14 @@ $('rotationRange').addEventListener('input',e=>{
 $('rotationRange').addEventListener('change',e=>{e.target.dataset.historyStarted='0';});
 ['rotX','rotY','rotZ'].forEach(id=>$(id).addEventListener('change',setRotationFromInputs));
 $('centerSupportBtn').addEventListener('click',centerAndSupportSelected);
+$('orbitBtn').addEventListener('click',()=>setTransformTool('orbit'));
+$('moveBtn').addEventListener('click',()=>setTransformTool('translate'));
+$('rotateBtn').addEventListener('click',()=>setTransformTool('rotate'));
+$('scaleBtn').addEventListener('click',()=>setTransformTool('scale'));
 $('snapBtn').addEventListener('click',()=>{
-  snapEnabled=!snapEnabled;$('snapBtn').classList.toggle('active',snapEnabled);
+  snapEnabled=!snapEnabled;$('snapBtn').classList.toggle('active',snapEnabled);updateTransformSnap();
   if(snapEnabled&&selected)setPositionFromInputs();else persist();
-  toast(snapEnabled?'Ajuste a cuadrícula activado: pasos de 0,5 m.':'Ajuste a cuadrícula desactivado.');
+  toast(snapEnabled?'Ajuste de posición activado: el manipulador se mueve en pasos de 0,5 m.':'Ajuste a cuadrícula desactivado.');
 });
 $('resetTransform').addEventListener('click',()=>{
   if(!selected)return;pushHistory();selected.position.set(0,0,0);selected.scale.set(1,1,1);selected.rotation.set(0,0,0);selectDesign(selected);updateDimensions();persist();toast('Transformación restablecida.');
@@ -2910,6 +2988,7 @@ document.querySelectorAll('[data-export]').forEach(btn=>btn.addEventListener('cl
 }));
 document.addEventListener('click',e=>{if(!e.target.closest('.export-wrap'))$('exportMenu').classList.remove('open');});
 canvas.addEventListener('pointerdown',e=>{
+  if(transformGizmo&&(transformGizmo.dragging||transformGizmo.axis))return;
   const bounds=canvas.getBoundingClientRect();const pointer=new THREE.Vector2((e.clientX-bounds.left)/bounds.width*2-1,-((e.clientY-bounds.top)/bounds.height)*2+1);
   const raycaster=new THREE.Raycaster();raycaster.setFromCamera(pointer,camera);
   const hits=raycaster.intersectObjects(modelRoot.children,true);
@@ -2934,6 +3013,10 @@ window.addEventListener('keydown',e=>{
   if(mod && e.key.toLowerCase()==='y'){e.preventDefault();$('redoBtn').click();}
   if(mod && e.key.toLowerCase()==='n'){e.preventDefault();$('newProject').click();}
   if(mod && e.key.toLowerCase()==='d'&&!typing&&selected){e.preventDefault();addDuplicate();}
+  if(!mod&&!typing&&!e.repeat&&['g','r','s'].includes(e.key.toLowerCase())){
+    const mode={g:'translate',r:'rotate',s:'scale'}[e.key.toLowerCase()];
+    e.preventDefault();setTransformTool(mode);
+  }
   if(!mod&&!typing&&e.key.toLowerCase()==='f'&&selected){e.preventDefault();focusModel();}
   if(e.key==='Escape'){$('exportMenu').classList.remove('open');$('sidebar').classList.remove('menu-open');}
 });
