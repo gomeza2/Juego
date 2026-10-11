@@ -1094,12 +1094,24 @@ function build(type,g) {
   else if(type==='fountain') addFountain(g);
   else addPrimitive(g,type);
 }
+function clearOwnedTextureMaps(root) {
+  root.traverse(node=>{
+    const owned=node.userData.nexoTextureClones;
+    if(owned){
+      owned.forEach(texture=>texture.dispose());
+      node.userData.nexoTextureClones=[];
+    }
+  });
+}
 function applyPrimaryMaterial(root) {
+  clearOwnedTextureMaps(root);
   const finish=materialSettings[currentMaterial]||materialSettings.matte;
-  const tex=makeProceduralTexture(currentTexture);
+  const cached=makeProceduralTexture(currentTexture);
+  const tex=cached?{map:cached.map.clone(),roughnessMap:cached.roughnessMap.clone(),bumpMap:cached.bumpMap.clone()}:null;
   const profile=textureProfile[currentTexture];
   const tileScale=textureScale;
   if(tex){
+    root.userData.nexoTextureClones=[tex.map,tex.roughnessMap,tex.bumpMap];
     tex.map.repeat.set(tileScale,tileScale);
     tex.roughnessMap.repeat.set(tileScale,tileScale);
     tex.bumpMap.repeat.set(tileScale,tileScale);
