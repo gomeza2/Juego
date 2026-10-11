@@ -304,6 +304,8 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
     <button class="nav-item" data-type="gear"><span class="nav-icon">⚙</span> Engranaje mecánico</button>
     <button class="nav-item" data-type="wedge"><span class="nav-icon">◢</span> Cuña / rampa</button>
     <button class="nav-item" data-type="pipe"><span class="nav-icon">◎</span> Tubo hueco</button>
+    <button class="nav-item" data-type="star"><span class="nav-icon">✦</span> Estrella sólida</button>
+    <button class="nav-item" data-type="octahedron"><span class="nav-icon">◇</span> Octaedro facetado</button>
     <div class="phase-board">
       <div class="phase-board-title">FASES DE DESARROLLO <span>09–10 / 10</span></div>
       <div class="phase-row done"><span class="phase-num">✓</span><div><b>01 · Editor base</b><small>Visor, materiales y exportación</small></div></div>
@@ -374,7 +376,7 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
           <div class="scene-actions"><button class="btn" id="groupBtn" title="Agrupar objetos marcados">Agrupar marcados</button><button class="btn" id="ungroupBtn" title="Separar el grupo seleccionado">Separar grupo</button></div>
           <div class="scene-quick-add">
             <select class="select-control" id="quickShapeSelect" aria-label="Elegir forma para agregar">
-              <option value="cube">Cubo</option><option value="sphere">Esfera</option><option value="cylinder">Cilindro</option><option value="cone">Cono</option><option value="torus">Toroide</option><option value="capsule">Cápsula</option><option value="hexagon">Prisma hexagonal</option><option value="gear">Engranaje</option><option value="wedge">Cuña / rampa</option><option value="pipe">Tubo hueco</option><option value="pyramid">Pirámide</option><option value="knot">Nudo</option><option value="wall">Pared</option><option value="floor">Piso / losa</option><option value="door">Puerta</option><option value="window">Ventana</option><option value="column">Columna</option><option value="arch">Arco</option><option value="tree">Árbol</option><option value="rock">Roca</option><option value="fountain">Fuente</option>
+              <option value="cube">Cubo</option><option value="sphere">Esfera</option><option value="cylinder">Cilindro</option><option value="cone">Cono</option><option value="torus">Toroide</option><option value="capsule">Cápsula</option><option value="hexagon">Prisma hexagonal</option><option value="star">Estrella sólida</option><option value="octahedron">Octaedro</option><option value="gear">Engranaje</option><option value="wedge">Cuña / rampa</option><option value="pipe">Tubo hueco</option><option value="pyramid">Pirámide</option><option value="knot">Nudo</option><option value="wall">Pared</option><option value="floor">Piso / losa</option><option value="door">Puerta</option><option value="window">Ventana</option><option value="column">Columna</option><option value="arch">Arco</option><option value="tree">Árbol</option><option value="rock">Roca</option><option value="fountain">Fuente</option>
             </select>
             <button class="btn" id="quickAddBtn" type="button">＋ Agregar</button>
           </div>
@@ -570,6 +572,8 @@ const meta = {
   gear:{name:'Engranaje mecánico',icon:'⚙',type:'MECÁNICA · COMPONENTE',tag:'Pieza · Engranaje'},
   wedge:{name:'Cuña / rampa',icon:'◢',type:'SÓLIDO GEOMÉTRICO · 3D',tag:'Forma · Cuña'},
   pipe:{name:'Tubo hueco',icon:'◎',type:'MECÁNICA · TUBERÍA',tag:'Pieza · Tubo'},
+  star:{name:'Estrella sólida',icon:'✦',type:'SÓLIDO GEOMÉTRICO · 3D',tag:'Forma · Estrella'},
+  octahedron:{name:'Octaedro facetado',icon:'◇',type:'SÓLIDO GEOMÉTRICO · 3D',tag:'Forma · Octaedro'},
   arch:{name:'Arco clásico',icon:'∩',type:'ARQUITECTURA · DETALLE',tag:'Detalle · Arco'},
   dome:{name:'Cúpula arquitectónica',icon:'◠',type:'ARQUITECTURA · CUBIERTA',tag:'Detalle · Cúpula'},
   stairs:{name:'Escalera de diseño',icon:'▥',type:'ARQUITECTURA · CIRCULACIÓN',tag:'Detalle · Escalera'},
@@ -1244,6 +1248,19 @@ function addPrimitive(g,type) {
     addMesh(g,new THREE.TorusGeometry(.32,.035,12,40),currentColor,[.725,.36,0],[1,1,1],[0,Math.PI/2,0],true,{metalness:.55,roughness:.3});
     addMesh(g,new THREE.TorusGeometry(.32,.035,12,40),currentColor,[-.725,.36,0],[1,1,1],[0,Math.PI/2,0],true,{metalness:.55,roughness:.3});
   }
+  if(type==='star') {
+    const shape=new THREE.Shape();
+    for(let i=0;i<10;i++){
+      const angle=Math.PI/2+i*Math.PI/5,r=i%2===0?.82:.36;
+      const x=Math.cos(angle)*r,y=.82+Math.sin(angle)*r;
+      if(i===0)shape.moveTo(x,y);else shape.lineTo(x,y);
+    }
+    shape.closePath();
+    const geo=new THREE.ExtrudeGeometry(shape,{depth:.22,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:.025,bevelThickness:.025});
+    geo.translate(0,0,-.11);
+    addMesh(g,geo,currentColor,[0,0,0],[1,1,1],[0,0,0],true,{metalness:.2,roughness:.3});
+  }
+  if(type==='octahedron')addMesh(g,new THREE.OctahedronGeometry(.88,0),currentColor,[0,.88,0],[1,1,1],[0,0,0],true,{metalness:.22,roughness:.27});
 }
 function addParametricArchitecturalPiece(type,g) {
   const dims=g.userData.archSize||architecturalSizeDefaults[type];
@@ -2062,6 +2079,8 @@ const promptEntityCatalog=[
   {type:'knot',aliases:'nudos?',label:'Nudo'},
   {type:'pyramid',aliases:'piramides?',label:'Pirámide'},
   {type:'hexagon',aliases:'hexagonos?',label:'Prisma hexagonal'},
+  {type:'star',aliases:'estrellas?',label:'Estrella'},
+  {type:'octahedron',aliases:'octaedros?',label:'Octaedro'},
   {type:'gear',aliases:'engranajes?|ruedas? dentadas?',label:'Engranaje'},
   {type:'wedge',aliases:'cunas?|rampas?',label:'Cuña'},
   {type:'pipe',aliases:'tubos?|tuberias?',label:'Tubo'},
@@ -2126,6 +2145,8 @@ function detectPromptType(text) {
   if(/tubo|tuberia/.test(t))return 'pipe';
   if(/rampa|cuna/.test(t))return 'wedge';
   if(/hexagono|hexagonal/.test(t))return 'hexagon';
+  if(/estrella/.test(t))return 'star';
+  if(/octaedro/.test(t))return 'octahedron';
   if(/cono\b/.test(t))return 'cone';
   if(/cilindro/.test(t))return 'cylinder';
   if(/capsula/.test(t))return 'capsule';
