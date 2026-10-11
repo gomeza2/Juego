@@ -196,6 +196,8 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
 .scene-arrange .btn{height:30px;justify-content:center;padding:0 8px;font-size:10px}
 .scene-arrange .btn:disabled{opacity:.45;cursor:not-allowed}
 .scene-arrange-hint{font-size:9px;line-height:1.55;color:#7b899c}
+.array-number{width:100%;height:32px;border:1px solid #d7e0eb;border-radius:6px;background:#fff;color:#27384d;padding:0 7px;font:11px 'DM Mono',monospace;min-width:0}
+#repeatMirrorPanel .scene-arrange{margin-top:8px}
 @media(max-width:1180px){.scene-arrange-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
 
 
@@ -450,8 +452,37 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
         <div class="prop-section"><div class="prop-title">Transformación <button id="resetTransform">RESTABLECER</button></div>
           <div class="prop-row"><div class="prop-label"><span>Posición</span><strong>XYZ</strong></div><div class="axis-fields"><div class="axis-field x"><label>X <input id="posX" type="number" step=".1" value="0"></label></div><div class="axis-field y"><label>Y <input id="posY" type="number" step=".1" value="0"></label></div><div class="axis-field z"><label>Z <input id="posZ" type="number" step=".1" value="0"></label></div></div></div>
           <div class="prop-row"><div class="prop-label"><span>Escala uniforme</span><strong id="scaleReadout">1.00 ×</strong></div><div class="range-line"><input type="range" min=".05" max="5" step=".05" value="1" id="scaleRange"><span class="range-val" id="scaleValue">1.00</span></div></div>
-          <div class="prop-row"><div class="prop-label"><span>Escala independiente</span><strong>XYZ</strong></div><div class="axis-fields scale-fields"><div class="axis-field x"><label>X × <input id="scaleX" type="number" min=".05" max="20" step=".05" value="1" aria-label="Escala independiente en X"></label></div><div class="axis-field y"><label>Y × <input id="scaleY" type="number" min=".05" max="20" step=".05" value="1" aria-label="Escala independiente en Y"></label></div><div class="axis-field z"><label>Z × <input id="scaleZ" type="number" min=".05" max="20" step=".05" value="1" aria-label="Escala independiente en Z"></label></div></div><div class="arch-size-help">Estirá cada eje de forma independiente.</div><button class="btn" id="applyScaleXYZBtn" type="button">Aplicar escala XYZ</button></div>
+          <div class="prop-row"><div class="prop-label"><span>Escala independiente</span><strong>XYZ</strong></div><div class="axis-fields scale-fields"><div class="axis-field x"><label>X × <input id="scaleX" type="number" min="-20" max="20" step=".05" value="1" aria-label="Escala independiente en X"></label></div><div class="axis-field y"><label>Y × <input id="scaleY" type="number" min="-20" max="20" step=".05" value="1" aria-label="Escala independiente en Y"></label></div><div class="axis-field z"><label>Z × <input id="scaleZ" type="number" min="-20" max="20" step=".05" value="1" aria-label="Escala independiente en Z"></label></div></div><div class="arch-size-help">Estirá cada eje de forma independiente. Los valores negativos reflejan la pieza en ese eje.</div><button class="btn" id="applyScaleXYZBtn" type="button">Aplicar escala XYZ</button></div>
           <div class="prop-row"><div class="prop-label"><span>Rotación Y</span><strong id="rotationValue">0°</strong></div><div class="range-line"><input type="range" min="-180" max="180" step="5" value="0" id="rotationRange"><span class="range-val" id="rotationReadout">0°</span></div><div class="axis-fields rotation-fields"><div class="axis-field x"><label>X° <input id="rotX" type="number" step="5" value="0" aria-label="Rotación eje X en grados"></label></div><div class="axis-field y"><label>Y° <input id="rotY" type="number" step="5" value="0" aria-label="Rotación eje Y en grados"></label></div><div class="axis-field z"><label>Z° <input id="rotZ" type="number" step="5" value="0" aria-label="Rotación eje Z en grados"></label></div></div><button class="btn center-support-btn" id="centerSupportBtn" type="button" title="Centrar en X/Z y apoyar la parte inferior en Y=0">Centrar y apoyar en el suelo</button></div>
+        </div>
+        <div class="prop-section" id="repeatMirrorPanel">
+          <div class="prop-title">Repetir y espejar</div>
+          <div class="scene-arrange">
+            <div class="scene-arrange-title">Serie de copias</div>
+            <div class="scene-arrange-row">
+              <label class="arch-size-field">Eje
+                <select class="select-control" id="arrayAxis" aria-label="Eje de la serie"><option value="x">X · ancho</option><option value="y">Y · alto</option><option value="z">Z · fondo</option></select>
+              </label>
+              <label class="arch-size-field">Copias nuevas
+                <input class="array-number" type="number" id="arrayCount" min="1" max="20" step="1" value="3" aria-label="Cantidad de copias nuevas">
+              </label>
+            </div>
+            <label class="arch-size-field" style="margin-top:8px">Distancia entre centros <span class="arch-unit-tag" id="arraySpacingUnit">m</span>
+              <input class="array-number" type="number" id="arraySpacing" min="0.05" max="200" step="0.1" value="1.5" aria-label="Distancia entre centros de las copias">
+            </label>
+            <button class="btn" id="arrayCreateBtn" type="button" style="width:100%;margin-top:8px">＋ Crear serie</button>
+            <div class="scene-arrange-hint">Crea copias independientes a una distancia fija. La pieza original se conserva y todas las copias se pueden editar por separado.</div>
+          </div>
+          <div class="scene-arrange">
+            <div class="scene-arrange-title">Espejo respecto del origen</div>
+            <div class="scene-arrange-row">
+              <label class="arch-size-field">Plano de simetría
+                <select class="select-control" id="mirrorAxis" aria-label="Plano de simetría"><option value="x">Plano YZ · reflejar X</option><option value="y">Plano XZ · reflejar Y</option><option value="z">Plano XY · reflejar Z</option></select>
+              </label>
+              <button class="btn" id="mirrorCreateBtn" type="button" style="align-self:end;min-height:32px">⇄ Espejar copia</button>
+            </div>
+            <div class="scene-arrange-hint">Crea un reflejo real de la pieza o grupo en el plano elegido. El original no se modifica; los valores de escala negativos indican el lado reflejado.</div>
+          </div>
         </div>
         <div class="prop-section">
           <div class="prop-title">Medidas y plano <span style="color:#748398;font:9px 'DM Mono',monospace">XYZ</span></div>
@@ -1616,6 +1647,10 @@ function selectDesign(root) {
   const scaleAvg=(root.scale.x+root.scale.y+root.scale.z)/3;
   $('scaleRange').value=THREE.MathUtils.clamp(scaleAvg,.05,5);$('scaleValue').textContent=scaleAvg.toFixed(2);$('scaleReadout').textContent=scaleAvg.toFixed(2)+' ×';
   $('scaleX').value=root.scale.x.toFixed(2);$('scaleY').value=root.scale.y.toFixed(2);$('scaleZ').value=root.scale.z.toFixed(2);
+  $('arraySpacingUnit').textContent=unitSystem;
+  const boundsForRepeat=new THREE.Box3().setFromObject(root);
+  const repeatSize=boundsForRepeat.getSize(new THREE.Vector3());
+  $('arraySpacing').value=((repeatSize.x||1)+.25)*factor===0?'1.5':(((repeatSize.x||1)+.25)*factor).toFixed(unitSystem==='mm'?0:unitSystem==='cm'?1:2);
   const deg=Math.round(THREE.MathUtils.radToDeg(root.rotation.y));
   $('rotationRange').value=deg;$('rotationValue').textContent=deg+'°';$('rotationReadout').textContent=deg+'°';
   $('rotX').value=Math.round(THREE.MathUtils.radToDeg(root.rotation.x));$('rotY').value=deg;$('rotZ').value=Math.round(THREE.MathUtils.radToDeg(root.rotation.z));
@@ -1797,7 +1832,7 @@ function updateMeta() {
   $('wallOpeningControls').classList.toggle('show',!!selected&&currentType==='wall');
   $('polygonControls').classList.toggle('show',!!selected&&currentType==='polygon');
   $('bevelControls').classList.toggle('show',!!selected&&(currentType==='rectangle'||currentType==='roundedCube'));
-  const objectControls=['posX','posY','posZ','scaleRange','scaleX','scaleY','scaleZ','applyScaleXYZBtn','rotationRange','rotX','rotY','rotZ','resetTransform','centerSupportBtn','renameBtn','duplicateBtn','deleteBtn','blueprintBtn','dimensionsBtn','applyArchSizeBtn','wallOpeningType','openingWidth','openingHeight','polygonSides','bevelRadius'];
+  const objectControls=['posX','posY','posZ','scaleRange','scaleX','scaleY','scaleZ','applyScaleXYZBtn','rotationRange','rotX','rotY','rotZ','resetTransform','centerSupportBtn','renameBtn','duplicateBtn','deleteBtn','blueprintBtn','dimensionsBtn','applyArchSizeBtn','wallOpeningType','openingWidth','openingHeight','polygonSides','bevelRadius','arrayAxis','arrayCount','arraySpacing','arrayCreateBtn','mirrorAxis','mirrorCreateBtn'];
   objectControls.forEach(id=>{const el=$(id);if(el)el.disabled=empty;});
   if(empty){
     $('posX').value='0';$('posY').value='0';$('posZ').value='0';
@@ -2228,6 +2263,51 @@ function addDuplicate() {
   const copy=restoreSceneNode(data,modelRoot);
   designObjects.push(copy);groupSelection.clear();
   currentType=copy.userData.designType||'group';selectDesign(copy);updateMeta();focusScene();persist();toast('Se duplicó el objeto.');
+}
+function createObjectArray() {
+  if(!selected){toast('Seleccioná una pieza para crear una serie.');return;}
+  const count=Number.parseInt($('arrayCount').value,10);
+  const axis=$('arrayAxis').value;
+  const factor=unitFactors[unitSystem]||1;
+  const spacingShown=Number.parseFloat($('arraySpacing').value);
+  if(!Number.isInteger(count)||count<1||count>20){toast('La serie admite entre 1 y 20 copias nuevas.');return;}
+  if(!['x','y','z'].includes(axis)){toast('Elegí un eje válido para la serie.');return;}
+  if(!Number.isFinite(spacingShown)||spacingShown<=0||spacingShown>200*factor){toast('La distancia debe ser mayor que cero y no superar 200 '+unitSystem+'.');return;}
+  const spacing=spacingShown/factor;
+  const source=selected;
+  const base=source.position.clone();
+  const sourceData=serializeSceneNode(source);
+  pushHistory();
+  const axisIndex={x:0,y:1,z:2}[axis];
+  const copies=[];
+  for(let i=1;i<=count;i++){
+    const data={...sourceData,position:[base.x,base.y,base.z]};
+    data.position[axisIndex]=base.getComponent(axisIndex)+spacing*i;
+    data.name=source.name+' · '+String(i+1).padStart(2,'0');
+    const copy=restoreSceneNode(data,modelRoot);
+    designObjects.push(copy);copies.push(copy);
+  }
+  groupSelection.clear();renderSceneList();updateMeta();focusScene();persist();
+  toast('Serie creada: '+count+' copias independientes sobre '+axis.toUpperCase()+'.');
+}
+function createMirroredCopy() {
+  if(!selected){toast('Seleccioná una pieza o grupo para espejarlo.');return;}
+  const axis=$('mirrorAxis').value;
+  if(!['x','y','z'].includes(axis)){toast('Elegí un plano de simetría válido.');return;}
+  const axisIndex={x:0,y:1,z:2}[axis];
+  const data=serializeSceneNode(selected);
+  const reflection=new THREE.Matrix4().makeScale(axisIndex===0?-1:1,axisIndex===1?-1:1,axisIndex===2?-1:1);
+  const originalRotation=new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(data.rotation[0],data.rotation[1],data.rotation[2]));
+  const reflectedRotation=reflection.clone().multiply(originalRotation).multiply(reflection);
+  const reflectedEuler=new THREE.Euler().setFromRotationMatrix(reflectedRotation,'XYZ');
+  data.rotation=[reflectedEuler.x,reflectedEuler.y,reflectedEuler.z];
+  data.position[axisIndex]*=-1;
+  data.scale[axisIndex]*=-1;
+  data.name=selected.name+' · espejo '+axis.toUpperCase();
+  pushHistory();
+  const mirror=restoreSceneNode(data,modelRoot);
+  designObjects.push(mirror);groupSelection.clear();renderSceneList();updateMeta();focusScene();persist();
+  toast('Copia espejada en el plano '+({x:'YZ',y:'XZ',z:'XY'}[axis])+'. El original queda intacto.');
 }
 function getMarkedBounds() {
   return designObjects.filter(root=>groupSelection.has(root)).map(root=>{
@@ -2863,6 +2943,15 @@ $('unitsSelect').addEventListener('change',e=>{
 $('blueprintBtn').addEventListener('click',exportTechnicalSVG);
 $('applyArchSizeBtn').addEventListener('click',applyArchitecturalDimensions);
 $('groupBtn').addEventListener('click',groupSelectedObjects);
+$('arrayCreateBtn').addEventListener('click',createObjectArray);
+$('mirrorCreateBtn').addEventListener('click',createMirroredCopy);
+$('arrayAxis').addEventListener('change',()=>{
+  if(!selected)return;
+  selected.updateMatrixWorld(true);
+  const bounds=new THREE.Box3().setFromObject(selected),size=bounds.getSize(new THREE.Vector3());
+  const factor=unitFactors[unitSystem]||1,axis=$('arrayAxis').value;
+  $('arraySpacing').value=((size[axis]||1)+.25>0?((size[axis]||1)+.25)*factor:1.5).toFixed(unitSystem==='mm'?0:unitSystem==='cm'?1:2);
+});
 $('ungroupBtn').addEventListener('click',ungroupSelectedObject);
 $('alignSelectedBtn').addEventListener('click',alignMarkedObjects);
 $('distributeSelectedBtn').addEventListener('click',distributeMarkedObjects);
@@ -2915,7 +3004,7 @@ $('scaleRange').addEventListener('change',e=>{e.target.dataset.historyStarted='0
 function applyScaleXYZ() {
   if(!selected)return;
   const values=['scaleX','scaleY','scaleZ'].map(id=>parseFloat($(id).value));
-  if(values.some(v=>!Number.isFinite(v)||v<.05||v>20)){toast('La escala por eje debe estar entre 0,05× y 20×.');return;}
+  if(values.some(v=>!Number.isFinite(v)||Math.abs(v)<.05||Math.abs(v)>20)){toast('La escala por eje debe estar entre −20 y −0,05 o entre 0,05 y 20.');return;}
   pushHistory();selected.scale.set(values[0],values[1],values[2]);
   const avg=(values[0]+values[1]+values[2])/3;
   $('scaleRange').value=THREE.MathUtils.clamp(avg,.05,5);$('scaleValue').textContent=avg.toFixed(2);$('scaleReadout').textContent=avg.toFixed(2)+' ×';
