@@ -86,7 +86,7 @@ Si el endpoint no está configurado, el asistente local y todas las herramientas
 
 ### Fase 10 · Lienzo vacío y constructor de escenas — implementada
 - Un proyecto nuevo arranca en blanco, sin obligarte a borrar un modelo de muestra. Los proyectos anteriores siguen recuperándose desde el almacenamiento local.
-- Agregado rápido desde el panel de escena: cubo, esfera, cilindro, cono, toroide, cápsula, pirámide, prisma hexagonal, engranaje, cuña/rampa, tubo hueco y piezas arquitectónicas.
+- Agregado rápido desde el panel de escena: cubo, esfera, cilindro, cono, toroide, cápsula, pirámide, prisma hexagonal, estrella sólida, octaedro, engranaje, cuña/rampa, tubo hueco y piezas arquitectónicas.
 - El constructor local ahora puede interpretar pedidos con varios objetos y cantidades en español (por ejemplo, «3 cubos azules y 2 esferas rojas»), acomodarlos en una cuadrícula o en una composición alrededor de un edificio, y elegir colores por objeto.
 - Reconoce medidas explícitas en componentes arquitectónicos, por ejemplo «pared de 4 m de ancho y 3 m de alto» o dimensiones tipo «4x3x0,2».
 - Distingue acabados y texturas comunes al generar modelos; cada pieza creada conserva su propio estilo y se puede cambiar individualmente.
@@ -96,7 +96,7 @@ Si el endpoint no está configurado, el asistente local y todas las herramientas
 
 La versión pública está prevista en https://gomeza2.github.io/Juego/
 
-El workflow `.github/workflows/deploy.yml` comprueba la sintaxis JavaScript del editor y del endpoint antes de publicar el contenido. Para activar o revisar Pages:
+El workflow `.github/workflows/deploy.yml` comprueba la sintaxis JavaScript del editor y del endpoint, y ejecuta pruebas de regresión del constructor local (cantidades, colores, texturas y conversiones de medidas) antes de publicar el contenido. Para activar o revisar Pages:
 1. Abrí [Settings → Pages](https://github.com/gomeza2/Juego/settings/pages) y seleccioná **GitHub Actions** como fuente.
 2. Revisá las ejecuciones en [Actions](https://github.com/gomeza2/Juego/actions).
 
@@ -105,5 +105,5 @@ El workflow `.github/workflows/deploy.yml` comprueba la sintaxis JavaScript del 
 - Three.js 0.169.0, OrbitControls, GLTFExporter, GLTFLoader, RoomEnvironment y geometría procedural.
 - Las bibliotecas se cargan desde CDN; el editor necesita conexión a internet.
 - Los proyectos locales se guardan en el navegador. Los modelos IA cacheados se guardan en IndexedDB en ese perfil de navegador, así que conviene exportar un GLB y un JSON si querés conservar una copia portable.
-- El asistente local elige y combina modelos de la biblioteca; no equivale a un modelo generativo.
+- El constructor local interpreta descripciones mediante reglas y las convierte en piezas; no equivale a un modelo generativo neuronal. La generación externa real necesita su función de servidor activa.
 - Los modelos arquitectónicos y las medidas son de diseño conceptual, no documentación lista para construir.
