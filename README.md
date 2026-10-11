@@ -1,33 +1,31 @@
 # NEXO Studio
 
-Un espacio de diseño 3D en el navegador, creado con HTML, CSS y Three.js.
+Editor 3D en el navegador para explorar y personalizar conceptos de productos, interiores, muebles y vehículos.
 
-## Qué incluye esta primera versión
+## Incluye
 
-- Visor 3D en tiempo real con cámara orbital, zoom y enfoque del modelo.
-- Modelos de partida: habitación, auriculares, avión, cohete, sillón, mesa, lámpara, botella, smartphone, cubo y esfera.
+- Interfaz clara y adaptable a pantallas pequeñas.
+- Visor 3D en tiempo real con órbita, zoom, enfoque y cuadrícula.
+- Biblioteca de modelos base: habitación, auriculares, avión, cohete, sillón, mesa, lámpara, botella, smartphone, auto, drone, cámara, nave espacial, sofá, jarrón, altavoz, reloj inteligente, cubo y esfera.
 - Ajustes de color, acabado, iluminación, escala, rotación y posición.
-- Duplicación y eliminación de objetos.
-- Guardado local automático en el navegador.
-- Deshacer y rehacer cambios comunes.
-- Exportación de modelo 3D en GLB, imagen PNG y parámetros del proyecto en JSON.
-- Interfaz adaptable a pantallas pequeñas.
-- Flujo de publicación automática con GitHub Actions.
+- Duplicar, eliminar, deshacer y rehacer.
+- Guardado automático en el navegador.
+- Exportar modelo GLB, captura PNG y parámetros del proyecto JSON.
+- Campo de texto que interpreta términos de algunas categorías para crear una base aproximada.
+- Despliegue automático con GitHub Actions.
 
-## Publicar la web
+## Publicar
 
-1. Abrí la pestaña **Settings** de este repositorio.
-2. En la barra lateral, entrá en **Pages**.
-3. En **Build and deployment → Source**, elegí **GitHub Actions**.
-4. Entrá en la pestaña **Actions** del repositorio y verificá que termine correctamente el flujo **Deploy NEXO Studio to GitHub Pages**.
-5. Cuando el despliegue termine, abrí: https://gomeza2.github.io/Juego/
+El workflow `.github/workflows/deploy.yml` intenta habilitar GitHub Pages y publicar el contenido del repositorio.
 
-El flujo se ejecuta en cada cambio de la rama `main`. El archivo principal es `index.html`; no hace falta instalar dependencias ni ejecutar un servidor local. Three.js se carga desde jsDelivr mediante módulos del navegador.
+1. Abrí la pestaña **Actions** y mirá el flujo **Deploy NEXO Studio to GitHub Pages**.
+2. Si la publicación falla porque Pages no está habilitado, abrí [Settings → Pages](https://github.com/gomeza2/Juego/settings/pages), seleccioná **GitHub Actions** como fuente y guardá.
+3. Cuando el flujo termine en verde, abrí https://gomeza2.github.io/Juego/
 
-## Importante
+## Alcance actual
 
-Esta versión crea geometría 3D procedural a partir de modelos base editables. El campo para describir ideas reconoce palabras clave y elige una base aproximada; todavía **no** genera modelos arbitrarios mediante IA ni es un sistema CAD profesional con medidas de fabricación. Para sumar generación real por IA, conviene integrar un backend seguro y mantener las claves de API fuera del navegador. La exportación GLB permite continuar el trabajo en herramientas 3D compatibles.
+Los modelos son geometría procedural de partida, personalizable y exportable. El texto elige el modelo base mediante palabras clave; no es todavía un generador IA capaz de construir cualquier objeto arbitrario ni un CAD profesional con medidas de fabricación. Para añadir generación real por IA hace falta integrar un servicio de generación 3D en un backend seguro, sin exponer claves privadas en el navegador.
 
-## Desarrollo
+## Tecnología
 
-La mayor parte de la aplicación está en `index.html`. Usa Three.js 0.169.0, OrbitControls y GLTFExporter cargados desde CDN. Se requiere conexión a internet para cargar esas bibliotecas y la fuente tipográfica.
+HTML, CSS, JavaScript y Three.js 0.169.0. Three.js y la tipografía se cargan desde CDNs, por lo que se necesita conexión a internet para iniciar el editor.
