@@ -2085,7 +2085,7 @@ const promptEntityCatalog=[
   {type:'wedge',aliases:'cunas?|rampas?',label:'Cuña'},
   {type:'pipe',aliases:'tubos?|tuberias?',label:'Tubo'},
   {type:'wall',aliases:'paredes?|muros?',label:'Pared'},
-  {type:'floor',aliases:'losas?|suelos?',label:'Losa'},
+  {type:'floor',aliases:'losas?|suelos?|pisos?',label:'Piso / losa'},
   {type:'door',aliases:'puertas?',label:'Puerta'},
   {type:'window',aliases:'ventanas?',label:'Ventana'},
   {type:'tree',aliases:'arboles?|arbustos?',label:'Árbol'},
@@ -2307,7 +2307,8 @@ function handlePrompt() {
   const explicitTexture=pickedTexture!==null;
   const hasBuilding=/\b(casa|mansion|residencia|palacete|rascacielos|edificio|torre de oficinas|castillo|villa|pabellon|puente|habitacion|dormitorio|salon|living|cocina|interior|hogar)\b/.test(text);
   const primaryType=detectPromptType(text);
-  const entities=promptEntityCatalog.map(spec=>({...spec,count:countPromptEntities(text,spec.aliases,spec.type==='tree'?16:24)})).filter(spec=>spec.count>0);
+  const storeyCountIsArchitectural=hasBuilding&&/\b(?:\d{1,2}|uno|una|un|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s*(?:pisos?|plantas?|niveles?)\b/.test(text);
+  const entities=promptEntityCatalog.map(spec=>({...spec,count:spec.type==='floor'&&storeyCountIsArchitectural?0:countPromptEntities(text,spec.aliases,spec.type==='tree'?16:24)})).filter(spec=>spec.count>0);
   architecturalFloors=THREE.MathUtils.clamp(parseInt(text.match(/\b(\d{1,2})\s*(?:pisos?|plantas?|niveles?)\b/)?.[1]||'10',10),3,40);
   pushHistory();
   $('projectName').value=raw.length>50?raw.slice(0,50)+'…':raw.charAt(0).toUpperCase()+raw.slice(1);
