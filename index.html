@@ -208,6 +208,22 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
 .arch-size-help{font-size:9px;line-height:1.5;color:#7b899c;margin-top:8px}
 .arch-apply-btn{width:100%;justify-content:center;margin-top:9px;background:#eef7df!important;border-color:#cfe5af!important;color:#456a22!important;font-weight:800}
 
+
+/* Construcción desde cero y biblioteca ampliada */
+.stage-empty{pointer-events:auto;color:#687991}
+.stage-empty strong{color:#243248}
+.empty-start-card{max-width:440px;padding:30px 28px;border:1px solid #dbe4ee;border-radius:18px;background:rgba(255,255,255,.92);box-shadow:0 18px 55px rgba(47,65,89,.10);backdrop-filter:blur(8px)}
+.empty-start-mark{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:#b4e36a;color:#203117;font-weight:900;font-size:22px;margin:0 auto 15px}
+.empty-start-card strong{font-size:18px;line-height:1.3}
+.empty-start-card p{font-size:11px;line-height:1.65;color:#718198;margin:8px 0 18px}
+.empty-start-card small{display:block;font-size:9px;color:#8997a8;margin-top:14px}
+.empty-start-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:8px}
+.empty-cta{border:1px solid #d7e0eb;background:#fff;color:#43546b;border-radius:8px;padding:10px 13px;font-size:10px;font-weight:800;cursor:pointer}
+.empty-cta.primary{background:#b4e36a;border-color:#a6d75c;color:#203117}
+.scene-quick-add{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;margin:0 0 9px}
+.scene-quick-add .select-control{height:32px;min-width:0;font-size:10px;padding:0 7px}
+.scene-quick-add .btn{height:32px;padding:0 10px;font-size:10px;white-space:nowrap}
+
 </style>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}
@@ -284,6 +300,10 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
     <button class="nav-item" data-type="cylinder"><span class="nav-icon">◯</span> Cilindro</button>
     <button class="nav-item" data-type="capsule"><span class="nav-icon">▱</span> Cápsula redondeada</button>
     <button class="nav-item" data-type="knot"><span class="nav-icon">∞</span> Nudo orgánico</button>
+    <button class="nav-item" data-type="hexagon"><span class="nav-icon">⬡</span> Prisma hexagonal</button>
+    <button class="nav-item" data-type="gear"><span class="nav-icon">⚙</span> Engranaje mecánico</button>
+    <button class="nav-item" data-type="wedge"><span class="nav-icon">◢</span> Cuña / rampa</button>
+    <button class="nav-item" data-type="pipe"><span class="nav-icon">◎</span> Tubo hueco</button>
     <div class="phase-board">
       <div class="phase-board-title">FASES DE DESARROLLO <span>03–04 / 05</span></div>
       <div class="phase-row done"><span class="phase-num">✓</span><div><b>01 · Editor base</b><small>Visor, materiales y exportación</small></div></div>
@@ -335,9 +355,9 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
         </div>
         <div class="axis-widget"><div class="axis"></div><div class="axis-label"><span>X</span> / <span style="color:#83c28b">Y</span> / <span>Z</span><br>ORIENTACIÓN</div></div>
         <div class="stage-bottom-right"><button id="resetViewBtn" title="Restablecer cámara">⌖</button><button id="focusBtn" title="Enfocar modelo">◎</button></div>
-        <div class="stage-empty" id="stageEmpty"><div><strong>Tu próximo concepto empieza acá.</strong>Elegí una categoría para crear tu primer modelo.</div></div>
+        <div class="stage-empty" id="stageEmpty"><div class="empty-start-card"><div class="empty-start-mark">N</div><strong>Un lienzo vacío. Todo por construir.</strong><p>Empezá con una forma, combiná piezas o describí lo que querés crear.</p><div class="empty-start-actions"><button class="empty-cta primary" data-type="cube" type="button">＋ Añadir cubo</button><button class="empty-cta" id="emptyPromptBtn" type="button">✦ Describir escena</button></div><small>También podés elegir cualquier pieza de la biblioteca.</small></div></div>
       </div>
-      <div class="prompt-bar"><div class="prompt-spark">✳</div><div class="prompt-copy"><input id="promptInput" placeholder="Describí un objeto o una escena… ej. “mansión con 4 árboles y fuente de mármol”" aria-label="Describir un concepto o escena"><div class="prompt-hint">Asistente procedural local: interpreta objetos, cantidades, colores y materiales; no requiere una API de IA.</div></div><button class="btn ai-generate-btn" id="aiGenerateBtn" title="Genera un modelo 3D texturizado con el proveedor externo si la API privada está configurada">✦ IA 3D</button><button class="prompt-send" id="promptSend">Construir escena <span>↗</span></button></div>
+      <div class="prompt-bar"><div class="prompt-spark">✳</div><div class="prompt-copy"><input id="promptInput" placeholder="Ej.: 3 cubos azules, 2 esferas y un engranaje; o una casa con 4 ventanas y 3 árboles" aria-label="Describir un concepto o escena"><div class="prompt-hint">Constructor local: interpreta objetos, cantidades, medidas, materiales y distribución. La generación externa usa el botón IA 3D.</div></div><button class="btn ai-generate-btn" id="aiGenerateBtn" title="Generación externa de modelos 3D. Requiere activar el servidor y configurar credenciales privadas.">✦ IA 3D</button><button class="prompt-send" id="promptSend">Generar escena <span>↗</span></button></div>
       <div class="bottom-bar"><div class="bottom-status"><span><i class="status-dot"></i> MOTOR 3D ACTIVO</span><span id="objectCount">1 objeto</span><span id="renderQuality">RENDER · TIEMPO REAL</span></div><div>UNIDADES: ARBITRARIAS <span style="color:#3b4759">|</span> V. 0.1.0</div></div>
     </section>
     <aside class="inspector" id="inspector">
@@ -347,6 +367,12 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
         <div class="prop-section scene-hierarchy-section">
           <div class="prop-title">Escena <span id="sceneCount" style="color:#748398;font:9px 'DM Mono',monospace">01 OBJETO</span></div>
           <div class="scene-actions"><button class="btn" id="groupBtn" title="Agrupar objetos marcados">Agrupar marcados</button><button class="btn" id="ungroupBtn" title="Separar el grupo seleccionado">Separar grupo</button></div>
+          <div class="scene-quick-add">
+            <select class="select-control" id="quickShapeSelect" aria-label="Elegir forma para agregar">
+              <option value="cube">Cubo</option><option value="sphere">Esfera</option><option value="cylinder">Cilindro</option><option value="cone">Cono</option><option value="torus">Toroide</option><option value="capsule">Cápsula</option><option value="hexagon">Prisma hexagonal</option><option value="gear">Engranaje</option><option value="wedge">Cuña / rampa</option><option value="pipe">Tubo hueco</option><option value="pyramid">Pirámide</option><option value="knot">Nudo</option><option value="wall">Pared</option><option value="floor">Piso / losa</option><option value="door">Puerta</option><option value="window">Ventana</option><option value="column">Columna</option><option value="arch">Arco</option><option value="tree">Árbol</option><option value="rock">Roca</option><option value="fountain">Fuente</option>
+            </select>
+            <button class="btn" id="quickAddBtn" type="button">＋ Agregar</button>
+          </div>
           <div id="sceneObjectList" class="scene-object-list" aria-label="Jerarquía de objetos"></div>
           <div class="scene-arrange">
             <div class="scene-arrange-title">Alineación y distribución</div>
@@ -477,7 +503,7 @@ const architecturalSizeDefaults = {
 const architecturalSizeTypes = new Set(Object.keys(architecturalSizeDefaults));
 let designObjects = [];
 let selected = null;
-let addMode = false;
+let addMode = true;
 let showDimensions = false;
 let unitSystem = 'm';
 let architecturalFloors = 10;
@@ -535,6 +561,10 @@ const meta = {
   cylinder:{name:'Cilindro',icon:'◯',type:'SÓLIDO GEOMÉTRICO · 3D',tag:'Forma · Cilindro'},
   capsule:{name:'Cápsula redondeada',icon:'▱',type:'FORMA ORGÁNICA · 3D',tag:'Forma · Cápsula'},
   knot:{name:'Nudo orgánico',icon:'∞',type:'FORMA ORGÁNICA · 3D',tag:'Forma · Nudo'},
+  hexagon:{name:'Prisma hexagonal',icon:'⬡',type:'SÓLIDO GEOMÉTRICO · 3D',tag:'Forma · Hexágono'},
+  gear:{name:'Engranaje mecánico',icon:'⚙',type:'MECÁNICA · COMPONENTE',tag:'Pieza · Engranaje'},
+  wedge:{name:'Cuña / rampa',icon:'◢',type:'SÓLIDO GEOMÉTRICO · 3D',tag:'Forma · Cuña'},
+  pipe:{name:'Tubo hueco',icon:'◎',type:'MECÁNICA · TUBERÍA',tag:'Pieza · Tubo'},
   arch:{name:'Arco clásico',icon:'∩',type:'ARQUITECTURA · DETALLE',tag:'Detalle · Arco'},
   dome:{name:'Cúpula arquitectónica',icon:'◠',type:'ARQUITECTURA · CUBIERTA',tag:'Detalle · Cúpula'},
   stairs:{name:'Escalera de diseño',icon:'▥',type:'ARQUITECTURA · CIRCULACIÓN',tag:'Detalle · Escalera'},
@@ -1190,6 +1220,25 @@ function addPrimitive(g,type) {
   if(type==='capsule') addMesh(g,new THREE.CapsuleGeometry(.43,.7,8,32),currentColor,[0,.86,0],[1,1,1],[0,0,0],true,{metalness:.2,roughness:.3});
   if(type==='knot') addMesh(g,new THREE.TorusKnotGeometry(.57,.17,160,24,2,3),currentColor,[0,.95,0],[1,1,1],[0,0,0],true,{metalness:.32,roughness:.22});
   if(type==='pyramid') addPyramid(g);
+  if(type==='hexagon') addMesh(g,new THREE.CylinderGeometry(.82,.82,1.45,6,1,false),currentColor,[0,.725,0],[1,1,1],[0,Math.PI/6,0],true,{metalness:.18,roughness:.34});
+  if(type==='gear') {
+    cyl(g,currentColor,[0,.18,0],.66,.66,.32,48,true,[0,0,0],{metalness:.62,roughness:.28});
+    cyl(g,'#303b49',[0,.355,0],.29,.29,.045,40,false,[0,0,0],{metalness:.6,roughness:.3});
+    for(let i=0;i<12;i++){
+      const a=i*Math.PI/6;
+      box(g,currentColor,[Math.cos(a)*.72,.18,Math.sin(a)*.72],[.24,.31,.23],true,{metalness:.62,roughness:.28});
+    }
+  }
+  if(type==='wedge') {
+    const shape=new THREE.Shape();shape.moveTo(-.85,0);shape.lineTo(.85,0);shape.lineTo(.85,1.35);shape.closePath();
+    const geo=new THREE.ExtrudeGeometry(shape,{depth:1.15,bevelEnabled:false,curveSegments:1});
+    addMesh(g,geo,currentColor,[0,0,-.575],[1,1,1],[0,0,0],true,{metalness:.12,roughness:.42});
+  }
+  if(type==='pipe') {
+    addMesh(g,new THREE.CylinderGeometry(.32,.32,1.45,40,1,true),currentColor,[0,.36,0],[1,1,1],[0,0,Math.PI/2],true,{metalness:.55,roughness:.3,side:THREE.DoubleSide});
+    addMesh(g,new THREE.TorusGeometry(.32,.035,12,40),currentColor,[.725,.36,0],[1,1,1],[0,Math.PI/2,0],true,{metalness:.55,roughness:.3});
+    addMesh(g,new THREE.TorusGeometry(.32,.035,12,40),currentColor,[-.725,.36,0],[1,1,1],[0,Math.PI/2,0],true,{metalness:.55,roughness:.3});
+  }
 }
 function addParametricArchitecturalPiece(type,g) {
   const dims=g.userData.archSize||architecturalSizeDefaults[type];
