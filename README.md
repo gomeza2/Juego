@@ -16,11 +16,12 @@ Editor 3D en el navegador para explorar y personalizar conceptos de productos, i
 
 ## Publicar
 
-El workflow `.github/workflows/deploy.yml` intenta habilitar GitHub Pages y publicar el contenido del repositorio.
+El workflow `.github/workflows/deploy.yml` publica el contenido automáticamente una vez que GitHub Pages queda habilitado.
 
-1. Abrí la pestaña **Actions** y mirá el flujo **Deploy NEXO Studio to GitHub Pages**.
-2. Si la publicación falla porque Pages no está habilitado, abrí [Settings → Pages](https://github.com/gomeza2/Juego/settings/pages), seleccioná **GitHub Actions** como fuente y guardá.
-3. Cuando el flujo termine en verde, abrí https://gomeza2.github.io/Juego/
+1. Abrí [Settings → Pages](https://github.com/gomeza2/Juego/settings/pages).
+2. En **Build and deployment → Source**, seleccioná **GitHub Actions** y guardá. Esta configuración inicial debe hacerse desde GitHub.
+3. Abrí la pestaña **Actions** y revisá el flujo **Deploy NEXO Studio to GitHub Pages**.
+4. Cuando el flujo termine en verde, abrí https://gomeza2.github.io/Juego/
 
 ## Alcance actual
 
