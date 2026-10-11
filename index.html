@@ -1856,7 +1856,7 @@ async function restoreGeneratedAsset(root,key) {
     persist();
   }catch(error){console.warn('Could not restore generated asset:',error);toast('No se pudo restaurar un modelo IA guardado.');}
 }
-async async function addGeneratedModel(gltf,prompt,bytes) {
+async function addGeneratedModel(gltf,prompt,bytes) {
   pushHistory();
   if(!addMode)clearModels();
   const root=new THREE.Group();
@@ -1874,7 +1874,7 @@ async async function addGeneratedModel(gltf,prompt,bytes) {
   designObjects.push(root);currentType='generated';groupSelection.clear();
   selectDesign(root);updateMeta();updateDimensions();focusScene();persist();
 }
-async async function generateWithRealAI() {
+async function generateWithRealAI() {
   const prompt=$('promptInput').value.trim();
   if(!prompt){$('promptInput').focus();toast('Escribí una descripción para generar un modelo 3D.');return;}
   if(window.location.hostname.endsWith('github.io')){
