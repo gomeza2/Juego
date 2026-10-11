@@ -2249,11 +2249,39 @@ function promptDefaultTexture(type) {
   const palette={wall:'concrete',floor:'tile',door:'wood',rock:'stone',fountain:'marble',table:'wood',chair:'fabric',sofa:'fabric'};
   return palette[type]||'none';
 }
+function promptTextureForEntity(text,aliases) {
+  const textures=[
+    ['wood','madera|roble|parquet|wood'],
+    ['marble','marmol|marble'],
+    ['concrete','hormigon|cemento|concrete'],
+    ['fabric','tela|tejido|tapizado|fabric'],
+    ['carbon','fibra de carbono|carbono'],
+    ['brick','ladrillo|brick'],
+    ['stone','piedra natural|piedra rustica|stone'],
+    ['tile','baldosa|ceramica|azulejo|tile'],
+    ['terrazzo','terrazo|terrazzo'],
+    ['brushed','metal rayado|metal cepillado|acero cepillado|brushed']
+  ];
+  for(const item of textures){
+    const onObject=new RegExp('(?:\\b\\d+\\s+)?(?:'+aliases+')\\s+(?:de|en|con|hecho de)?\\s*(?:'+item[1]+')\\b');
+    const onMaterial=new RegExp('(?:'+item[1]+')\\s+(?:para|en)?\\s*(?:'+aliases+')\\b');
+    if(onObject.test(text)||onMaterial.test(text))return item[0];
+  }
+  return null;
+}
 function handlePrompt() {
   const raw=$('promptInput').value.trim();
   if(!raw){$('promptInput').focus();toast('Describí qué querés construir. Podés pedir varios objetos y medidas.');return;}
   const text=normalizePrompt(raw);
   const pickedColor=promptColor(text),pickedTexture=promptTexture(text),pickedFinish=promptFinish(text);
+  const textureKinds=[
+    ['wood',/\\b(madera|roble|parquet|wood)\\b/],['marble',/\\b(marmol|marble)\\b/],
+    ['concrete',/\\b(hormigon|cemento|concrete)\\b/],['fabric',/\\b(tela|tejido|tapizado|fabric)\\b/],
+    ['carbon',/\\b(fibra de carbono|carbono)\\b/],['brick',/\\b(ladrillo|brick)\\b/],
+    ['stone',/\\b(piedra natural|piedra rustica|stone)\\b/],['tile',/\\b(baldosa|ceramica|azulejo|tile)\\b/],
+    ['terrazzo',/\\b(terrazo|terrazzo)\\b/],['brushed',/\\b(metal rayado|metal cepillado|acero cepillado|brushed)\\b/]
+  ];
+  const mentionedTextures=textureKinds.filter(item=>item[1].test(text)).map(item=>item[0]);
   const explicitColor=/\b(rojo|roja|rojos|rojas|coral|naranja|naranjas|azul|azulada|azulado|azules|celeste|celestes|violeta|lila|lavanda|purpura|blanco|blanca|blancos|blancas|hielo|marfil|negro|negra|negros|negras|grafito|oscuro|oscuros|verde|verdes|lima|amarillo|amarilla|amarillos|amarillas|madera clara|roble|beige|arena|marron|marrones|gris|grises|concreto|cemento|dorado|dorada|oro)\b/.test(text);
   const explicitTexture=pickedTexture!==null;
   const hasBuilding=/\b(casa|mansion|residencia|palacete|rascacielos|edificio|torre de oficinas|castillo|villa|pabellon|puente|habitacion|dormitorio|salon|living|cocina|interior|hogar)\b/.test(text);
@@ -2271,8 +2299,10 @@ function handlePrompt() {
     const color=explicitColor?promptColorForEntity(text,promptEntityCatalog.find(item=>item.type===type)?.aliases||type,pickedColor):promptDefaultColor(type);
     if(type==='tree'&&!explicitColor&&/autumn|otono/.test(text))currentColor='#d28a4b';
     else currentColor=color;
-    let texture=explicitTexture?pickedTexture:promptDefaultTexture(type);
-    if(type==='tree'||type==='window'||type==='gear'||type==='pipe')texture=explicitTexture?pickedTexture:'none';
+    const aliases=promptEntityCatalog.find(item=>item.type===type)?.aliases||type;
+    const localTexture=promptTextureForEntity(text,aliases);
+    let texture=localTexture||(explicitTexture&&mentionedTextures.length<=1?pickedTexture:promptDefaultTexture(type));
+    if(type==='tree'||type==='window')texture=localTexture||'none';
     currentTexture=texture;
     const options={keepScene:true,skipHistory:true,position,name,focus:false};
     if(architecturalSizeTypes.has(type))options.archSize=promptArchitecturalSize(type,text);
