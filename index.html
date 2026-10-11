@@ -625,7 +625,7 @@ function addSkyscraper(g) {
   for(let level=0;level<10;level++){
     const y=baseY+.24+level*.53;
     const r=1.20-level*.027;
-    cyl(g,frame,[0,y,0],r,r,.045,32,false,{roughness:.5});
+    cyl(g,frame,[0,y,0],r,r,.045,32,false,[0,0,0],{roughness:.5});
     for(let i=0;i<12;i++){
       const a=(Math.PI*2*i)/12;
       const wx=Math.sin(a)*(r+.008), wz=Math.cos(a)*(r+.008);
@@ -708,11 +708,11 @@ function addBridge(g) {
     }
   }
   const arch1=[],arch2=[];
-  for(let i=0;i<=32;i++){const x=-2.35+i*(4.7/32);const y=.18+1.2*Math.sin(i/32*Math.PI);arch1.push([x,y,-.21]);arch2.push([x,y,.21]);}
+  for(let i=0;i<=32;i++){const x=-2.35+i*(4.7/32);const y=.18+.68*Math.sin(i/32*Math.PI);arch1.push([x,y,-.21]);arch2.push([x,y,.21]);}
   tube(g,support,arch1,.085,false);tube(g,support,arch2,.085,false);
   for(let i=2;i<31;i+=3){
-    const p=arch1[i];box(g,support,[p[0],p[1]+.14,-.21],[.055,1.02-p[1]+.08,.055],false);
-    const q=arch2[i];box(g,support,[q[0],q[1]+.14,.21],[.055,1.02-q[1]+.08,.055],false);
+    const p=arch1[i],hp=Math.max(.055,.92-p[1]);box(g,support,[p[0],p[1]+hp/2,-.21],[.055,hp,.055],false);
+    const q=arch2[i],hq=Math.max(.055,.92-q[1]);box(g,support,[q[0],q[1]+hq/2,.21],[.055,hq,.055],false);
   }
   for(const x of [-2.45,2.45])cyl(g,'#9aa8b8',[x,.42,0],.16,.18,.75,20,false);
 }
