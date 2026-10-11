@@ -1117,6 +1117,8 @@ function applyPrimaryMaterial(root) {
       o.material.needsUpdate=true;
     }
   });
+  root.userData.style={color:currentColor,material:currentMaterial,texture:currentTexture,textureScale};
+  if(root.userData.isSceneGroup)root.traverse(n=>{if(n!==root&&n.userData.designRoot)n.userData.style={...root.userData.style};});
   updateTextureUI();
 }
 function updateTextureUI() {
@@ -1145,56 +1147,85 @@ function applyGraphicsQuality(mode) {
   updateTextureUI();
   resize();
 }
-function clearModels() {
-  if(selected && selected.userData.helper) scene.remove(selected.userData.helper);
-  selected = null;
-  while(modelRoot.children.length) {
-    const obj=modelRoot.children[0]; modelRoot.remove(obj);
-    obj.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}});
-  }
-  designObjects=[];
+function disposeTree(root) {
+  root.traverse(o=>{
+    if(o.geometry)o.geometry.dispose();
+    if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}
+  });
 }
-function createDesign(type, options={}) {
-  if(!meta[type]) type='headphones';
-  if(!options.skipHistory) pushHistory();
-  currentType=type;
-  clearModels();
-  const root=new THREE.Group();
-  root.name=meta[type].name;
-  root.userData.designType=type;
-  root.userData.designRoot=true;
-  modelRoot.add(root); designObjects.push(root);
-  build(type,root);
-  applyPrimaryMaterial(root);
-  if(options.state) {
-    const s=options.state;
-    root.position.set(s.position?.[0]||0,s.position?.[1]||0,s.position?.[2]||0);
-    root.scale.set(s.scale?.[0]||1,s.scale?.[1]||1,s.scale?.[2]||1);
-    root.rotation.set(s.rotation?.[0]||0,s.rotation?.[1]||0,s.rotation?.[2]||0);
-    if(s.color) {currentColor=s.color;applyPrimaryMaterial(root);}
-    if(s.material) {currentMaterial=s.material;applyPrimaryMaterial(root);}
+function clearDimensionHelpers() {
+  while(dimensionGuideGroup.children.length){
+    const o=dimensionGuideGroup.children[0];dimensionGuideGroup.remove(o);
+    if(o.geometry)o.geometry.dispose();
+    if(o.material)o.material.dispose();
   }
-  selectDesign(root);
-  updateMeta();
-  focusModel();
-  persist();
-  return root;
+  dimensionAnchors.length=0;
+}
+function clearModels() {
+  if(selectionHelper)scene.remove(selectionHelper);
+  selectionHelper=null;
+  clearDimensionHelpers();
+  while(modelRoot.children.length) {
+    const obj=modelRoot.children[0];modelRoot.remove(obj);disposeTree(obj);
+  }
+  designObjects=[];selected=null;
+  if($('dimensionOverlay'))$('dimensionOverlay').classList.remove('active');
+}
+const placementOffsets=[[3.1,0,1.7],[-3.1,0,1.7],[3.1,0,-1.7],[-3.1,0,-1.7],[0,0,4.1],[0,0,-4.1],[5.2,0,.1],[-5.2,0,.1]];
+function styleSnapshot(){return {color:currentColor,material:currentMaterial,texture:currentTexture,textureScale};}
+function createDesign(type, options={}) {
+  if(!meta[type]||type==='group')type='headphones';
+  if(!options.skipHistory)pushHistory();
+  if(!options.keepScene)clearModels();
+  if(options.style){
+    currentColor=options.style.color||currentColor;currentMaterial=options.style.material||currentMaterial;
+    currentTexture=options.style.texture||currentTexture;textureScale=options.style.textureScale||textureScale;
+  }
+  if(options.state){
+    const s=options.state;
+    currentColor=s.color||currentColor;currentMaterial=s.material||currentMaterial;
+    currentTexture=s.texture||currentTexture;textureScale=s.textureScale||textureScale;
+  }
+  currentType=type;
+  const root=new THREE.Group();root.name=meta[type].name;
+  root.userData.designType=type;root.userData.designRoot=true;root.userData.style=styleSnapshot();
+  modelRoot.add(root);designObjects.push(root);
+  build(type,root);
+  if(options.position)root.position.set(options.position[0]||0,options.position[1]||0,options.position[2]||0);
+  else if(options.state?.position)root.position.set(options.state.position[0]||0,options.state.position[1]||0,options.state.position[2]||0);
+  else if(options.keepScene&&designObjects.length>1){
+    const slot=designObjects.length-2,off=placementOffsets[slot%placementOffsets.length],cycle=Math.floor(slot/placementOffsets.length);
+    root.position.set(off[0]+(cycle%2)*.6,0,off[2]+cycle*.5);
+  }
+  if(options.state){
+    const s=options.state;
+    root.scale.set(s.scale?.[0]??1,s.scale?.[1]??1,s.scale?.[2]??1);
+    root.rotation.set(s.rotation?.[0]||0,s.rotation?.[1]||0,s.rotation?.[2]||0);
+  }
+  applyPrimaryMaterial(root);selectDesign(root);updateMeta();updateDimensions();
+  if(options.focus!==false){if(options.keepScene)focusScene();else focusModel();}
+  persist();return root;
 }
 function selectDesign(root) {
-  selected=root;
-  $('posX').value=root.position.x.toFixed(2); $('posY').value=root.position.y.toFixed(2); $('posZ').value=root.position.z.toFixed(2);
+  if(!root)return;
+  selected=root;currentType=root.userData.designType||'group';
+  const savedStyle=root.userData.style;
+  if(savedStyle){
+    currentColor=savedStyle.color||currentColor;currentMaterial=savedStyle.material||currentMaterial;
+    currentTexture=savedStyle.texture||'none';textureScale=savedStyle.textureScale||2;
+  }
+  const factor=unitFactors[unitSystem]||1;
+  $('posX').value=(root.position.x*factor).toFixed(2);$('posY').value=(root.position.y*factor).toFixed(2);$('posZ').value=(root.position.z*factor).toFixed(2);
   const scaleAvg=(root.scale.x+root.scale.y+root.scale.z)/3;
-  $('scaleRange').value=scaleAvg; $('scaleValue').textContent=scaleAvg.toFixed(2); $('scaleReadout').textContent=scaleAvg.toFixed(2)+' ×';
+  $('scaleRange').value=scaleAvg;$('scaleValue').textContent=scaleAvg.toFixed(2);$('scaleReadout').textContent=scaleAvg.toFixed(2)+' ×';
   const deg=Math.round(THREE.MathUtils.radToDeg(root.rotation.y));
-  $('rotationRange').value=deg; $('rotationValue').textContent=deg+'°'; $('rotationReadout').textContent=deg+'°';
-  if(highlightEnabled) makeHelper();
-  $('selectedThumb').textContent=meta[currentType].icon;
-  $('selectedName').textContent=root.name;
-  $('selectedType').textContent=meta[currentType].type;
-  updateSwatches();
+  $('rotationRange').value=deg;$('rotationValue').textContent=deg+'°';$('rotationReadout').textContent=deg+'°';
+  if(selectionHelper)scene.remove(selectionHelper);selectionHelper=null;
+  if(highlightEnabled)makeHelper();
+  const m=meta[currentType]||meta.group;
+  $('selectedThumb').textContent=m.icon;$('selectedName').textContent=root.name;$('selectedType').textContent=m.type;
   $('materialSelect').value=currentMaterial;
-  updateTextureUI();
-  updateMeta();
+  updateSwatches();updateTextureUI();updateMeta();updateDimensions();
 }
 let selectionHelper=null;
 function makeHelper() {
@@ -1204,40 +1235,75 @@ function makeHelper() {
   selectionHelper.material.transparent=true; selectionHelper.material.opacity=.7; selectionHelper.material.depthTest=false;
   scene.add(selectionHelper);
 }
+function renderSceneList() {
+  const list=$('sceneObjectList');if(!list)return;
+  list.replaceChildren();
+  $('sceneCount').textContent=String(designObjects.length).padStart(2,'0')+' '+(designObjects.length===1?'OBJETO':'OBJETOS');
+  $('ungroupBtn').disabled=!(selected&&selected.userData.isSceneGroup);
+  designObjects.forEach((root,index)=>{
+    const row=document.createElement('div');row.className='scene-object-row';
+    const selectBtn=document.createElement('button');selectBtn.type='button';selectBtn.className='scene-object-select'+(root===selected?' active':'');selectBtn.dataset.sceneSelect=String(index);
+    const m=meta[root.userData.designType]||meta.group;
+    const icon=document.createElement('span');icon.className='scene-object-icon';icon.textContent=m.icon;
+    const name=document.createElement('span');name.className='scene-object-name';name.textContent=root.name;
+    selectBtn.append(icon,name);selectBtn.title=root.name;
+    const check=document.createElement('input');check.type='checkbox';check.className='scene-object-check';check.checked=groupSelection.has(root);check.dataset.groupCheck=String(index);check.title='Marcar para agrupar';check.setAttribute('aria-label','Marcar '+root.name);
+    const eye=document.createElement('button');eye.type='button';eye.className='scene-object-eye'+(!root.visible?' off':'');eye.dataset.sceneEye=String(index);eye.textContent=root.visible?'◉':'○';eye.title=root.visible?'Ocultar objeto':'Mostrar objeto';
+    row.append(selectBtn,check,eye);list.append(row);
+  });
+}
 function updateMeta() {
   const m=meta[currentType]||meta.headphones;
-  $('viewportObject').textContent=m.tag;
-  $('selectedName').textContent=selected ? selected.name : m.name;
-  $('selectedType').textContent=m.type;
-  $('selectedThumb').textContent=m.icon;
+  $('viewportObject').textContent=m.tag;$('selectedName').textContent=selected?selected.name:m.name;
+  $('selectedType').textContent=m.type;$('selectedThumb').textContent=m.icon;
   $('objectCount').textContent=designObjects.length+' '+(designObjects.length===1?'objeto':'objetos');
   document.querySelectorAll('.category-card').forEach(b=>b.classList.toggle('selected',b.dataset.type===currentType));
   document.querySelectorAll('.nav-item[data-type]').forEach(b=>b.classList.remove('active'));
+  renderSceneList();
 }
-function focusModel() {
-  if(!selected) return;
-  const bounds=new THREE.Box3().setFromObject(selected);
-  const size=bounds.getSize(new THREE.Vector3());
-  const center=bounds.getCenter(new THREE.Vector3());
-  controls.target.copy(center);
-  const maxDim=Math.max(size.x,size.y,size.z,1);
-  const dist=maxDim*2.55;
-  camera.position.set(center.x+dist*.72,center.y+dist*.55,center.z+dist*.95);
-  camera.near=Math.max(.01,dist/100);camera.far=dist*100;camera.updateProjectionMatrix();
-  controls.update();
+function frameBounds(bounds) {
+  if(!bounds||bounds.isEmpty())return;
+  const size=bounds.getSize(new THREE.Vector3()),center=bounds.getCenter(new THREE.Vector3());
+  const maxDim=Math.max(size.x,size.y,size.z,.5),dist=Math.max(maxDim*2.5,2.8);
+  let dir=new THREE.Vector3(.58,.45,.68).normalize();
+  if(activeView==='top')dir.set(0,1,0);else if(activeView==='front')dir.set(0,0,1);else if(activeView==='side')dir.set(1,0,0);
+  if(camera.isOrthographicCamera){
+    camera.zoom=THREE.MathUtils.clamp(8.2/Math.max(size.x,size.y,size.z,1),.35,8);
+    camera.position.copy(center).addScaledVector(dir,dist*2.5);camera.up.set(0,1,0);
+    if(activeView==='top')camera.up.set(0,0,-1);
+    camera.lookAt(center);camera.updateProjectionMatrix();
+  }else{
+    camera.position.copy(center).addScaledVector(dir,dist);camera.near=Math.max(.01,dist/100);
+    camera.far=dist*100;camera.up.set(0,1,0);camera.lookAt(center);camera.updateProjectionMatrix();
+  }
+  controls.target.copy(center);controls.update();
 }
-function resize() {
-  const w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);
-  renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+function focusModel(){if(selected)frameBounds(new THREE.Box3().setFromObject(selected));}
+function focusScene(){
+  const bounds=new THREE.Box3();designObjects.filter(o=>o.visible).forEach(o=>bounds.expandByObject(o));
+  if(!bounds.isEmpty())frameBounds(bounds);else focusModel();
+}
+function configureControls(){controls.enableDamping=true;controls.dampingFactor=.07;controls.minDistance=2.1;controls.maxDistance=150;controls.maxPolarAngle=Math.PI*.495;}
+function setCameraView(mode){
+  activeView=['perspective','top','front','side'].includes(mode)?mode:'perspective';
+  controls.dispose();camera=activeView==='perspective'?perspectiveCamera:orthographicCamera;
+  controls=new OrbitControls(camera,renderer.domElement);configureControls();
+  const labels={perspective:'PERSPECTIVA',top:'VISTA SUPERIOR',front:'VISTA FRONTAL',side:'VISTA LATERAL'};
+  $('viewMode').textContent=labels[activeView];$('viewModePill').innerHTML=activeView==='perspective'?'3D <b>●</b>':'ORTO <b>▦</b>';
+  $('viewSelect').value=activeView;resize();focusScene();
+}
+function resize(){
+  const w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);renderer.setSize(w,h,false);
+  if(camera.isOrthographicCamera){const halfH=(camera.userData.frustumHeight||12)/2;camera.left=-halfH*w/h;camera.right=halfH*w/h;camera.top=halfH;camera.bottom=-halfH;}
+  else camera.aspect=w/h;
+  camera.updateProjectionMatrix();
 }
 new ResizeObserver(resize).observe(stage);
-applyGraphicsQuality('high');
 window.addEventListener('resize',resize);
-function animate() {
-  requestAnimationFrame(animate);
-  controls.update();
-  if(selectionHelper && selected) selectionHelper.update();
-  renderer.render(scene,camera);
+function animate(){
+  requestAnimationFrame(animate);controls.update();
+  if(selectionHelper&&selected)selectionHelper.update();
+  renderer.render(scene,camera);updateDimensionScreenPositions();
 }
 resize();
 animate();
