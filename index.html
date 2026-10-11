@@ -219,6 +219,7 @@ body{background:#f5f7fa;color:#182235}
           <div class="prop-row"><div class="prop-label"><span>Acabado</span></div><select class="select-control" id="materialSelect"><option value="matte">Mate · suave</option><option value="satin">Satín · equilibrado</option><option value="glossy">Brillante · pulido</option><option value="metal">Metal cepillado</option></select></div>
           <div class="prop-row"><div class="prop-label"><span>Textura procedural</span><strong id="textureValue">SIN TEXTURA</strong></div><select class="select-control" id="textureSelect"><option value="none">Color liso</option><option value="wood">Madera con vetas</option><option value="marble">Mármol veteado</option><option value="concrete">Hormigón / cemento</option><option value="fabric">Tela tejida</option><option value="brushed">Metal rayado</option><option value="carbon">Fibra de carbono</option><option value="terrazzo">Terrazo</option><option value="brick">Ladrillo</option><option value="stone">Piedra natural</option><option value="tile">Baldosas</option></select></div>
           <div class="prop-row"><div class="prop-label"><span>Calidad gráfica</span><strong id="qualityValue">ALTA</strong></div><select class="select-control" id="qualitySelect"><option value="standard">Estándar · rápida</option><option value="high" selected>Alta · recomendada</option><option value="ultra">Ultra · más detalle</option></select></div>
+          <div class="prop-row"><div class="prop-label"><span>Escala de textura</span><strong id="textureScaleValue">2.0×</strong></div><div class="range-line"><input type="range" id="textureScaleRange" min=".5" max="6" step=".25" value="2"><span class="range-val" id="textureScaleReadout">2.0×</span></div></div>
           <div class="prop-row"><div class="prop-label"><span>Intensidad de luz</span><strong id="lightValue">72%</strong></div><div class="range-line"><input type="range" id="lightRange" min="30" max="100" value="72"><span class="range-val" id="lightReadout">72%</span></div></div>
         </div>
         <div class="prop-section"><div class="prop-title">Escena</div>
@@ -269,6 +270,13 @@ keyLight.shadow.mapSize.set(1024,1024); keyLight.shadow.camera.left=-8;keyLight.
 scene.add(keyLight);
 const fillLight = new THREE.DirectionalLight(0xd7e5ff, 1.35); fillLight.position.set(-5,3,-4); scene.add(fillLight);
 const rimLight = new THREE.PointLight(0xc8ff57, 8, 10); rimLight.position.set(0,4,-3); scene.add(rimLight);
+// A procedural studio environment adds soft reflections to glossy and metallic surfaces.
+const pmremGenerator = new THREE.PMREMGenerator(renderer);
+const studioEnvironment = new RoomEnvironment();
+const studioEnvironmentTexture = pmremGenerator.fromScene(studioEnvironment, 0.04).texture;
+scene.environment = studioEnvironmentTexture;
+studioEnvironment.dispose();
+pmremGenerator.dispose();
 const floorMat = new THREE.MeshStandardMaterial({color:0xf8fafc,roughness:.92,metalness:.02});
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(200,200), floorMat);
 floor.rotation.x=-Math.PI/2; floor.position.y=-.055; floor.receiveShadow=true; scene.add(floor);
@@ -279,6 +287,9 @@ let selected = null;
 let currentType = 'headphones';
 let currentColor = '#c8ff57';
 let currentMaterial = 'matte';
+let currentTexture = 'none';
+let textureScale = 2;
+let qualityMode = 'high';
 let lightLevel = .72;
 let highlightEnabled = true;
 let shadowsEnabled = true;
@@ -335,6 +346,121 @@ const materialSettings = {
   glossy:{roughness:.13,metalness:.22},
   metal:{roughness:.28,metalness:.88}
 };
+const textureLabels = {
+  none:'SIN TEXTURA',wood:'MADERA',marble:'MÁRMOL',concrete:'HORMIGÓN',
+  fabric:'TELA',brushed:'METAL RAYADO',carbon:'FIBRA DE CARBONO',
+  terrazzo:'TERRAZO',brick:'LADRILLO',stone:'PIEDRA',tile:'BALDOSAS'
+};
+const textureProfile = {
+  wood:{roughness:.73,metalness:.03,bump:.035},
+  marble:{roughness:.24,metalness:.04,bump:.018},
+  concrete:{roughness:.92,metalness:.01,bump:.065},
+  fabric:{roughness:.97,metalness:0,bump:.05},
+  brushed:{roughness:.32,metalness:.82,bump:.02},
+  carbon:{roughness:.33,metalness:.28,bump:.025},
+  terrazzo:{roughness:.38,metalness:.04,bump:.025},
+  brick:{roughness:.88,metalness:.02,bump:.055},
+  stone:{roughness:.84,metalness:.02,bump:.06},
+  tile:{roughness:.22,metalness:.06,bump:.012}
+};
+const proceduralTextureCache = new Map();
+function makeProceduralTexture(kind) {
+  if(kind==='none') return null;
+  if(proceduralTextureCache.has(kind)) return proceduralTextureCache.get(kind);
+  const canvas=document.createElement('canvas');
+  canvas.width=512;canvas.height=512;
+  const ctx=canvas.getContext('2d');
+  const randSource={seed:173+kind.split('').reduce((sum,ch)=>sum+ch.charCodeAt(0),0)};
+  const rand=()=>{randSource.seed=(randSource.seed*16807)%2147483647;return (randSource.seed-1)/2147483646;};
+  ctx.fillStyle='rgb(224,224,224)';ctx.fillRect(0,0,512,512);
+  if(kind==='wood'){
+    for(let y=0;y<512;y+=64){
+      ctx.fillStyle=(Math.floor(y/64)%2===0)?'rgb(236,236,236)':'rgb(210,210,210)';
+      ctx.fillRect(0,y,512,63);
+      for(let j=0;j<17;j++){
+        const baseY=y+rand()*62;
+        ctx.beginPath();ctx.moveTo(0,baseY);
+        for(let x=0;x<=512;x+=32)ctx.lineTo(x,baseY+Math.sin(x*.035+j)*2.3+Math.sin(x*.009+j*2)*3.5);
+        ctx.strokeStyle='rgba(65,65,65,'+(0.05+rand()*.16)+')';ctx.lineWidth=.5+rand()*2;ctx.stroke();
+      }
+      if(rand()>.35){const x=rand()*512, ky=y+rand()*50+5;ctx.beginPath();ctx.ellipse(x,ky,8+rand()*12,2+rand()*4,0,0,Math.PI*2);ctx.strokeStyle='rgba(45,45,45,.22)';ctx.lineWidth=2;ctx.stroke();ctx.beginPath();ctx.ellipse(x,ky,3+rand()*5,1.5,0,0,Math.PI*2);ctx.strokeStyle='rgba(50,50,50,.18)';ctx.stroke();}
+      ctx.fillStyle='rgba(35,35,35,.16)';ctx.fillRect(0,y+62,512,2);
+    }
+  } else if(kind==='marble'){
+    ctx.fillStyle='rgb(245,245,245)';ctx.fillRect(0,0,512,512);
+    for(let i=0;i<16;i++){
+      let x=rand()*512,y=rand()*512;
+      ctx.beginPath();ctx.moveTo(x,y);
+      for(let k=0;k<7;k++){x+=rand()*95-38;y+=rand()*78-25;ctx.lineTo(x,y);}
+      ctx.strokeStyle='rgba(75,75,75,'+(0.08+rand()*.25)+')';ctx.lineWidth=.7+rand()*2.2;ctx.stroke();
+      ctx.beginPath();ctx.moveTo(x-30,y-22);ctx.lineTo(x,y);ctx.lineTo(x+15,y+24);ctx.strokeStyle='rgba(85,85,85,.11)';ctx.lineWidth=.7;ctx.stroke();
+    }
+  } else if(kind==='concrete'||kind==='stone'){
+    ctx.fillStyle=kind==='stone'?'rgb(205,205,205)':'rgb(215,215,215)';ctx.fillRect(0,0,512,512);
+    for(let i=0;i<3600;i++){
+      const v=Math.floor(95+rand()*150),alpha=.08+rand()*.24;
+      ctx.fillStyle='rgba('+v+','+v+','+v+','+alpha+')';
+      const x=rand()*512,y=rand()*512,s=kind==='stone'?1+rand()*5:.6+rand()*2.4;
+      ctx.fillRect(x,y,s,s*(.7+rand()));
+    }
+    if(kind==='stone'){
+      for(let i=0;i<26;i++){const x=rand()*512,y=rand()*512;ctx.beginPath();ctx.ellipse(x,y,10+rand()*42,4+rand()*24,rand()*Math.PI,0,Math.PI*2);ctx.strokeStyle='rgba(80,80,80,.16)';ctx.lineWidth=.8+rand()*1.4;ctx.stroke();}
+    }
+  } else if(kind==='fabric'){
+    ctx.fillStyle='rgb(220,220,220)';ctx.fillRect(0,0,512,512);
+    for(let i=0;i<512;i+=5){
+      ctx.strokeStyle=i%10===0?'rgba(60,60,60,.14)':'rgba(255,255,255,.24)';ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(512,i+2);ctx.stroke();
+      ctx.strokeStyle=i%10===0?'rgba(255,255,255,.24)':'rgba(65,65,65,.13)';
+      ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i+2,512);ctx.stroke();
+    }
+  } else if(kind==='brushed'){
+    for(let i=0;i<1900;i++){
+      const v=Math.floor(85+rand()*165);ctx.strokeStyle='rgba('+v+','+v+','+v+','+(0.04+rand()*.22)+')';
+      ctx.lineWidth=.3+rand()*1.6;ctx.beginPath();const y=rand()*512;ctx.moveTo(0,y);ctx.lineTo(512,y+(rand()-.5)*2);ctx.stroke();
+    }
+  } else if(kind==='carbon'){
+    ctx.fillStyle='rgb(140,140,140)';ctx.fillRect(0,0,512,512);
+    for(let y=-512;y<1024;y+=16)for(let x=-512;x<1024;x+=16){
+      const v=160+Math.floor(rand()*70);
+      ctx.save();ctx.translate(x,y);ctx.rotate(-Math.PI/4);
+      ctx.fillStyle='rgb('+v+','+v+','+v+')';ctx.fillRect(0,0,17,7);
+      ctx.fillStyle='rgba(25,25,25,.35)';ctx.fillRect(0,7,17,2);ctx.restore();
+    }
+  } else if(kind==='terrazzo'){
+    ctx.fillStyle='rgb(238,238,238)';ctx.fillRect(0,0,512,512);
+    for(let i=0;i<420;i++){
+      const v=Math.floor(55+rand()*175);ctx.fillStyle='rgb('+v+','+v+','+v+')';
+      ctx.globalAlpha=.35+rand()*.6;ctx.save();ctx.translate(rand()*512,rand()*512);ctx.rotate(rand()*Math.PI);
+      ctx.fillRect(0,0,2+rand()*10,2+rand()*6);ctx.restore();
+    }
+    ctx.globalAlpha=1;
+  } else if(kind==='brick'){
+    ctx.fillStyle='rgb(238,238,238)';ctx.fillRect(0,0,512,512);
+    const bw=64,bh=32;
+    for(let row=0;row<16;row++)for(let col=-1;col<9;col++){
+      const x=col*bw+(row%2)*bw/2,y=row*bh;
+      const v=Math.floor(165+rand()*65);ctx.fillStyle='rgb('+v+','+v+','+v+')';ctx.fillRect(x+2,y+2,bw-4,bh-4);
+      ctx.strokeStyle='rgba(65,65,65,.36)';ctx.lineWidth=2;ctx.strokeRect(x+2,y+2,bw-4,bh-4);
+      ctx.strokeStyle='rgba(255,255,255,.2)';ctx.beginPath();ctx.moveTo(x+5,y+5);ctx.lineTo(x+bw-7,y+5);ctx.stroke();
+    }
+  } else if(kind==='tile'){
+    ctx.fillStyle='rgb(240,240,240)';ctx.fillRect(0,0,512,512);
+    for(let y=0;y<512;y+=64)for(let x=0;x<512;x+=64){
+      const grad=ctx.createLinearGradient(x,y,x+58,y+58);grad.addColorStop(0,'rgb(242,242,242)');grad.addColorStop(1,'rgb(190,190,190)');
+      ctx.fillStyle=grad;ctx.fillRect(x+2,y+2,60,60);ctx.strokeStyle='rgba(70,70,70,.23)';ctx.lineWidth=2;ctx.strokeRect(x+2,y+2,60,60);
+    }
+  }
+  const colorMap=new THREE.CanvasTexture(canvas);
+  colorMap.colorSpace=THREE.SRGBColorSpace;colorMap.wrapS=THREE.RepeatWrapping;colorMap.wrapT=THREE.RepeatWrapping;
+  colorMap.minFilter=THREE.LinearMipmapLinearFilter;colorMap.magFilter=THREE.LinearFilter;colorMap.generateMipmaps=true;
+  colorMap.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
+  const roughnessMap=colorMap.clone();roughnessMap.colorSpace=THREE.NoColorSpace;
+  const bumpMap=colorMap.clone();bumpMap.colorSpace=THREE.NoColorSpace;
+  const result={map:colorMap,roughnessMap,bumpMap};
+  proceduralTextureCache.set(kind,result);
+  return result;
+}
 function material(color, extra={}) {
   return new THREE.MeshStandardMaterial({color, roughness:.54, metalness:.08, ...extra});
 }
@@ -776,17 +902,63 @@ function build(type,g) {
   else addPrimitive(g,type);
 }
 function applyPrimaryMaterial(root) {
-  const settings = materialSettings[currentMaterial] || materialSettings.matte;
+  const finish=materialSettings[currentMaterial]||materialSettings.matte;
+  const tex=makeProceduralTexture(currentTexture);
+  const profile=textureProfile[currentTexture];
+  const tileScale=textureScale;
+  if(tex){
+    tex.map.repeat.set(tileScale,tileScale);
+    tex.roughnessMap.repeat.set(tileScale,tileScale);
+    tex.bumpMap.repeat.set(tileScale,tileScale);
+    tex.map.needsUpdate=true;tex.roughnessMap.needsUpdate=true;tex.bumpMap.needsUpdate=true;
+  }
   root.traverse(o=>{
     if(o.isMesh && o.userData.primary) {
-      const previousColor = o.material.color ? o.material.color.getHex() : 0xffffff;
-      o.material.dispose();
-      o.material = material(currentColor,{...settings,color:previousColor});
+      if(o.material) {
+        if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());
+        else o.material.dispose();
+      }
+      const textured=tex&&profile;
+      const p=textured?{
+        map:tex.map,roughnessMap:tex.roughnessMap,bumpMap:tex.bumpMap,
+        bumpScale:profile.bump,
+        roughness:Math.max(.12,Math.min(.98,(finish.roughness+profile.roughness)/2)),
+        metalness:(finish.metalness+profile.metalness)/2
+      }:{};
+      o.material=material(currentColor,{...finish,...p});
       o.material.color.set(currentColor);
-      o.material.wireframe = wireEnabled;
-      o.castShadow = shadowsEnabled;
+      o.material.wireframe=wireEnabled;
+      o.castShadow=shadowsEnabled;
+      o.receiveShadow=true;
+      o.material.needsUpdate=true;
     }
   });
+  updateTextureUI();
+}
+function updateTextureUI() {
+  const label=textureLabels[currentTexture]||'SIN TEXTURA';
+  if($('textureValue'))$('textureValue').textContent=label;
+  if($('textureSelect'))$('textureSelect').value=currentTexture;
+  if($('textureScaleValue'))$('textureScaleValue').textContent=textureScale.toFixed(1)+'×';
+  if($('textureScaleReadout'))$('textureScaleReadout').textContent=textureScale.toFixed(1)+'×';
+  const qualityNames={standard:'ESTÁNDAR',high:'ALTA',ultra:'ULTRA'};
+  if($('qualityValue'))$('qualityValue').textContent=qualityNames[qualityMode]||'ALTA';
+  if($('qualitySelect'))$('qualitySelect').value=qualityMode;
+}
+function applyGraphicsQuality(mode) {
+  qualityMode=['standard','high','ultra'].includes(mode)?mode:'high';
+  const dprCap={standard:1,high:1.5,ultra:2}[qualityMode];
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,dprCap));
+  const shadowSize={standard:1024,high:2048,ultra:3072}[qualityMode];
+  keyLight.shadow.mapSize.set(shadowSize,shadowSize);
+  if(keyLight.shadow.map){keyLight.shadow.map.dispose();keyLight.shadow.map=null;}
+  keyLight.shadow.camera.near=.1;keyLight.shadow.camera.far=45;
+  keyLight.shadow.bias=-.00015;keyLight.shadow.normalBias=.025;
+  keyLight.shadow.radius=qualityMode==='ultra'?5:qualityMode==='high'?3:1;
+  keyLight.shadow.needsUpdate=true;
+  renderer.toneMappingExposure=qualityMode==='ultra'?1.18:qualityMode==='high'?1.15:1.1;
+  updateTextureUI();
+  resize();
 }
 function clearModels() {
   if(selected && selected.userData.helper) scene.remove(selected.userData.helper);
@@ -835,6 +1007,7 @@ function selectDesign(root) {
   $('selectedType').textContent=meta[currentType].type;
   updateSwatches();
   $('materialSelect').value=currentMaterial;
+  updateTextureUI();
   updateMeta();
 }
 let selectionHelper=null;
@@ -885,7 +1058,7 @@ animate();
 function snapshot() {
   return {
     name:$('projectName').value,
-    type:currentType,color:currentColor,material:currentMaterial,light:lightLevel,
+    type:currentType,color:currentColor,material:currentMaterial,texture:currentTexture,textureScale,quality:qualityMode,light:lightLevel,
     position:selected?[selected.position.x,selected.position.y,selected.position.z]:[0,0,0],
     scale:selected?[selected.scale.x,selected.scale.y,selected.scale.z]:[1,1,1],
     rotation:selected?[selected.rotation.x,selected.rotation.y,selected.rotation.z]:[0,0,0],
@@ -900,7 +1073,8 @@ function applySnapshot(s) {
   if(!s)return;
   applyingState=true;
   $('projectName').value=s.name||'Concepto sin título';
-  currentColor=s.color||'#c8ff57'; currentMaterial=s.material||'matte';lightLevel=s.light||.72;
+  currentColor=s.color||'#c8ff57'; currentMaterial=s.material||'matte';currentTexture=s.texture||'none';textureScale=s.textureScale||2;lightLevel=s.light||.72;
+  applyGraphicsQuality(s.quality||'high');
   gridEnabled=s.grid!==false;shadowsEnabled=s.shadows!==false;highlightEnabled=s.highlight!==false;
   $('lightRange').value=Math.round(lightLevel*100);$('lightValue').textContent=Math.round(lightLevel*100)+'%';$('lightReadout').textContent=Math.round(lightLevel*100)+'%';
   grid.visible=gridEnabled;keyLight.castShadow=shadowsEnabled;$('gridSwitch').classList.toggle('on',gridEnabled);$('shadowSwitch').classList.toggle('on',shadowsEnabled);$('highlightSwitch').classList.toggle('on',highlightEnabled);
@@ -937,6 +1111,11 @@ function setMaterial(value) {
   pushHistory();currentMaterial=value;
   if(selected)applyPrimaryMaterial(selected);
   persist();
+}
+function setTexture(value) {
+  pushHistory();currentTexture=textureLabels[value]!==undefined?value:'none';
+  if(selected)applyPrimaryMaterial(selected);
+  updateTextureUI();persist();
 }
 function setPositionFromInputs() {
   if(!selected)return;
@@ -996,6 +1175,14 @@ function handlePrompt() {
   const text=raw.toLowerCase();
   let type='headphones';
   if(/mans[ií]on|mansión|residencia enorme|palacete/.test(text)) type='mansion';
+  else if(/arco|arcada/.test(text))type='arch';
+  else if(/c[uú]pula|domo|dome/.test(text))type='dome';
+  else if(/escalera|peldaño|escalinata/.test(text))type='stairs';
+  else if(/columna|pilar/.test(text))type='column';
+  else if(/pir[aá]mide|pyramid/.test(text))type='pyramid';
+  else if(/[aá]rbol|arbol|paisajismo|arbusto/.test(text))type='tree';
+  else if(/roca|piedra irregular|boulder/.test(text))type='rock';
+  else if(/fuente|fontana/.test(text))type='fountain';
   else if(/rascacielos|edificio|torre de oficinas|skyscraper/.test(text))type='skyscraper';
   else if(/castillo|fortaleza/.test(text))type='castle';
   else if(/villa moderna|villa contempor[aá]nea/.test(text))type='villa';
@@ -1056,6 +1243,19 @@ $('projectName').addEventListener('input',persist);
 $('colorSwatches').addEventListener('click',e=>{const b=e.target.closest('[data-color]');if(b)setColor(b.dataset.color);});
 $('customColor').addEventListener('input',e=>setColor(e.target.value));
 $('materialSelect').addEventListener('change',e=>setMaterial(e.target.value));
+$('textureSelect').addEventListener('change',e=>setTexture(e.target.value));
+$('qualitySelect').addEventListener('change',e=>{
+  pushHistory();applyGraphicsQuality(e.target.value);persist();
+  toast('Calidad gráfica: '+(qualityMode==='ultra'?'Ultra':qualityMode==='high'?'Alta':'Estándar')+'.');
+});
+$('textureScaleRange').addEventListener('input',e=>{
+  if(!selected)return;
+  if(e.target.dataset.historyStarted!=='1'){pushHistory();e.target.dataset.historyStarted='1';}
+  textureScale=parseFloat(e.target.value)||2;
+  if(selected)applyPrimaryMaterial(selected);
+  updateTextureUI();persist();
+});
+$('textureScaleRange').addEventListener('change',e=>{e.target.dataset.historyStarted='0';});
 ['posX','posY','posZ'].forEach(id=>$(id).addEventListener('change',setPositionFromInputs));
 $('scaleRange').addEventListener('input',e=>{
   if(!selected)return;
