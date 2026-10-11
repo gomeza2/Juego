@@ -2275,11 +2275,11 @@ function handlePrompt() {
   const text=normalizePrompt(raw);
   const pickedColor=promptColor(text),pickedTexture=promptTexture(text),pickedFinish=promptFinish(text);
   const textureKinds=[
-    ['wood',/\\b(madera|roble|parquet|wood)\\b/],['marble',/\\b(marmol|marble)\\b/],
-    ['concrete',/\\b(hormigon|cemento|concrete)\\b/],['fabric',/\\b(tela|tejido|tapizado|fabric)\\b/],
-    ['carbon',/\\b(fibra de carbono|carbono)\\b/],['brick',/\\b(ladrillo|brick)\\b/],
-    ['stone',/\\b(piedra natural|piedra rustica|stone)\\b/],['tile',/\\b(baldosa|ceramica|azulejo|tile)\\b/],
-    ['terrazzo',/\\b(terrazo|terrazzo)\\b/],['brushed',/\\b(metal rayado|metal cepillado|acero cepillado|brushed)\\b/]
+    ['wood',/\b(madera|roble|parquet|wood)\b/],['marble',/\b(marmol|marble)\b/],
+    ['concrete',/\b(hormigon|cemento|concrete)\b/],['fabric',/\b(tela|tejido|tapizado|fabric)\b/],
+    ['carbon',/\b(fibra de carbono|carbono)\b/],['brick',/\b(ladrillo|brick)\b/],
+    ['stone',/\b(piedra natural|piedra rustica|stone)\b/],['tile',/\b(baldosa|ceramica|azulejo|tile)\b/],
+    ['terrazzo',/\b(terrazo|terrazzo)\b/],['brushed',/\b(metal rayado|metal cepillado|acero cepillado|brushed)\b/]
   ];
   const mentionedTextures=textureKinds.filter(item=>item[1].test(text)).map(item=>item[0]);
   const explicitColor=/\b(rojo|roja|rojos|rojas|coral|naranja|naranjas|azul|azulada|azulado|azules|celeste|celestes|violeta|lila|lavanda|purpura|blanco|blanca|blancos|blancas|hielo|marfil|negro|negra|negros|negras|grafito|oscuro|oscuros|verde|verdes|lima|amarillo|amarilla|amarillos|amarillas|madera clara|roble|beige|arena|marron|marrones|gris|grises|concreto|cemento|dorado|dorada|oro)\b/.test(text);
