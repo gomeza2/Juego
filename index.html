@@ -2258,6 +2258,11 @@ const promptEntityCatalog=[
   {type:'hexagon',aliases:'hexagonos?',label:'Prisma hexagonal'},
   {type:'star',aliases:'estrellas?',label:'Estrella'},
   {type:'octahedron',aliases:'octaedros?',label:'Octaedro'},
+  {type:'disk',aliases:'circulos?|discos?',label:'Disco circular'},
+  {type:'triangle',aliases:'triangulos?',label:'Triángulo'},
+  {type:'rectangle',aliases:'rectangulos?|placas?',label:'Rectángulo'},
+  {type:'polygon',aliases:'poligonos?',label:'Polígono'},
+  {type:'roundedCube',aliases:'cubos? biselados?|bloques? redondeados?',label:'Cubo biselado'},
   {type:'gear',aliases:'engranajes?|ruedas? dentadas?',label:'Engranaje'},
   {type:'wedge',aliases:'cunas?|rampas?',label:'Cuña'},
   {type:'pipe',aliases:'tubos?|tuberias?',label:'Tubo'},
@@ -2305,6 +2310,7 @@ function detectPromptType(text) {
   if(/villa|casa moderna|casa contemporanea|casa\b/.test(t))return 'villa';
   if(/pabellon|gazebo/.test(t))return 'pavilion';
   if(/puente|pasarela/.test(t))return 'bridge';
+  if(/espacio interior|ambiente abierto|habitacion sin amoblar|espacio vacio/.test(t))return 'space';
   if(/habitacion|dormitorio|salon|living|cocina|interior|hogar/.test(t))return 'room';
   if(/fuente|fontana/.test(t))return 'fountain';
   if(/ventana|window/.test(t))return 'window';
@@ -2322,6 +2328,11 @@ function detectPromptType(text) {
   if(/tubo|tuberia/.test(t))return 'pipe';
   if(/rampa|cuna/.test(t))return 'wedge';
   if(/hexagono|hexagonal/.test(t))return 'hexagon';
+  if(/circulo|disco/.test(t))return 'disk';
+  if(/triangulo/.test(t))return 'triangle';
+  if(/rectangulo|placa/.test(t))return 'rectangle';
+  if(/poligono/.test(t))return 'polygon';
+  if(/cubo biselado|bloque redondeado/.test(t))return 'roundedCube';
   if(/estrella/.test(t))return 'star';
   if(/octaedro/.test(t))return 'octahedron';
   if(/cono\b/.test(t))return 'cone';
@@ -2482,7 +2493,7 @@ function handlePrompt() {
   const mentionedTextures=textureKinds.filter(item=>item[1].test(text)).map(item=>item[0]);
   const explicitColor=/\b(rojo|roja|rojos|rojas|coral|naranja|naranjas|azul|azulada|azulado|azules|celeste|celestes|violeta|lila|lavanda|purpura|blanco|blanca|blancos|blancas|hielo|marfil|negro|negra|negros|negras|grafito|oscuro|oscuros|verde|verdes|lima|amarillo|amarilla|amarillos|amarillas|madera clara|roble|beige|arena|marron|marrones|gris|grises|concreto|cemento|dorado|dorada|oro)\b/.test(text);
   const explicitTexture=pickedTexture!==null;
-  const hasBuilding=/\b(casa|mansion|residencia|palacete|rascacielos|edificio|torre de oficinas|castillo|villa|pabellon|puente|habitacion|dormitorio|salon|living|cocina|interior|hogar)\b/.test(text);
+  const hasBuilding=/\b(casa|mansion|residencia|palacete|rascacielos|edificio|torre de oficinas|castillo|villa|pabellon|puente|habitacion|dormitorio|salon|living|cocina|interior|hogar|espacio interior|ambiente abierto|espacio vacio)\b/.test(text);
   const primaryType=detectPromptType(text);
   const storeyCountIsArchitectural=hasBuilding&&/\b(?:\d{1,2}|uno|una|un|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s*(?:pisos?|plantas?|niveles?)\b/.test(text);
   const entities=promptEntityCatalog.map(spec=>({...spec,count:spec.type==='floor'&&storeyCountIsArchitectural?0:countPromptEntities(text,spec.aliases,spec.type==='tree'?16:24)})).filter(spec=>spec.count>0);
@@ -2505,13 +2516,14 @@ function handlePrompt() {
     currentTexture=texture;
     const options={keepScene:true,skipHistory:true,position,name,focus:false};
     if(architecturalSizeTypes.has(type))options.archSize=promptArchitecturalSize(type,text);
+    if(type==='polygon'){const sides=text.match(/\b(\d{1,2})\s*lados?\b/);if(sides)options.polygonSides=THREE.MathUtils.clamp(parseInt(sides[1],10),3,16);}
     const root=createDesign(type,options);
     root.name=name||root.name;
     created.push(root);
     return root;
   };
   if(hasBuilding){
-    const macroName=({'villa':'Villa contemporánea','mansion':'Mansión conceptual','skyscraper':'Edificio conceptual','castle':'Castillo conceptual','pavilion':'Pabellón conceptual','bridge':'Puente conceptual','room':'Ambiente conceptual'})[primaryType]||meta[primaryType]?.name||'Escena conceptual';
+    const macroName=({'villa':'Villa contemporánea','mansion':'Mansión conceptual','skyscraper':'Edificio conceptual','castle':'Castillo conceptual','pavilion':'Pabellón conceptual','bridge':'Puente conceptual','room':'Ambiente conceptual','space':'Espacio interior'})[primaryType]||meta[primaryType]?.name||'Escena conceptual';
     makePiece(primaryType,origin,macroName);
   }
   if(!entities.length&&!hasBuilding){
