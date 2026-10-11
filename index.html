@@ -9,7 +9,19 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
 :root{color-scheme:dark;--bg:#090d14;--panel:#101620;--panel2:#141c29;--line:#263143;--muted:#8b98aa;--text:#edf2f8;--accent:#c8ff57;--accent2:#a4dc35;--blue:#84a8ff;--radius:13px;font-family:Manrope,system-ui,sans-serif}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;font-size:13px}button,input,select{font:inherit}button{cursor:pointer;color:inherit}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.app{display:grid;grid-template-columns:246px minmax(0,1fr);height:100vh;min-height:520px}.sidebar{display:flex;flex-direction:column;background:#0c1119;border-right:1px solid var(--line);min-height:0;overflow:hidden}.brand{height:72px;padding:0 20px;display:flex;align-items:center;gap:11px;border-bottom:1px solid var(--line);flex-shrink:0}.brand-mark{height:34px;width:34px;display:grid;place-items:center;background:var(--accent);border-radius:10px;color:#10150b;font-size:22px;font-weight:800;letter-spacing:-3px;padding-right:3px}.brand-name{font-size:16px;font-weight:800;letter-spacing:1.4px}.brand-sub{font-size:9px;color:#8491a4;letter-spacing:2px;margin-top:2px}.side-scroll{padding:17px 12px 18px;overflow:auto;scrollbar-width:thin;scrollbar-color:#303a4a transparent}.workspace-label{display:flex;align-items:center;justify-content:space-between;padding:0 9px 9px;color:#778498;font-size:10px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase}.new-project{width:100%;height:40px;border:1px solid #3b4a5b;border-radius:9px;background:linear-gradient(140deg,#1a2432,#101722);display:flex;gap:9px;align-items:center;padding:0 12px;font-weight:700;margin-bottom:23px;transition:.18s}.new-project:hover{border-color:var(--accent);background:#19231d}.plus{font-size:20px;color:var(--accent);font-weight:400}.section-title{padding:0 9px;margin:20px 0 9px;color:#778498;font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}.nav-item{border:0;background:transparent;width:100%;height:35px;padding:0 10px;display:flex;align-items:center;gap:10px;color:#a3afbf;text-align:left;border-radius:8px;margin-bottom:3px;font-size:12px;transition:.15s}.nav-item:hover{background:#171f2c;color:#f4f7fc}.nav-item.active{background:#252e3b;color:#f4f7fc}.nav-icon{width:20px;text-align:center;font-size:16px;color:#a6b4c8}.nav-item.active .nav-icon{color:var(--accent)}.nav-count{margin-left:auto;color:#7f8da1;font:10px 'DM Mono',monospace}.category-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.category-card{background:#111924;border:1px solid #273244;border-radius:10px;min-height:78px;text-align:left;padding:10px 9px;transition:transform .16s,border-color .16s,background .16s;display:flex;flex-direction:column;justify-content:space-between}.category-card:hover{border-color:#8ea84f;background:#172019;transform:translateY(-2px)}.category-card.selected{border-color:var(--accent);background:#1c261a}.cat-icon{font-size:21px;line-height:1}.cat-title{font-size:11px;font-weight:700;color:#dce4ef}.cat-sub{font-size:9px;color:#8b99ac;margin-top:2px}.side-tip{margin:20px 2px 0;border:1px solid #293344;border-radius:11px;background:linear-gradient(145deg,#141c28,#0f151f);padding:13px}.tip-top{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:800}.tip-light{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px #c8ff5755}.side-tip p{color:#9ba8ba;line-height:1.6;font-size:10px;margin:8px 0 0}.side-foot{margin-top:auto;border-top:1px solid var(--line);padding:13px 17px;display:flex;align-items:center;gap:9px;flex-shrink:0}.avatar{height:28px;width:28px;border-radius:9px;background:#26343d;color:var(--accent);display:grid;place-items:center;font-weight:800}.foot-name{font-size:11px;font-weight:700}.foot-status{font-size:9px;color:#7f8da0;margin-top:2px}.foot-dot{margin-left:auto;width:6px;height:6px;background:#88d87b;border-radius:50%}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;font-size:13px}button,input,select{font:inherit}button{cursor:pointer;color:inherit}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.app{display:grid;grid-template-columns:246px minmax(0,1fr);height:100vh;min-height:520px}.sidebar{display:flex;flex-direction:column;background:#0c1119;border-right:1px solid var(--line);min-height:0;overflow:hidden}.brand{height:72px;padding:0 20px;display:flex;align-items:center;gap:11px;border-bottom:1px solid var(--line);flex-shrink:0}.brand-mark{height:34px;width:34px;display:grid;place-items:center;background:var(--accent);border-radius:10px;color:#10150b;font-size:22px;font-weight:800;letter-spacing:-3px;padding-right:3px}.brand-name{font-size:16px;font-weight:800;letter-spacing:1.4px}.brand-sub{font-size:9px;color:#8491a4;letter-spacing:2px;margin-top:2px}.side-scroll{padding:17px 12px 18px;overflow:auto;scrollbar-width:thin;scrollbar-color:#303a4a transparent}.workspace-label{display:flex;align-items:center;justify-content:space-between;padding:0 9px 9px;color:#778498;font-size:10px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase}.new-project{width:100%;height:40px;border:1px solid #3b4a5b;border-radius:9px;background:linear-gradient(140deg,#1a2432,#101722);display:flex;gap:9px;align-items:center;padding:0 12px;font-weight:700;margin-bottom:23px;transition:.18s}.new-project:hover{border-color:var(--accent);background:#19231d}.plus{font-size:20px;color:var(--accent);font-weight:400}.section-title{padding:0 9px;margin:20px 0 9px;color:#778498;font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}.nav-item{border:0;background:transparent;width:100%;height:35px;padding:0 10px;display:flex;align-items:center;gap:10px;color:#a3afbf;text-align:left;border-radius:8px;margin-bottom:3px;font-size:12px;transition:.15s}.nav-item:hover{background:#171f2c;color:#f4f7fc}.nav-item.active{background:#252e3b;color:#f4f7fc}.nav-icon{width:20px;text-align:center;font-size:16px;color:#a6b4c8}.nav-item.active .nav-icon{color:var(--accent)}.nav-count{margin-left:auto;color:#7f8da1;font:10px 'DM Mono',monospace}.category-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.category-card{background:#111924;border:1px solid #273244;border-radius:10px;min-height:78px;text-align:left;padding:10px 9px;transition:transform .16s,border-color .16s,background .16s;display:flex;flex-direction:column;justify-content:space-between}.category-card:hover{border-color:#8ea84f;background:#172019;transform:translateY(-2px)}.category-card.selected{border-color:var(--accent);background:#1c261a}.cat-icon{font-size:21px;line-height:1}.cat-title{font-size:11px;font-weight:700;color:#dce4ef}.cat-sub{font-size:9px;color:#8b99ac;margin-top:2px}.architecture-grid{margin-bottom:3px}
+.phase-board{margin:18px 2px 2px;border:1px solid #dfe6ee;border-radius:11px;background:#fff;padding:12px}
+.phase-board-title{display:flex;justify-content:space-between;gap:6px;color:#56657b;font-size:9px;font-weight:800;letter-spacing:1px;margin-bottom:12px}
+.phase-board-title span{color:#719a2e;font:9px 'DM Mono',monospace;white-space:nowrap}
+.phase-row{display:flex;gap:9px;align-items:flex-start;position:relative;padding:0 0 13px;margin-bottom:1px}
+.phase-row:last-child{padding-bottom:0}
+.phase-num{width:22px;height:22px;flex:0 0 22px;border:1px solid #dbe3ec;border-radius:7px;display:grid;place-items:center;color:#78869a;font:9px 'DM Mono',monospace;background:#f8fafc}
+.phase-row b{display:block;color:#4c5a70;font-size:10px;margin:1px 0 4px}
+.phase-row small{display:block;color:#8491a2;font-size:9px;line-height:1.4}
+.phase-row.done .phase-num{background:#edf5df;border-color:#d5e7b4;color:#658d27}
+.phase-row.current .phase-num{background:#b7e85b;border-color:#a8d94b;color:#24360c}
+.phase-row.current b{color:#2c4310}
+.side-tip{margin:16px 2px 0;border:1px solid #dfe6ee;border-radius:11px;background:linear-gradient(145deg,#f8fafc,#f0f4f8);padding:13px}.tip-top{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:800}.tip-light{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px #c8ff5755}.side-tip p{color:#66748a;line-height:1.6;font-size:10px;margin:8px 0 0}.side-foot{margin-top:auto;border-top:1px solid var(--line);padding:13px 17px;display:flex;align-items:center;gap:9px;flex-shrink:0}.avatar{height:28px;width:28px;border-radius:9px;background:#26343d;color:var(--accent);display:grid;place-items:center;font-weight:800}.foot-name{font-size:11px;font-weight:700}.foot-status{font-size:9px;color:#7f8da0;margin-top:2px}.foot-dot{margin-left:auto;width:6px;height:6px;background:#88d87b;border-radius:50%}
 .main{display:flex;flex-direction:column;min-width:0;min-height:0}.topbar{height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--line);background:#0c1119;flex-shrink:0;gap:14px}.crumbs{display:flex;align-items:center;gap:9px;color:#778498;font-size:11px;white-space:nowrap}.crumbs b{color:#eef3fa;font-weight:700}.crumb-sep{color:#445064}.project-name{display:flex;gap:7px;align-items:center;color:#e6edf6;font-weight:700;font-size:12px}.project-name input{border:0;background:transparent;color:inherit;width:150px;padding:4px 0;font-weight:700}.tiny-save{font:9px 'DM Mono',monospace;color:#8796a8;display:flex;align-items:center;gap:6px;margin-top:4px}.tiny-save span{width:5px;height:5px;background:var(--accent);border-radius:50%}.top-actions{display:flex;gap:8px;align-items:center}.icon-btn,.btn{height:34px;border:1px solid #2c3749;background:#151d29;border-radius:8px;padding:0 10px;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:11px;font-weight:700;transition:.15s;white-space:nowrap}.icon-btn{width:34px;padding:0;font-size:16px;color:#a6b3c5}.icon-btn:hover,.btn:hover{border-color:#596a80;background:#1b2634}.btn-primary{background:var(--accent);border-color:var(--accent);color:#11180a;font-weight:800}.btn-primary:hover{background:#dcff8c;border-color:#dcff8c}.top-divider{height:22px;width:1px;background:var(--line);margin:0 2px}.studio-grid{display:grid;grid-template-columns:minmax(0,1fr) 278px;flex:1;min-height:0}.canvas-column{padding:15px;display:flex;flex-direction:column;gap:10px;min-width:0;min-height:0;background:radial-gradient(ellipse at 45% 40%,#111a28 0%,#0c1119 70%)}.canvas-toolbar{height:38px;display:flex;align-items:center;justify-content:space-between;gap:9px;flex-shrink:0}.tool-group{display:flex;gap:5px;align-items:center}.tool-btn{height:31px;min-width:31px;border:1px solid transparent;border-radius:7px;background:transparent;color:#9caabd;font-size:12px;padding:0 9px;display:flex;align-items:center;gap:6px}.tool-btn:hover{background:#202a38;color:#eaf0f8}.tool-btn.active{background:#27323f;border-color:#3a475a;color:var(--accent)}.tool-line{width:1px;height:19px;background:#2b3646;margin:0 3px}.viewport-label{display:flex;align-items:center;gap:8px;color:#7e8da2;font-size:10px}.live-dot{height:6px;width:6px;border-radius:50%;background:#8fdb7c}.stage{flex:1;min-height:260px;position:relative;border:1px solid #283447;border-radius:12px;overflow:hidden;background:#0c1420;isolation:isolate}.stage canvas{width:100%;height:100%;display:block;outline:none}.stage-gradient{pointer-events:none;position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,11,17,.26),transparent 24%,transparent 82%,rgba(7,11,17,.32));z-index:1}.viewport-top-left{position:absolute;left:14px;top:13px;z-index:2;pointer-events:none}.viewport-tag{font:9px 'DM Mono',monospace;letter-spacing:1.3px;text-transform:uppercase;color:#9ba9bc;border:1px solid #3a4659;background:#111a27dd;border-radius:5px;padding:6px 8px}.viewport-object{margin-top:8px;font-size:12px;font-weight:800;text-shadow:0 2px 12px #000}.viewport-top-right{position:absolute;top:12px;right:12px;display:flex;gap:6px;z-index:3}.view-pill{background:#111a27dc;border:1px solid #354155;border-radius:6px;padding:7px 8px;color:#aab6c6;font:9px 'DM Mono',monospace}.view-pill b{font-weight:400;color:var(--accent)}.axis-widget{position:absolute;bottom:15px;left:15px;z-index:2;display:flex;align-items:center;gap:7px;pointer-events:none}.axis{width:32px;height:32px;border:1px solid #39475b;border-radius:50%;position:relative;background:#111a27dd}.axis:before{content:'';position:absolute;left:15px;top:4px;height:23px;width:1px;background:#f07f77;transform:rotate(42deg)}.axis:after{content:'';position:absolute;left:4px;top:15px;height:1px;width:23px;background:#7ca8ff;transform:rotate(-28deg)}.axis-label{font:9px 'DM Mono',monospace;color:#8f9db0;line-height:1.6}.axis-label span:first-child{color:#ef8d83}.axis-label span:last-child{color:#8cafef}.stage-bottom-right{position:absolute;bottom:12px;right:12px;display:flex;gap:6px;z-index:3}.stage-bottom-right button{height:30px;width:30px;border:1px solid #354155;background:#111a27df;border-radius:7px;color:#b1bfd0;font-size:14px}.stage-bottom-right button:hover{border-color:var(--accent);color:var(--accent)}.stage-empty{position:absolute;inset:0;display:none;z-index:2;pointer-events:none;align-items:center;justify-content:center;text-align:center;color:#a2aec0}.stage-empty strong{display:block;color:#e8edf6;margin-bottom:7px}.prompt-bar{border:1px solid #344153;background:#111925;border-radius:11px;min-height:58px;padding:9px 10px;display:flex;gap:10px;align-items:center;flex-shrink:0;box-shadow:0 8px 28px #0002}.prompt-spark{font-size:18px;color:var(--accent);width:30px;height:30px;border-radius:8px;background:#293521;display:grid;place-items:center;flex-shrink:0}.prompt-copy{min-width:0;flex:1}.prompt-copy input{width:100%;border:0;outline:0;background:transparent;color:#edf2f8;font-size:11px;padding:3px 0}.prompt-copy input::placeholder{color:#718096}.prompt-hint{font-size:9px;color:#77869b;margin-top:4px}.prompt-send{height:35px;border:0;border-radius:8px;padding:0 12px;background:var(--accent);color:#131909;font-weight:800;font-size:11px;display:flex;gap:7px;align-items:center}.prompt-send:hover{background:#dcff91}.bottom-bar{height:30px;display:flex;justify-content:space-between;align-items:center;color:#718096;font:9px 'DM Mono',monospace;flex-shrink:0}.bottom-status{display:flex;gap:12px;align-items:center}.bottom-status span{display:flex;align-items:center;gap:5px}.status-dot{height:5px;width:5px;background:#84d87a;border-radius:50%}
 .inspector{background:#0d131c;border-left:1px solid var(--line);min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:#303a4a transparent}.inspector-head{height:59px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;background:#0d131cf5;z-index:5}.inspector-title{font-size:12px;font-weight:800}.inspector-kicker{font:9px 'DM Mono',monospace;color:#77869a;letter-spacing:1px;margin-top:4px}.inspector-content{padding:15px 15px 22px}.selected-summary{display:flex;align-items:center;gap:11px;padding:11px;border:1px solid #2d394b;background:#141d29;border-radius:10px}.selected-thumb{width:42px;height:42px;border-radius:8px;background:linear-gradient(145deg,#384958,#18212c);display:grid;place-items:center;font-size:22px}.selected-title{font-size:11px;font-weight:800}.selected-type{font:9px 'DM Mono',monospace;color:#8291a5;margin-top:4px}.selected-status{margin-left:auto;align-self:flex-start;border:1px solid #455442;border-radius:4px;padding:3px 5px;font:8px 'DM Mono',monospace;color:var(--accent);text-transform:uppercase}.prop-section{margin-top:20px}.prop-title{display:flex;align-items:center;justify-content:space-between;font-size:10px;font-weight:800;letter-spacing:1.1px;color:#bac5d4;text-transform:uppercase;margin-bottom:13px}.prop-title button{border:0;background:transparent;color:#8492a6;font:9px 'DM Mono',monospace}.prop-row{margin-bottom:14px}.prop-label{display:flex;justify-content:space-between;align-items:center;color:#8c9aae;font-size:10px;margin-bottom:8px}.prop-label strong{color:#dbe4ef;font:10px 'DM Mono',monospace;font-weight:400}.axis-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.axis-field label{height:31px;border:1px solid #2b3748;border-radius:6px;background:#131c28;display:flex;align-items:center;gap:6px;padding:0 7px;color:#9dabc0;font:9px 'DM Mono',monospace}.axis-field input{border:0;outline:0;background:transparent;color:#e0e7f0;min-width:0;width:100%;font:10px 'DM Mono',monospace}.axis-field.x label{border-color:#7e4445}.axis-field.y label{border-color:#436747}.axis-field.z label{border-color:#405f87}.range-line{display:flex;align-items:center;gap:10px}.range-line input[type=range]{width:100%;accent-color:var(--accent);height:4px}.range-val{font:10px 'DM Mono',monospace;min-width:32px;text-align:right;color:#d5dfeb}.color-row{display:flex;gap:8px;flex-wrap:wrap}.swatch{height:25px;width:25px;border-radius:7px;border:2px solid transparent;outline:1px solid transparent;transition:.15s}.swatch:hover{transform:scale(1.08)}.swatch.active{border-color:#111721;outline-color:var(--accent)}.custom-color{width:29px;height:29px;padding:0;border:1px solid #3b485a;border-radius:7px;background:transparent;overflow:hidden}.custom-color input{width:38px;height:36px;margin:-4px;border:0;padding:0;cursor:pointer;background:transparent}.select-control{width:100%;height:35px;border:1px solid #2c394b;background:#131c28;border-radius:7px;padding:0 9px;color:#d7e0ec;font-size:10px}.toggle-row{display:flex;align-items:center;justify-content:space-between;color:#8f9db0;font-size:10px;margin:13px 0}.switch{height:18px;width:31px;border-radius:20px;background:#303b4d;border:1px solid #46546a;padding:2px;transition:.15s}.switch:after{content:'';height:12px;width:12px;border-radius:50%;background:#9aa8bc;display:block;transition:.15s}.switch.on{background:#4f6a29;border-color:#849e4f}.switch.on:after{transform:translateX(12px);background:var(--accent)}.inspector-note{padding:10px 11px;border:1px solid #293547;background:#111a26;border-radius:8px;color:#8291a4;font-size:9px;line-height:1.6;margin-top:18px}.inspector-note b{color:#c6d0de;font-weight:700}.inspector-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:14px}.inspector-actions button{font-size:10px;height:33px;justify-content:center}.toast{position:fixed;bottom:26px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:30;border:1px solid #44523d;background:#182319;color:#d9f8bd;border-radius:9px;padding:11px 16px;box-shadow:0 12px 32px #0008;font-size:11px;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}.mobile-inspector-toggle{display:none}.export-wrap{position:relative}.export-menu{display:none;position:absolute;right:0;top:41px;background:#131c28;border:1px solid #374358;border-radius:9px;padding:5px;min-width:160px;box-shadow:0 12px 40px #0008;z-index:20}.export-menu.open{display:block}.export-option{width:100%;border:0;background:transparent;text-align:left;border-radius:6px;padding:9px;font-size:11px;color:#cad4e1}.export-option:hover{background:#253041;color:var(--accent)}.export-option small{display:block;margin-top:3px;color:#8190a4;font-size:9px}
 @media(max-width:1180px){.app{grid-template-columns:214px minmax(0,1fr)}.studio-grid{grid-template-columns:minmax(0,1fr) 252px}.sidebar{font-size:12px}.category-card{min-height:72px;padding:8px}.topbar{padding:0 14px}.crumbs{display:none}.canvas-column{padding:11px}}
@@ -108,7 +120,16 @@ body{background:#f5f7fa;color:#182235}
       <button class="category-card" data-type="speaker"><span class="cat-icon">◉</span><span><span class="cat-title">Sonido</span><span class="cat-sub">Altavoces y equipos</span></span></button>
       <button class="category-card" data-type="watch"><span class="cat-icon">◷</span><span><span class="cat-title">Wearables</span><span class="cat-sub">Relojes y accesorios</span></span></button>
     </div>
-    <div class="section-title">Formas rápidas</div>
+    <div class="section-title">Arquitectura · grandes estructuras</div>
+    <div class="category-grid architecture-grid">
+      <button class="category-card" data-type="mansion"><span class="cat-icon">⌂</span><span><span class="cat-title">Mansión</span><span class="cat-sub">Dos plantas y jardín</span></span></button>
+      <button class="category-card" data-type="skyscraper"><span class="cat-icon">▥</span><span><span class="cat-title">Rascacielos</span><span class="cat-sub">Torre de varios pisos</span></span></button>
+      <button class="category-card" data-type="castle"><span class="cat-icon">♜</span><span><span class="cat-title">Castillo</span><span class="cat-sub">Torres redondas y arcos</span></span></button>
+      <button class="category-card" data-type="villa"><span class="cat-icon">⌂</span><span><span class="cat-title">Villa moderna</span><span class="cat-sub">Vidrio y terrazas</span></span></button>
+      <button class="category-card" data-type="pavilion"><span class="cat-icon">◠</span><span><span class="cat-title">Pabellón</span><span class="cat-sub">Columnas y cúpula</span></span></button>
+      <button class="category-card" data-type="bridge"><span class="cat-icon">⌒</span><span><span class="cat-title">Puente</span><span class="cat-sub">Arcos estructurales</span></span></button>
+    </div>
+    <div class="section-title">Formas rápidas · curvas y sólidos</div>
     <button class="nav-item" data-type="phone"><span class="nav-icon">▯</span> Smartphone</button>
     <button class="nav-item" data-type="lamp"><span class="nav-icon">♧</span> Lámpara de diseño</button>
     <button class="nav-item" data-type="bottle"><span class="nav-icon">♙</span> Botella</button>
@@ -121,6 +142,20 @@ body{background:#f5f7fa;color:#182235}
     <button class="nav-item" data-type="speaker"><span class="nav-icon">◉</span> Altavoz</button>
     <button class="nav-item" data-type="watch"><span class="nav-icon">◷</span> Reloj inteligente</button>
     <button class="nav-item" data-type="spaceship"><span class="nav-icon">✦</span> Nave futurista</button>
+    <button class="nav-item" data-type="sphere"><span class="nav-icon">◉</span> Esfera suave</button>
+    <button class="nav-item" data-type="torus"><span class="nav-icon">◎</span> Anillo toroidal</button>
+    <button class="nav-item" data-type="cone"><span class="nav-icon">△</span> Cono</button>
+    <button class="nav-item" data-type="cylinder"><span class="nav-icon">◯</span> Cilindro</button>
+    <button class="nav-item" data-type="capsule"><span class="nav-icon">▱</span> Cápsula redondeada</button>
+    <button class="nav-item" data-type="knot"><span class="nav-icon">∞</span> Nudo orgánico</button>
+    <div class="phase-board">
+      <div class="phase-board-title">FASES DE DESARROLLO <span>02 / 05</span></div>
+      <div class="phase-row done"><span class="phase-num">✓</span><div><b>01 · Editor base</b><small>Visor, materiales y exportación</small></div></div>
+      <div class="phase-row current"><span class="phase-num">02</span><div><b>02 · Formas y arquitectura</b><small>En desarrollo en esta versión</small></div></div>
+      <div class="phase-row"><span class="phase-num">03</span><div><b>03 · Composición</b><small>Construir escenas pieza por pieza</small></div></div>
+      <div class="phase-row"><span class="phase-num">04</span><div><b>04 · Medidas y planos</b><small>Escala, cotas y vistas técnicas</small></div></div>
+      <div class="phase-row"><span class="phase-num">05</span><div><b>05 · IA generativa</b><small>Crear modelos a partir de texto</small></div></div>
+    </div>
     <div class="side-tip"><div class="tip-top"><span class="tip-light"></span> Tu lienzo, tus reglas</div><p>Elegí una base, cambiá sus materiales y proporciones, y orbitá la cámara para verla desde cualquier ángulo.</p></div>
   </div>
   <div class="side-foot"><div class="avatar">N</div><div><div class="foot-name">Creative mode</div><div class="foot-status">Proyecto local</div></div><span class="foot-dot"></span></div>
@@ -257,7 +292,18 @@ const meta = {
   sofa:{name:'Sofá modular',icon:'▰',type:'MOBILIARIO · INTERIOR',tag:'Sofá · Concepto A'},
   vase:{name:'Jarrón de diseño',icon:'♙',type:'DECORACIÓN · OBJETO',tag:'Jarrón · Concepto A'},
   speaker:{name:'Altavoz de diseño',icon:'◉',type:'AUDIO · ELECTRÓNICA',tag:'Altavoz · Concepto A'},
-  watch:{name:'Reloj inteligente',icon:'◷',type:'WEARABLE · PRODUCTO',tag:'Reloj · Concepto A'}
+  watch:{name:'Reloj inteligente',icon:'◷',type:'WEARABLE · PRODUCTO',tag:'Reloj · Concepto A'},
+  mansion:{name:'Mansión clásica',icon:'⌂',type:'ARQUITECTURA · RESIDENCIAL',tag:'Mansión · 2 plantas'},
+  skyscraper:{name:'Rascacielos moderno',icon:'▥',type:'ARQUITECTURA · EDIFICIO',tag:'Torre · Varios niveles'},
+  castle:{name:'Castillo con torres',icon:'♜',type:'ARQUITECTURA · HISTÓRICA',tag:'Castillo · Concepto'},
+  villa:{name:'Villa contemporánea',icon:'⌂',type:'ARQUITECTURA · RESIDENCIAL',tag:'Villa · Moderna'},
+  pavilion:{name:'Pabellón con cúpula',icon:'◠',type:'ARQUITECTURA · ESTRUCTURA',tag:'Pabellón · Cúpula'},
+  bridge:{name:'Puente arqueado',icon:'⌒',type:'INGENIERÍA · ESTRUCTURA',tag:'Puente · Arcos'},
+  torus:{name:'Anillo toroidal',icon:'◎',type:'FORMA ORGÁNICA · 3D',tag:'Forma · Toroide'},
+  cone:{name:'Cono',icon:'△',type:'SÓLIDO GEOMÉTRICO · 3D',tag:'Forma · Cono'},
+  cylinder:{name:'Cilindro',icon:'◯',type:'SÓLIDO GEOMÉTRICO · 3D',tag:'Forma · Cilindro'},
+  capsule:{name:'Cápsula redondeada',icon:'▱',type:'FORMA ORGÁNICA · 3D',tag:'Forma · Cápsula'},
+  knot:{name:'Nudo orgánico',icon:'∞',type:'FORMA ORGÁNICA · 3D',tag:'Forma · Nudo'}
 };
 const materialSettings = {
   matte:{roughness:.82,metalness:.04},
@@ -494,9 +540,190 @@ function addWatch(g) {
   addMesh(g,new THREE.BoxGeometry(.13,.025,.015),'#d9e4ef',[0,.94,.096],[1,1,1],[0,0,0],false);
   cyl(g,dark,[.27,.94,0],.045,.045,.12,16,false,[0,0,Math.PI/2]);
 }
+function addArchWindow(g,x,y,z,w,h,frameColor='#f0f2f5',glassColor='#7fa6c4',mullions=true) {
+  const radius=w/2;
+  const shoulder=Math.max(h-radius,.05);
+  const shape=new THREE.Shape();
+  shape.moveTo(-radius,0);
+  shape.lineTo(radius,0);
+  shape.lineTo(radius,shoulder);
+  shape.absarc(0,shoulder,radius,0,Math.PI,false);
+  shape.lineTo(-radius,0);
+  shape.closePath();
+  const pane=addMesh(g,new THREE.ShapeGeometry(shape,24),glassColor,[x,y,z],[1,1,1],[0,0,0],false,{roughness:.22,metalness:.28,side:THREE.DoubleSide});
+  pane.material.side=THREE.DoubleSide;
+  box(g,frameColor,[x-radius-.015,y+shoulder/2,z+.025],[.04,shoulder,.045],false);
+  box(g,frameColor,[x+radius+.015,y+shoulder/2,z+.025],[.04,shoulder,.045],false);
+  box(g,frameColor,[x,y+.018,z+.025],[w+.06,.045,.05],false);
+  const points=[];
+  for(let i=0;i<=20;i++){const a=Math.PI*i/20;points.push([x+radius*Math.cos(a),y+shoulder+radius*Math.sin(a),z+.025]);}
+  tube(g,frameColor,points,.027,false);
+  if(mullions){
+    box(g,frameColor,[x,y+shoulder*.52,z+.045],[.022,shoulder,.025],false);
+    box(g,frameColor,[x,y+shoulder*.55,z+.045],[w,.022,.025],false);
+  }
+}
+function addGableRoof(g,color,x,y,z,w,d,h) {
+  const v=[
+    -w/2,0,-d/2, 0,h,-d/2, 0,h,d/2,
+    -w/2,0,-d/2, 0,h,d/2, -w/2,0,d/2,
+    0,h,-d/2, w/2,0,-d/2, w/2,0,d/2,
+    0,h,-d/2, w/2,0,d/2, 0,h,d/2
+  ];
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.Float32BufferAttribute(v,3));
+  geo.computeVertexNormals();
+  const roof=addMesh(g,geo,color,[x,y,z],[1,1,1],[0,0,0],false,{roughness:.66,metalness:.04,side:THREE.DoubleSide});
+  roof.material.side=THREE.DoubleSide;
+  roof.castShadow=true;roof.receiveShadow=true;
+  return roof;
+}
+function addGableEnd(g,color,x,y,z,w,h) {
+  const shape=new THREE.Shape();
+  shape.moveTo(-w/2,0);shape.lineTo(w/2,0);shape.lineTo(0,h);shape.closePath();
+  const end=addMesh(g,new THREE.ShapeGeometry(shape),color,[x,y,z],[1,1,1],[0,0,0],true,{roughness:.78,side:THREE.DoubleSide});
+  end.material.side=THREE.DoubleSide;
+  return end;
+}
+function addMansion(g) {
+  const wall=currentColor, roof='#596779', trim='#f1f3f5', stone='#c6ced7', glass='#78a2c1';
+  box(g,stone,[0,.19,0],[6.05,.24,3.55],false);
+  box(g,wall,[0,1.23,0],[4.35,2.02,2.38],true,{roughness:.78});
+  box(g,wall,[-2.37,.91,0],[1.48,1.36,2.48],true,{roughness:.82});
+  box(g,wall,[2.37,.91,0],[1.48,1.36,2.48],true,{roughness:.82});
+  box(g,wall,[0,2.65,-.03],[3.12,1.08,1.98],true,{roughness:.75});
+  addGableRoof(g,roof,0,3.12,-.03,3.5,2.28,.93);
+  addGableRoof(g,roof,-2.37,1.55,0,1.78,2.55,.72);
+  addGableRoof(g,roof,2.37,1.55,0,1.78,2.55,.72);
+  addGableEnd(g,wall,0,3.12,1.105,3.5,.93);
+  addGableEnd(g,wall,0,3.12,-1.17,3.5,.93);
+  addGableEnd(g,wall,-2.37,1.55,1.29,1.78,.72);
+  addGableEnd(g,wall,2.37,1.55,1.29,1.78,.72);
+  [-1.4,1.4].forEach(x=>addArchWindow(g,x,.67,1.205,.61,.91,trim,glass,true));
+  [-.82,0,.82].forEach(x=>addArchWindow(g,x,2.22,1.005,.49,.7,trim,glass,true));
+  addArchWindow(g,0,.32,1.225,.68,1.33,'#f4f0e8','#624b3e',false);
+  [-2.37,2.37].forEach(x=>addArchWindow(g,x,.49,1.255,.43,.78,trim,glass,false));
+  box(g,'#e5e9ef',[0,1.83,1.53],[1.72,.14,.62],false);
+  [-.67,.67].forEach(x=>cyl(g,trim,[x,1.03,1.65],.105,.12,1.45,24,false));
+  box(g,trim,[0,1.92,1.63],[1.9,.13,.67],false);
+  box(g,stone,[0,.105,1.82],[1.5,.12,.42],false);
+  box(g,stone,[0,.19,1.62],[1.36,.12,.28],false);
+  box(g,stone,[0,.27,1.45],[1.22,.1,.2],false);
+  [-2.65,2.65].forEach(x=>{
+    addMesh(g,new THREE.SphereGeometry(.34,24,16),'#769777',[x,.47,1.12],[1,1,.82],[0,0,0],false,{roughness:.95});
+    cyl(g,'#7e9477',[x,.26,1.12],.13,.13,.24,16,false);
+  });
+  [-1.1,1.1].forEach(x=>box(g,'#e0c99d',[x,.29,1.43],[.11,.18,.1],false));
+}
+function addSkyscraper(g) {
+  const glass=currentColor, frame='#dce5ed', dark='#63758a';
+  cyl(g,'#c7d0db',[0,.18,0],1.62,1.62,.28,64,false);
+  cyl(g,'#e7ecf2',[0,.36,0],1.42,1.42,.09,64,false);
+  const height=5.65, baseY=.48, centerY=baseY+height/2;
+  const body=addMesh(g,new THREE.CylinderGeometry(.92,1.23,height,16,1,false),glass,[0,centerY,0],[1,1,1],[0,0,0],true,{roughness:.24,metalness:.35,side:THREE.DoubleSide});
+  body.material.side=THREE.DoubleSide;
+  for(let level=0;level<10;level++){
+    const y=baseY+.24+level*.53;
+    const r=1.20-level*.027;
+    cyl(g,frame,[0,y,0],r,r,.045,32,false,{roughness:.5});
+    for(let i=0;i<12;i++){
+      const a=(Math.PI*2*i)/12;
+      const wx=Math.sin(a)*(r+.008), wz=Math.cos(a)*(r+.008);
+      const win=box(g,'#98c1d8',[wx,y+.16,wz],[.19,.31,.035],false,{roughness:.18,metalness:.26});
+      win.rotation.y=a;
+      const beam=box(g,frame,[Math.sin(a)*(r-.015),centerY,Math.cos(a)*(r-.015)],[.035,height,.04],false,{roughness:.48});
+      beam.rotation.y=a;
+    }
+  }
+  cyl(g,dark,[0,baseY+height,0],.98,.98,.1,32,false);
+  const dome=addMesh(g,new THREE.SphereGeometry(.9,48,24,0,Math.PI*2,0,Math.PI/2),glass,[0,baseY+height+.05,0],[1,.72,1],[0,0,0],true,{roughness:.2,metalness:.3,side:THREE.DoubleSide});
+  dome.material.side=THREE.DoubleSide;
+  cyl(g,'#b7e85b',[0,baseY+height+.68,0],.035,.035,.36,12,false);
+}
+function addCastle(g) {
+  const wall=currentColor, stone='#c0c8d2', roof='#536378', dark='#37475c', glass='#7ca4be';
+  box(g,stone,[0,.18,0],[4.45,.28,3.25],false);
+  box(g,wall,[0,1.3,-.02],[3.0,2.28,2.25],true,{roughness:.85});
+  box(g,wall,[0,2.48,1.12],[1.25,.35,.12],false);
+  addArchWindow(g,0,.29,1.12,.85,1.42,dark,'#283748',false);
+  [-.83,.83].forEach(x=>addArchWindow(g,x,1.38,1.12,.42,.72,stone,glass,false));
+  [-1.58,1.58].forEach(x=>[-1.08,1.08].forEach(z=>{
+    cyl(g,wall,[x,1.72,z],.43,.48,3.12,32,true);
+    cyl(g,stone,[x,3.32,z],.49,.49,.12,32,false);
+    addMesh(g,new THREE.ConeGeometry(.52,.82,32),roof,[x,3.78,z],[1,1,1],[0,0,0],false,{roughness:.58});
+    for(let i=0;i<8;i++){
+      const a=Math.PI*2*i/8;
+      box(g,stone,[x+.42*Math.cos(a),3.44,z+.42*Math.sin(a)],[.17,.22,.17],false);
+    }
+    addArchWindow(g,x,1.55,z+.43,.23,.5,stone,glass,false);
+  }));
+  for(let x=-1.22;x<=1.23;x+=.4)box(g,stone,[x,2.54,1.16],[.19,.26,.22],false);
+  for(let z=-.84;z<=.86;z+=.43)box(g,stone,[1.55,2.54,z],[.22,.26,.19],false);
+  for(let z=-.84;z<=.86;z+=.43)box(g,stone,[-1.55,2.54,z],[.22,.26,.19],false);
+}
+function addVilla(g) {
+  const wall=currentColor, glass='#8db7cf', trim='#f2f5f8', concrete='#bbc6d0';
+  box(g,concrete,[0,.18,0],[4.55,.22,3.2],false);
+  box(g,wall,[0,1.08,-.04],[3.85,1.65,2.25],true,{roughness:.75});
+  box(g,wall,[1.35,.91,.56],[1.1,1.32,1.22],true,{roughness:.72});
+  box(g,'#eef2f5',[0,1.98,-.04],[4.22,.15,2.68],false);
+  box(g,'#d4dde6',[0,2.09,-.04],[3.8,.08,2.3],false);
+  addArchWindow(g,-.82,.38,1.095,.9,1.33,trim,glass,true);
+  addArchWindow(g,.25,.38,1.095,.9,1.33,trim,glass,true);
+  addArchWindow(g,1.35,.38,1.185,.42,1.02,trim,glass,false);
+  [-1.45,-.78,-.1,.57].forEach(x=>{
+    cyl(g,trim,[x,1.0,1.38],.045,.045,1.4,16,false);
+  });
+  box(g,trim,[-.44,1.72,1.39],[2.3,.1,.2],false);
+  const sunroom=addMesh(g,new THREE.SphereGeometry(.77,32,24,0,Math.PI*2,0,Math.PI/2),glass,[1.15,1.02,-.3],[1.05,.72,.88],[0,0,0],false,{roughness:.24,metalness:.28,side:THREE.DoubleSide});
+  sunroom.material.side=THREE.DoubleSide;
+  [-1.5,1.5].forEach(x=>addMesh(g,new THREE.SphereGeometry(.3,22,15),'#82a27c',[x,.39,1.25],[1,.9,1],[0,0,0],false,{roughness:.95}));
+}
+function addPavilion(g) {
+  const roof='#718095', trim='#ecf0f5', glass=currentColor;
+  cyl(g,'#c6d0dc',[0,.12,0],1.85,1.85,.22,64,false);
+  cyl(g,'#f1f3f6',[0,.26,0],1.65,1.65,.08,64,false);
+  const count=10;
+  for(let i=0;i<count;i++){
+    const a=i*Math.PI*2/count;
+    const x=1.37*Math.cos(a),z=1.37*Math.sin(a);
+    cyl(g,trim,[x,1.25,z],.095,.12,1.93,24,false);
+    cyl(g,'#cad3dd',[x,.32,z],.16,.16,.12,24,false);
+  }
+  cyl(g,roof,[0,2.22,0],1.62,1.62,.18,64,false);
+  const dome=addMesh(g,new THREE.SphereGeometry(1.6,64,28,0,Math.PI*2,0,Math.PI/2),glass,[0,2.25,0],[1,.74,1],[0,0,0],true,{roughness:.3,metalness:.25,side:THREE.DoubleSide});
+  dome.material.side=THREE.DoubleSide;
+  cyl(g,trim,[0,3.45,0],.16,.16,.1,24,false);
+}
+function addBridge(g) {
+  const deck=currentColor, rail='#d9e1e9', support='#718196';
+  box(g,deck,[0,1.02,0],[5.2,.2,.72],true,{roughness:.58});
+  for(const z of [-.32,.32]){
+    const pts=[];
+    for(let i=0;i<=20;i++){const x=-2.5+i*.25;pts.push([x,1.32+.12*Math.cos(x/2.5*Math.PI),z]);}
+    tube(g,rail,pts,.035,false);
+    for(let i=0;i<=10;i++){
+      const x=-2.45+i*.49;const y=1.18+.12*Math.cos(x/2.5*Math.PI);
+      cyl(g,rail,[x,y,z],.025,.025,.3,10,false);
+    }
+  }
+  const arch1=[],arch2=[];
+  for(let i=0;i<=32;i++){const x=-2.35+i*(4.7/32);const y=.18+1.2*Math.sin(i/32*Math.PI);arch1.push([x,y,-.21]);arch2.push([x,y,.21]);}
+  tube(g,support,arch1,.085,false);tube(g,support,arch2,.085,false);
+  for(let i=2;i<31;i+=3){
+    const p=arch1[i];box(g,support,[p[0],p[1]+.14,-.21],[.055,1.02-p[1]+.08,.055],false);
+    const q=arch2[i];box(g,support,[q[0],q[1]+.14,.21],[.055,1.02-q[1]+.08,.055],false);
+  }
+  for(const x of [-2.45,2.45])cyl(g,'#9aa8b8',[x,.42,0],.16,.18,.75,20,false);
+}
 function addPrimitive(g,type) {
   if(type==='cube') addMesh(g,new THREE.BoxGeometry(1.4,1.4,1.4),currentColor,[0,.72,0],[1,1,1],[0,0,0],true,{metalness:.22,roughness:.32});
   if(type==='sphere') addMesh(g,new THREE.SphereGeometry(.83,64,48),currentColor,[0,.83,0],[1,1,1],[0,0,0],true,{metalness:.22,roughness:.25});
+  if(type==='torus') addMesh(g,new THREE.TorusGeometry(.68,.2,24,72),currentColor,[0,.9,0],[1,1,1],[Math.PI/2,0,0],true,{metalness:.22,roughness:.25});
+  if(type==='cone') addMesh(g,new THREE.ConeGeometry(.72,1.55,64),currentColor,[0,.8,0],[1,1,1],[0,0,0],true,{metalness:.18,roughness:.4});
+  if(type==='cylinder') addMesh(g,new THREE.CylinderGeometry(.65,.65,1.55,64),currentColor,[0,.8,0],[1,1,1],[0,0,0],true,{metalness:.2,roughness:.35});
+  if(type==='capsule') addMesh(g,new THREE.CapsuleGeometry(.43,.7,8,32),currentColor,[0,.86,0],[1,1,1],[0,0,0],true,{metalness:.2,roughness:.3});
+  if(type==='knot') addMesh(g,new THREE.TorusKnotGeometry(.57,.17,160,24,2,3),currentColor,[0,.95,0],[1,1,1],[0,0,0],true,{metalness:.32,roughness:.22});
 }
 function build(type,g) {
   if(type==='headphones') addHeadphones(g);
@@ -516,6 +743,12 @@ function build(type,g) {
   else if(type==='vase') addVase(g);
   else if(type==='speaker') addSpeaker(g);
   else if(type==='watch') addWatch(g);
+  else if(type==='mansion') addMansion(g);
+  else if(type==='skyscraper') addSkyscraper(g);
+  else if(type==='castle') addCastle(g);
+  else if(type==='villa') addVilla(g);
+  else if(type==='pavilion') addPavilion(g);
+  else if(type==='bridge') addBridge(g);
   else addPrimitive(g,type);
 }
 function applyPrimaryMaterial(root) {
@@ -738,7 +971,13 @@ function handlePrompt() {
   if(!raw){$('promptInput').focus();toast('Escribí una idea para empezar.');return;}
   const text=raw.toLowerCase();
   let type='headphones';
-  if(/habitaci|casa|sal[oó]n|interior|dormitorio|cocina|decoraci|hogar/.test(text)) type='room';
+  if(/mans[ií]on|mansión|residencia enorme|palacete/.test(text)) type='mansion';
+  else if(/rascacielos|edificio|torre de oficinas|skyscraper/.test(text))type='skyscraper';
+  else if(/castillo|fortaleza/.test(text))type='castle';
+  else if(/villa moderna|villa contempor[aá]nea/.test(text))type='villa';
+  else if(/pabell[oó]n|gazebo|c[uú]pula/.test(text))type='pavilion';
+  else if(/puente|pasarela/.test(text))type='bridge';
+  else if(/habitaci|casa|sal[oó]n|interior|dormitorio|cocina|decoraci|hogar/.test(text)) type='room';
   else if(/cohete|rocket|espacial|orbita/.test(text))type='rocket';
   else if(/avi[oó]n|avion|aeronave|aircraft|jet/.test(text))type='plane';
   else if(/sill[oó]n|sillon|silla|butaca|sof[aá]|chair/.test(text))type='chair';
@@ -754,6 +993,11 @@ function handlePrompt() {
   else if(/jarr[oó]n|florero|vase/.test(text))type='vase';
   else if(/altavoz|parlante|bocina|speaker/.test(text))type='speaker';
   else if(/reloj|smartwatch|wearable/.test(text))type='watch';
+  else if(/anillo|toroide|torus/.test(text))type='torus';
+  else if(/c[aá]psula|capsule/.test(text))type='capsule';
+  else if(/cono|cone/.test(text))type='cone';
+  else if(/cilindro|cylinder/.test(text))type='cylinder';
+  else if(/nudo|knot/.test(text))type='knot';
   else if(/esfera|bola|sphere/.test(text))type='sphere';
   else if(/cubo|bloque|caja|cube/.test(text))type='cube';
   $('projectName').value=raw.length>42?raw.slice(0,42)+'…':raw.charAt(0).toUpperCase()+raw.slice(1);
