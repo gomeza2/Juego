@@ -121,6 +121,70 @@ body{background:#f5f7fa;color:#182235}
 #addModeBtn.active{background:#edf5df;border-color:#c5dfa0;color:#4d7815}
 #dimensionsBtn.active{background:#edf3ff;border-color:#b9d2f3;color:#315f9e}
 @media(max-width:760px){.viewport-label{display:none}.canvas-toolbar{height:auto;flex-wrap:wrap}.view-tools{margin-left:auto}.tool-group{flex-wrap:wrap}.view-tools select{width:108px!important}.view-tools #unitsSelect{width:62px!important}.dimension-label{font-size:9px;padding:4px 5px}}
+
+/* Fase 5: espacio de trabajo claro y controles de precisión */
+:root{color-scheme:light;--bg:#f4f7fb;--panel:#fff;--panel2:#f7f9fc;--line:#dce4ee;--muted:#68788e;--text:#1d293b;--accent:#b4e36a;--accent2:#8dbf3f;--blue:#3977d6}
+body,.main{background:#f4f7fb!important;color:#1d293b}
+.sidebar,.inspector{background:#fff!important;color:#1d293b;border-color:#dce4ee!important}
+.brand,.topbar,.toolbar,.bottom-bar,.inspector-head{border-color:#e0e6ef!important}
+.brand-sub,.side-section-title,.crumbs,.tiny-save,.inspector-kicker,.selected-type,.prop-label,.prompt-hint,.cat-sub{color:#78869a!important}
+.side-scroll{scrollbar-color:#d7e0eb transparent}
+.nav-item,.category-card,.scene-object-select,.scene-object-eye{color:#526176!important}
+.nav-item:hover,.nav-item.active,.nav-item:focus-visible{background:#f0f5e9!important;color:#2e491c!important}
+.category-card{background:#fff!important;border-color:#e4e9f0!important}
+.category-card:hover,.category-card.selected{background:#f5faed!important;border-color:#cfe5af!important}
+.cat-title,.project-name input,.selected-title,.prop-title,.measure-grid strong{color:#243248!important}
+.project-name input{background:transparent!important}
+.btn,.icon-btn,.tool-btn,.export-option,.stage-bottom-right button{background:#fff!important;color:#3c4b60!important;border-color:#d7e0eb!important}
+.btn:hover,.icon-btn:hover,.tool-btn:hover,.export-option:hover,.stage-bottom-right button:hover{background:#f0f5fa!important;border-color:#c0cddd!important}
+.btn-primary{background:#b4e36a!important;color:#203117!important;border-color:#a6d75c!important}
+.btn-primary:hover{background:#a7d95a!important}
+.tool-btn.active,.nav-count{background:#eef7df!important;color:#456a22!important;border-color:#d4e9b9!important}
+.tool-line{background:#d9e1eb!important}
+.topbar,.toolbar,.bottom-bar{background:#fff!important;color:#253247!important}
+.stage{background:#eef2f7!important;border-color:#dce4ee!important}
+.stage:before{background-image:linear-gradient(rgba(110,130,155,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(110,130,155,.10) 1px,transparent 1px)!important}
+.stage:after{background:radial-gradient(ellipse at center,rgba(255,255,255,.12),rgba(226,233,242,.34))!important}
+.viewport-label,.viewport-tag,.view-pill{color:#738197!important;background:rgba(255,255,255,.82)!important;border-color:#dce4ee!important}
+.viewport-object{color:#26374d!important}
+.view-pill b{color:#4b6a32!important}
+.dimension-label{background:#fff!important;color:#2a3b51!important;border-color:#d5e0ec!important;box-shadow:0 3px 10px rgba(40,55,75,.08)!important}
+.stage-bottom-right button{box-shadow:0 3px 12px rgba(38,55,75,.08)!important}
+.prompt-bar{background:#fff!important;border-color:#dce4ee!important;box-shadow:0 8px 24px rgba(39,56,78,.06)!important}
+.prompt-copy input{color:#26364b!important}
+.prompt-copy input::placeholder{color:#93a0b0!important}
+.prompt-spark{color:#3b5f16!important}
+.bottom-bar{color:#77859a!important}
+.bottom-bar .bottom-status{color:#66778d!important}
+.inspector{border-left:1px solid #dce4ee!important}
+.selected-summary,.prop-section,.scene-object-row{border-color:#e4e9f0!important}
+.selected-thumb{background:#f1f6e8!important;color:#486a23!important;border-color:#dce9c8!important}
+.prop-title{color:#435269!important}
+.axis-field label{background:#f7f9fc!important;border-color:#dbe3ec!important;color:#65758b!important}
+.axis-field input{color:#24344a!important}
+.axis-field.x label{border-color:#e4b9b9!important}.axis-field.y label{border-color:#b9d9bb!important}.axis-field.z label{border-color:#b8cce9!important}
+.range-val{color:#43546b!important}
+.select-control,.axis-field input,.prompt-copy input{color-scheme:light}
+.select-control{background:#fff!important;color:#34445a!important;border-color:#d9e2ec!important}
+.scene-object-select.active{background:#f1f7e8!important;color:#34541d!important}
+.scene-object-eye{background:#f7f9fc!important;border-color:#dce4ee!important}
+.measure-grid>div{background:#f8fafc!important;border-color:#e0e7f0!important}
+.measure-grid small{color:#7b8ba0!important}
+.measure-grid strong{color:#26364b!important}
+.measure-note{color:#718198!important}
+.toggle-row{color:#4b5b70!important}
+.switch{background:#e5eaf1!important;border-color:#d2dbe7!important}
+.switch.on{background:#b4e36a!important;border-color:#a4d75b!important}
+.inspector-actions{background:linear-gradient(0deg,#fff 70%,rgba(255,255,255,0))!important}
+.export-menu{background:#fff!important;border-color:#dce4ee!important;box-shadow:0 12px 30px rgba(33,48,68,.12)!important}
+.export-option{border-color:#eef1f5!important}
+.export-option small{color:#7a899b!important}
+.toast{background:#253247!important;color:#fff!important;box-shadow:0 10px 26px rgba(33,48,68,.20)!important}
+.center-support-btn{width:100%;margin-top:9px}
+.rotation-fields{margin-top:10px}
+#snapBtn.active{background:#eef7df!important;color:#456a22!important;border-color:#cfe5af!important}
+@media(max-width:920px){.stage{background:#eef2f7!important}}
+
 </style>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}
@@ -224,7 +288,7 @@ body{background:#f5f7fa;color:#182235}
           <button class="tool-btn" id="gridBtn" title="Mostrar u ocultar la cuadrícula">▦ Cuadrícula</button>
           <button class="tool-btn" id="wireBtn" title="Alternar vista de malla">⌗ Malla</button>
           <button class="tool-btn" id="addModeBtn" title="Añadir los próximos modelos a la escena">＋ <span>Añadir piezas</span></button>
-          <button class="tool-btn" id="dimensionsBtn" title="Mostrar cotas del objeto">↔ Cotas</button>
+          <button class="tool-btn" id="dimensionsBtn" title="Mostrar cotas del objeto">↔ Cotas</button><button class="tool-btn" id="snapBtn" title="Ajustar posición a una cuadrícula de 0,5 m">⌗ Ajuste 0,5 m</button>
         </div>
         <div class="tool-group view-tools">
           <select class="select-control" id="viewSelect" aria-label="Vista de cámara" style="width:120px;height:31px"><option value="perspective">Perspectiva</option><option value="top">Superior / plano</option><option value="front">Frontal</option><option value="side">Lateral</option></select>
@@ -262,7 +326,7 @@ body{background:#f5f7fa;color:#182235}
         <div class="prop-section"><div class="prop-title">Transformación <button id="resetTransform">RESTABLECER</button></div>
           <div class="prop-row"><div class="prop-label"><span>Posición</span><strong>XYZ</strong></div><div class="axis-fields"><div class="axis-field x"><label>X <input id="posX" type="number" step=".1" value="0"></label></div><div class="axis-field y"><label>Y <input id="posY" type="number" step=".1" value="0"></label></div><div class="axis-field z"><label>Z <input id="posZ" type="number" step=".1" value="0"></label></div></div></div>
           <div class="prop-row"><div class="prop-label"><span>Escala</span><strong id="scaleReadout">1.00 ×</strong></div><div class="range-line"><input type="range" min=".35" max="2.5" step=".05" value="1" id="scaleRange"><span class="range-val" id="scaleValue">1.00</span></div></div>
-          <div class="prop-row"><div class="prop-label"><span>Rotación Y</span><strong id="rotationValue">0°</strong></div><div class="range-line"><input type="range" min="-180" max="180" step="5" value="0" id="rotationRange"><span class="range-val" id="rotationReadout">0°</span></div></div>
+          <div class="prop-row"><div class="prop-label"><span>Rotación Y</span><strong id="rotationValue">0°</strong></div><div class="range-line"><input type="range" min="-180" max="180" step="5" value="0" id="rotationRange"><span class="range-val" id="rotationReadout">0°</span></div><div class="axis-fields rotation-fields"><div class="axis-field x"><label>X° <input id="rotX" type="number" step="5" value="0" aria-label="Rotación eje X en grados"></label></div><div class="axis-field y"><label>Y° <input id="rotY" type="number" step="5" value="0" aria-label="Rotación eje Y en grados"></label></div><div class="axis-field z"><label>Z° <input id="rotZ" type="number" step="5" value="0" aria-label="Rotación eje Z en grados"></label></div></div><button class="btn center-support-btn" id="centerSupportBtn" type="button" title="Centrar en X/Z y apoyar la parte inferior en Y=0">Centrar y apoyar en el suelo</button></div>
         </div>
         <div class="prop-section">
           <div class="prop-title">Medidas y plano <span style="color:#748398;font:9px 'DM Mono',monospace">XYZ</span></div>
@@ -371,6 +435,8 @@ let lightLevel = .72;
 let highlightEnabled = true;
 let shadowsEnabled = true;
 let gridEnabled = true;
+let snapEnabled = false;
+const snapStep = 0.5;
 let wireEnabled = false;
 let toastTimer = null;
 let saveTimer = null;
@@ -1259,6 +1325,7 @@ function selectDesign(root) {
   $('scaleRange').value=scaleAvg;$('scaleValue').textContent=scaleAvg.toFixed(2);$('scaleReadout').textContent=scaleAvg.toFixed(2)+' ×';
   const deg=Math.round(THREE.MathUtils.radToDeg(root.rotation.y));
   $('rotationRange').value=deg;$('rotationValue').textContent=deg+'°';$('rotationReadout').textContent=deg+'°';
+  $('rotX').value=Math.round(THREE.MathUtils.radToDeg(root.rotation.x));$('rotY').value=deg;$('rotZ').value=Math.round(THREE.MathUtils.radToDeg(root.rotation.z));
   if(selectionHelper)scene.remove(selectionHelper);selectionHelper=null;
   if(highlightEnabled)makeHelper();
   const m=meta[currentType]||meta.group;
@@ -1461,7 +1528,7 @@ function snapshot() {
     scale:selected?[selected.scale.x,selected.scale.y,selected.scale.z]:[1,1,1],
     rotation:selected?[selected.rotation.x,selected.rotation.y,selected.rotation.z]:[0,0,0],
     objects:designObjects.map(serializeSceneNode),selectedIndex:Math.max(0,designObjects.indexOf(selected)),
-    grid:gridEnabled,shadows:shadowsEnabled,highlight:highlightEnabled,
+    grid:gridEnabled,snap:snapEnabled,shadows:shadowsEnabled,highlight:highlightEnabled,
     units:unitSystem,view:activeView,showDimensions,architecturalFloors
   };
 }
@@ -1480,8 +1547,8 @@ function applySnapshot(s) {
   $('dimensionOverlay').classList.toggle('active',showDimensions);
   $('lightRange').value=Math.round(lightLevel*100);$('lightValue').textContent=Math.round(lightLevel*100)+'%';$('lightReadout').textContent=Math.round(lightLevel*100)+'%';
   applyGraphicsQuality(s.quality||'high');
-  gridEnabled=s.grid!==false;shadowsEnabled=s.shadows!==false;highlightEnabled=s.highlight!==false;
-  grid.visible=gridEnabled;keyLight.castShadow=shadowsEnabled;
+  gridEnabled=s.grid!==false;snapEnabled=!!s.snap;shadowsEnabled=s.shadows!==false;highlightEnabled=s.highlight!==false;
+  $('snapBtn').classList.toggle('active',snapEnabled);grid.visible=gridEnabled;keyLight.castShadow=shadowsEnabled;
   $('gridSwitch').classList.toggle('on',gridEnabled);$('shadowSwitch').classList.toggle('on',shadowsEnabled);$('highlightSwitch').classList.toggle('on',highlightEnabled);
   clearModels();groupSelection.clear();
   if(Array.isArray(s.objects)&&s.objects.length){
@@ -1533,8 +1600,29 @@ function setPositionFromInputs() {
   if(!selected)return;
   pushHistory();
   const factor=unitFactors[unitSystem]||1;
-  selected.position.set((parseFloat($('posX').value)||0)/factor,(parseFloat($('posY').value)||0)/factor,(parseFloat($('posZ').value)||0)/factor);
+  let x=(parseFloat($('posX').value)||0)/factor,y=(parseFloat($('posY').value)||0)/factor,z=(parseFloat($('posZ').value)||0)/factor;
+  if(snapEnabled){x=Math.round(x/snapStep)*snapStep;y=Math.round(y/snapStep)*snapStep;z=Math.round(z/snapStep)*snapStep;}
+  selected.position.set(x,y,z);
+  const shown=[x,y,z].map(v=>(v*factor).toFixed(2));$('posX').value=shown[0];$('posY').value=shown[1];$('posZ').value=shown[2];
   if(selectionHelper)selectionHelper.update();updateDimensions();persist();
+}
+function setRotationFromInputs() {
+  if(!selected)return;
+  pushHistory();
+  const values=['rotX','rotY','rotZ'].map(id=>{const value=parseFloat($(id).value);return THREE.MathUtils.degToRad(Number.isFinite(value)?value:0);});
+  selected.rotation.set(values[0],values[1],values[2]);
+  const y=Math.round(THREE.MathUtils.radToDeg(selected.rotation.y));$('rotationRange').value=THREE.MathUtils.clamp(y,-180,180);$('rotationValue').textContent=y+'°';$('rotationReadout').textContent=y+'°';
+  if(selectionHelper)selectionHelper.update();updateDimensions();persist();
+}
+function centerAndSupportSelected() {
+  if(!selected)return;
+  pushHistory();selected.updateMatrixWorld(true);
+  const bounds=new THREE.Box3().setFromObject(selected);
+  if(bounds.isEmpty()){toast('Este objeto no tiene volumen para ajustar.');return;}
+  const center=bounds.getCenter(new THREE.Vector3());
+  selected.position.x-=center.x;selected.position.z-=center.z;selected.position.y-=bounds.min.y;
+  selectDesign(selected);if(selectionHelper)selectionHelper.update();updateDimensions();persist();
+  toast('Objeto centrado en X/Z y apoyado en Y = 0.');
 }
 function downloadBlob(blob,filename) {
   const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200);
@@ -1901,7 +1989,7 @@ async function restoreGeneratedAsset(root,key) {
     const gltf=await new Promise((resolve,reject)=>loader.parse(bytes,'',resolve,reject));
     if(!root.parent)return;
     attachGeneratedGLTF(root,gltf);
-    if(selected){if(selectionHelper)selectionHelper.update();updateDimensions();focusModel();}
+    if(root===selected){if(selectionHelper)selectionHelper.update();updateDimensions();focusModel();}
     persist();
   }catch(error){console.warn('Could not restore generated asset:',error);toast('No se pudo restaurar un modelo IA guardado.');}
 }
@@ -2036,11 +2124,18 @@ $('scaleRange').addEventListener('change',e=>{e.target.dataset.historyStarted='0
 $('rotationRange').addEventListener('input',e=>{
   if(!selected)return;
   if(e.target.dataset.historyStarted!=='1'){pushHistory();e.target.dataset.historyStarted='1';}
-  const d=parseInt(e.target.value,10)||0;selected.rotation.y=THREE.MathUtils.degToRad(d);
+  const d=parseInt(e.target.value,10)||0;selected.rotation.y=THREE.MathUtils.degToRad(d);$('rotY').value=d;
   $('rotationValue').textContent=d+'°';$('rotationReadout').textContent=d+'°';
   if(selectionHelper)selectionHelper.update();updateDimensions();persist();
 });
 $('rotationRange').addEventListener('change',e=>{e.target.dataset.historyStarted='0';});
+['rotX','rotY','rotZ'].forEach(id=>$(id).addEventListener('change',setRotationFromInputs));
+$('centerSupportBtn').addEventListener('click',centerAndSupportSelected);
+$('snapBtn').addEventListener('click',()=>{
+  snapEnabled=!snapEnabled;$('snapBtn').classList.toggle('active',snapEnabled);
+  if(snapEnabled&&selected)setPositionFromInputs();else persist();
+  toast(snapEnabled?'Ajuste a cuadrícula activado: pasos de 0,5 m.':'Ajuste a cuadrícula desactivado.');
+});
 $('resetTransform').addEventListener('click',()=>{
   if(!selected)return;pushHistory();selected.position.set(0,0,0);selected.scale.set(1,1,1);selected.rotation.set(0,0,0);selectDesign(selected);updateDimensions();persist();toast('Transformación restablecida.');
 });
@@ -2111,7 +2206,7 @@ try {
   if(stored){const s=JSON.parse(stored);if(s&&s.type&&meta[s.type]){currentColor=s.color||'#c8ff57';currentMaterial=s.material||'matte';applySnapshot(s);restored=true;}}
 } catch(e) {console.warn('No se pudo restaurar el proyecto local.',e);}
 if(!restored)createDesign('headphones',{skipHistory:true});
-$('gridBtn').classList.toggle('active',gridEnabled);
+$('gridBtn').classList.toggle('active',gridEnabled);$('snapBtn').classList.toggle('active',snapEnabled);
 updateSwatches();
 </script>
 </body>
