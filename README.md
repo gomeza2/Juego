@@ -69,6 +69,13 @@ El backend está en `api/ai3d.js`. El código de acceso evita que el endpoint qu
 
 Si el endpoint no está configurado, el asistente local y todas las herramientas de modelado siguen disponibles; no se simula una respuesta de IA.
 
+### Fase 8 · Composición avanzada de escenas — implementada
+- Seleccioná piezas con las casillas de la jerarquía y alineá sus bordes iniciales, centros o bordes finales.
+- Elegí el eje X, Y o Z para que la alineación sirva tanto para objetos de escritorio como para elementos verticales de edificios.
+- Distribuí uniformemente tres o más piezas a lo largo de un eje; la herramienta conserva los tamaños y el espacio entre extremos, y avisa si no hay espacio suficiente para evitar superposiciones.
+- Las acciones se integran con deshacer/rehacer y guardado automático.
+- La alineación usa las cajas envolventes visibles en el modelo, por lo que sirve para composición y referencia, no para tolerancias de fabricación.
+
 ## Publicación en GitHub Pages
 
 La versión pública está prevista en https://gomeza2.github.io/Juego/
