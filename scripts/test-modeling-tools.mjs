@@ -23,7 +23,9 @@ const requiredIds = [
   'orbitBtn', 'moveBtn', 'rotateBtn', 'scaleBtn',
   'repeatMirrorPanel', 'arrayAxis', 'arrayCount', 'arraySpacing', 'arraySpacingUnit',
   'arrayCreateBtn', 'mirrorAxis', 'mirrorCreateBtn',
-  'booleanPanel', 'booleanMode', 'booleanApplyBtn'
+  'booleanPanel', 'booleanMode', 'booleanApplyBtn',
+  'planeCutAxis', 'planeCutSide', 'planeCutPosition', 'planeCutPositionValue', 'planeCutApplyBtn',
+  'edgeBevelPanel', 'edgeBevelRadius', 'edgeBevelSegments', 'edgeBevelUnit', 'edgeBevelApplyBtn', 'edgeBevelRemoveBtn'
 ];
 for (const id of requiredIds) assert.equal(ids.filter(value => value === id).length, 1, 'Expected exactly one #' + id);
 
@@ -57,6 +59,19 @@ assert.ok(html.includes('function restoreBooleanGeometry(data)'), 'Boolean resul
 assert.ok(html.includes('booleanGeometry:node.userData.booleanGeometry||null'), 'Boolean geometry must be included in project JSON');
 assert.ok(html.includes("if(type==='boolean')root.userData.booleanGeometry=data.booleanGeometry||null"), 'Boolean geometry must be restored with scene nodes');
 assert.ok(html.includes("$('booleanApplyBtn').addEventListener('click',applyBooleanOperation)"), 'Boolean UI button must invoke the operation');
+assert.ok(html.includes("const edgeBevelTypes=new Set(['cube','rectangle','roundedCube'])"), 'Direct edge bevel must only target compatible single-mesh solids');
+assert.ok(html.includes('function applyEdgeBevelToRoot(root,radius,segments=3,store=true)'), 'Actual rounded bevel geometry transform must be defined');
+assert.ok(html.includes('new RoundedBoxGeometry(size.x,size.y,size.z,safeSegments,safeRadius)'), 'Bevel must change the underlying mesh geometry instead of only its appearance');
+assert.ok(html.includes("if(root.userData.edgeBevel)applyEdgeBevelToRoot(root,root.userData.edgeBevel,root.userData.edgeBevelSegments||3,false)"), 'Edge bevel settings must be reapplied when JSON restores a model');
+assert.ok(html.includes('edgeBevel:node.userData.edgeBevel??null'), 'Edge bevel radius must be serialized to project JSON');
+assert.ok(html.includes('edgeBevelSegments:node.userData.edgeBevelSegments??null'), 'Edge bevel segment count must be serialized to project JSON');
+assert.ok(html.includes("root.userData.edgeBevel=Number(data.edgeBevel)"), 'Edge bevel settings must be restored from serialized objects');
+assert.ok(html.includes('function applyPlaneCut()'), 'Plane cut handler must exist');
+assert.ok(html.includes('const cutterGeometry=new THREE.BoxGeometry(cutterSize.x,cutterSize.y,cutterSize.z)'), 'Plane cut must use a real subtractive solid to form the cap face');
+assert.ok(html.includes('result=CSG.subtract(worldA,cutter)'), 'Plane cut must produce an actual boolean mesh');
+assert.ok(html.includes("data.name=source.name+' · corte '+axis.toUpperCase()+' '+percentage+'%'"), 'Plane cut result should be identifiable in the scene hierarchy');
+assert.ok(html.includes("modelRoot.remove(source);disposeTree(source);designObjects[sourceIndex]=root"), 'Plane cut should replace the source object while preserving its scene position in the hierarchy');
+assert.ok(html.includes("source.userData.designType==='boolean'")===false, 'Avoid requiring a boolean source type in the plane-cut path');
 assert.ok(html.includes('reflection.clone().multiply(originalRotation).multiply(reflection)'), 'Mirror must reflect both position and orientation across the chosen plane');
 assert.ok(html.includes('data.scale[axisIndex]*=-1'), 'Mirror copy must reverse scale along the reflected axis');
 assert.ok(html.includes("$('arraySpacingUnit').textContent=unitSystem"), 'Array spacing must follow the selected measurement system');
@@ -78,4 +93,4 @@ assert.ok(html.includes('bevelRadius:node.userData.bevelRadius??null'), 'Bevel r
 assert.ok(html.includes('if(!restored)startBlankProject({skipHistory:true,notify:false})'), 'First launch must use a blank scene');
 assert.ok(html.includes('function startBlankProject(options={})'), 'New-project action must create a blank scene');
 
-console.log('Modeling tools tests passed: unique IDs, parametric shapes, transform gizmo, arrays, mirrors, boolean operations, wall openings and persistence.');
+console.log('Modeling tools tests passed: unique IDs, parametric shapes, transforms, arrays, mirrors, booleans, plane cuts, edge bevels and persistence.');
