@@ -69,7 +69,7 @@ assert.ok(html.includes("root.userData.edgeBevel=Number(data.edgeBevel)"), 'Edge
 assert.ok(html.includes('function applyPlaneCut()'), 'Plane cut handler must exist');
 assert.ok(html.includes('const cutterGeometry=new THREE.BoxGeometry(cutterSize.x,cutterSize.y,cutterSize.z)'), 'Plane cut must use a real subtractive solid to form the cap face');
 assert.ok(html.includes('result=CSG.subtract(worldA,cutter)'), 'Plane cut must produce an actual boolean mesh');
-assert.ok(html.includes("data.name=source.name+' · corte '+axis.toUpperCase()+' '+percentage+'%'"), 'Plane cut result should be identifiable in the scene hierarchy');
+assert.ok(html.includes("root.name=source.name+' · corte '+axis.toUpperCase()+' '+percentage+'%'"), 'Plane cut result should be identifiable in the scene hierarchy');
 assert.ok(html.includes("modelRoot.remove(source);disposeTree(source);designObjects[sourceIndex]=root"), 'Plane cut should replace the source object while preserving its scene position in the hierarchy');
 assert.ok(html.includes("source.userData.designType==='boolean'")===false, 'Avoid requiring a boolean source type in the plane-cut path');
 assert.ok(html.includes('reflection.clone().multiply(originalRotation).multiply(reflection)'), 'Mirror must reflect both position and orientation across the chosen plane');
