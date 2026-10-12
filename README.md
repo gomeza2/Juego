@@ -119,6 +119,15 @@ Si el endpoint no está configurado, el asistente local y todas las herramientas
 - La escala por eje admite valores negativos para manejar objetos reflejados y se conserva en los proyectos JSON y en la estructura exportada.
 - La separación predeterminada de la serie se estima con el tamaño del objeto en el eje activo, más un margen; se puede ajustar manualmente antes de generar copias.
 
+
+### Fase 14 · Operaciones geométricas booleanas — implementada
+- Agregada integración bajo demanda de `three-csg-ts`; solo se carga al usar una operación, para que un fallo de CDN no impida abrir el editor.
+- La herramienta permite **Unir (A ∪ B)**, **Restar (A − B)** e **Intersecar (A ∩ B)** dos sólidos seleccionados: el objeto activo es A y el único objeto marcado como B se usa como segundo sólido.
+- El resultado se convierte en una malla nueva en coordenadas de la escena, reemplaza las dos piezas usadas y puede transformarse, cambiar de material, guardarse en el proyecto JSON y exportarse como GLB.
+- La geometría booleana guarda posición, normales, UV e índices necesarios para reconstruirse al reabrir un proyecto.
+- Se limita a sólidos cerrados de una sola malla (cubos, esferas, cilindros, conos y algunas formas paramétricas). No se promete compatibilidad con muebles/vehículos compuestos, paredes ya segmentadas, superficies abiertas o mallas importadas arbitrarias.
+- La operación booleana se basa en una biblioteca comunitaria de CSG y puede fallar ante caras coplanares, mallas no cerradas o casos numéricamente difíciles. Los resultados son para modelado conceptual: revisá el resultado y exportá una copia antes de reemplazar piezas importantes.
+
 ## Publicación en GitHub Pages
 
 La versión pública está prevista en https://gomeza2.github.io/Juego/
