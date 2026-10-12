@@ -128,6 +128,14 @@ Si el endpoint no está configurado, el asistente local y todas las herramientas
 - Se limita a sólidos cerrados de una sola malla (cubos, esferas, cilindros, conos y algunas formas paramétricas). No se promete compatibilidad con muebles/vehículos compuestos, paredes ya segmentadas, superficies abiertas o mallas importadas arbitrarias.
 - La operación booleana se basa en una biblioteca comunitaria de CSG y puede fallar ante caras coplanares, mallas no cerradas o casos numéricamente difíciles. Los resultados son para modelado conceptual: revisá el resultado y exportá una copia antes de reemplazar piezas importantes.
 
+
+### Fase 15 · Corte por plano y bisel de bordes — implementada
+- Herramienta de **corte por plano** con eje X/Y/Z, posición relativa del 10 al 90 % y selección del lado que se conserva. El corte se construye mediante una operación de sustracción, generando una cara geométrica nueva en lugar de simularla con una textura.
+- El resultado del corte queda como una malla booleana independiente que admite transformación, material, guardado en JSON y exportación GLB; la operación se incorpora al historial de deshacer.
+- Herramienta de **bisel directo** para cubos, rectángulos y cubos biselados de una sola malla. Permite fijar radio y entre 1 y 8 segmentos, y reemplaza las geometrías base por una geometría redondeada real.
+- Radio y cantidad de segmentos del bisel se conservan en el proyecto y se reaplican al restaurar la escena. Quitar bisel reconstruye la geometría paramétrica base de la pieza.
+- Límites: el bisel no se ofrece para muebles compuestos ni mallas de muchas piezas. El corte requiere un sólido cerrado y puede fallar ante geometría abierta, caras coplanares o configuraciones numéricamente difíciles. Exportá una copia antes de aplicar cambios importantes.
+
 ## Publicación en GitHub Pages
 
 La versión pública está prevista en https://gomeza2.github.io/Juego/
