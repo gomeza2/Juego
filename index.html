@@ -241,7 +241,7 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
 
 </style>
 <script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/","three-csg-ts":"https://cdn.jsdelivr.net/npm/three-csg-ts@3.2.0/lib/esm/index.js"}}
 </script>
 </head>
 <body>
@@ -455,6 +455,22 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
           <div class="prop-row"><div class="prop-label"><span>Escala independiente</span><strong>XYZ</strong></div><div class="axis-fields scale-fields"><div class="axis-field x"><label>X × <input id="scaleX" type="number" min="-20" max="20" step=".05" value="1" aria-label="Escala independiente en X"></label></div><div class="axis-field y"><label>Y × <input id="scaleY" type="number" min="-20" max="20" step=".05" value="1" aria-label="Escala independiente en Y"></label></div><div class="axis-field z"><label>Z × <input id="scaleZ" type="number" min="-20" max="20" step=".05" value="1" aria-label="Escala independiente en Z"></label></div></div><div class="arch-size-help">Estirá cada eje de forma independiente. Los valores negativos reflejan la pieza en ese eje.</div><button class="btn" id="applyScaleXYZBtn" type="button">Aplicar escala XYZ</button></div>
           <div class="prop-row"><div class="prop-label"><span>Rotación Y</span><strong id="rotationValue">0°</strong></div><div class="range-line"><input type="range" min="-180" max="180" step="5" value="0" id="rotationRange"><span class="range-val" id="rotationReadout">0°</span></div><div class="axis-fields rotation-fields"><div class="axis-field x"><label>X° <input id="rotX" type="number" step="5" value="0" aria-label="Rotación eje X en grados"></label></div><div class="axis-field y"><label>Y° <input id="rotY" type="number" step="5" value="0" aria-label="Rotación eje Y en grados"></label></div><div class="axis-field z"><label>Z° <input id="rotZ" type="number" step="5" value="0" aria-label="Rotación eje Z en grados"></label></div></div><button class="btn center-support-btn" id="centerSupportBtn" type="button" title="Centrar en X/Z y apoyar la parte inferior en Y=0">Centrar y apoyar en el suelo</button></div>
         </div>
+        <div class="prop-section" id="booleanPanel">
+          <div class="prop-title">Geometría booleana</div>
+          <div class="scene-arrange">
+            <div class="scene-arrange-title">Combinar dos sólidos</div>
+            <label class="arch-size-field">Operación
+              <select class="select-control" id="booleanMode" aria-label="Operación booleana">
+                <option value="union">Unir volúmenes · A + B</option>
+                <option value="subtract">Restar B de A · A − B</option>
+                <option value="intersect">Solo intersección · A ∩ B</option>
+              </select>
+            </label>
+            <button class="btn" id="booleanApplyBtn" type="button" style="width:100%;margin-top:9px">Aplicar a dos sólidos</button>
+            <div class="scene-arrange-hint">Seleccioná el sólido A y marcá exactamente un segundo sólido B con la casilla de la lista Escena. El resultado reemplaza ambos objetos y se guarda como una malla editable.</div>
+            <div class="scene-arrange-hint">Compatible en esta fase con sólidos cerrados de una sola malla: cubos, esferas, cilindros, conos y formas paramétricas. Muebles compuestos, huecos existentes y mallas importadas pueden no ser válidos.</div>
+          </div>
+        </div>
         <div class="prop-section" id="repeatMirrorPanel">
           <div class="prop-title">Repetir y espejar</div>
           <div class="scene-arrange">
@@ -616,6 +632,7 @@ let undoStack = [];
 let redoStack = [];
 let applyingState = false;
 const meta = {
+  boolean:{name:'Malla booleana',icon:'◈',type:'GEOMETRÍA · MALLA',tag:'Volumen booleano'},
   room:{name:'Habitación moderna',icon:'⌂',type:'ESPACIO · INTERIOR',tag:'Espacio arquitectónico'},
   wall:{name:'Pared modular',icon:'▥',type:'ARQUITECTURA · PARED',tag:'Pared · Medidas editables'},
   floor:{name:'Piso / losa',icon:'▱',type:'ARQUITECTURA · LOSA',tag:'Losa · Medidas editables'},
@@ -1818,7 +1835,7 @@ function renderSceneList() {
     const icon=document.createElement('span');icon.className='scene-object-icon';icon.textContent=m.icon;
     const name=document.createElement('span');name.className='scene-object-name';name.textContent=root.name;
     selectBtn.append(icon,name);selectBtn.title=root.name;
-    const check=document.createElement('input');check.type='checkbox';check.className='scene-object-check';check.checked=groupSelection.has(root);check.dataset.groupCheck=String(index);check.title='Marcar para agrupar';check.setAttribute('aria-label','Marcar '+root.name);
+    const check=document.createElement('input');check.type='checkbox';check.className='scene-object-check';check.checked=groupSelection.has(root);check.dataset.groupCheck=String(index);check.title='Marcar para agrupar o usar como sólido B';check.setAttribute('aria-label','Marcar '+root.name+' para agrupar o para operación booleana');
     const eye=document.createElement('button');eye.type='button';eye.className='scene-object-eye'+(!root.visible?' off':'');eye.dataset.sceneEye=String(index);eye.textContent=root.visible?'◉':'○';eye.title=root.visible?'Ocultar objeto':'Mostrar objeto';
     row.append(selectBtn,check,eye);list.append(row);
   });
@@ -1836,7 +1853,7 @@ function updateMeta() {
   $('wallOpeningControls').classList.toggle('show',!!selected&&currentType==='wall');
   $('polygonControls').classList.toggle('show',!!selected&&currentType==='polygon');
   $('bevelControls').classList.toggle('show',!!selected&&(currentType==='rectangle'||currentType==='roundedCube'));
-  const objectControls=['posX','posY','posZ','scaleRange','scaleX','scaleY','scaleZ','applyScaleXYZBtn','rotationRange','rotX','rotY','rotZ','resetTransform','centerSupportBtn','renameBtn','duplicateBtn','deleteBtn','blueprintBtn','dimensionsBtn','applyArchSizeBtn','wallOpeningType','openingWidth','openingHeight','polygonSides','bevelRadius','arrayAxis','arrayCount','arraySpacing','arrayCreateBtn','mirrorAxis','mirrorCreateBtn'];
+  const objectControls=['posX','posY','posZ','scaleRange','scaleX','scaleY','scaleZ','applyScaleXYZBtn','rotationRange','rotX','rotY','rotZ','resetTransform','centerSupportBtn','renameBtn','duplicateBtn','deleteBtn','blueprintBtn','dimensionsBtn','applyArchSizeBtn','wallOpeningType','openingWidth','openingHeight','polygonSides','bevelRadius','arrayAxis','arrayCount','arraySpacing','arrayCreateBtn','mirrorAxis','mirrorCreateBtn','booleanMode','booleanApplyBtn'];
   objectControls.forEach(id=>{const el=$(id);if(el)el.disabled=empty;});
   if(empty){
     $('posX').value='0';$('posY').value='0';$('posZ').value='0';
@@ -1964,6 +1981,7 @@ function serializeSceneNode(node) {
     visible:node.visible,style:node.userData.style||null,assetKey:node.userData.assetKey||null,
     archSize:node.userData.archSize||null,archOpening:node.userData.archOpening||null,
     polygonSides:node.userData.polygonSides||null,bevelRadius:node.userData.bevelRadius??null,
+    booleanGeometry:node.userData.booleanGeometry||null,
     children:childRoots
   };
 }
@@ -1981,6 +1999,7 @@ function restoreSceneNode(data,parent=modelRoot) {
   if(type==='wall'){const opening=data.archOpening||{};root.userData.archOpening={type:['door','window'].includes(opening.type)?opening.type:'none',width:Math.max(.2,Number(opening.width)||.9),height:Math.max(.2,Number(opening.height)||2.1)};}
   if(type==='polygon')root.userData.polygonSides=THREE.MathUtils.clamp(Math.round(Number(data.polygonSides)||6),3,16);
   if(type==='rectangle'||type==='roundedCube')root.userData.bevelRadius=THREE.MathUtils.clamp(Number(data.bevelRadius??(type==='rectangle'?.055:.12)),0,.7);
+  if(type==='boolean')root.userData.booleanGeometry=data.booleanGeometry||null;
   root.position.set(data.position?.[0]??0,data.position?.[1]??0,data.position?.[2]??0);
   root.scale.set(data.scale?.[0]??1,data.scale?.[1]??1,data.scale?.[2]??1);
   root.rotation.set(data.rotation?.[0]??0,data.rotation?.[1]??0,data.rotation?.[2]??0);
@@ -1991,6 +2010,13 @@ function restoreSceneNode(data,parent=modelRoot) {
   }else if(type==='generated'||type==='imported'){
     if(data.assetKey)restoreGeneratedAsset(root,data.assetKey);
     else toast('Este JSON referencia un modelo 3D que no está guardado en este navegador. Importá su GLB por separado.');
+  }else if(type==='boolean'){
+    const geometry=restoreBooleanGeometry(data.booleanGeometry);
+    if(geometry){
+      const mesh=addMesh(root,geometry,currentColor,[0,0,0],[1,1,1],[0,0,0],true);
+      mesh.userData.booleanResult=true;
+    }else{build('cube',root);toast('Esta malla booleana no tiene datos geométricos válidos; se restauró como cubo de emergencia.');}
+    applyPrimaryMaterial(root);
   }else{
     build(type,root);applyPrimaryMaterial(root);
   }
@@ -2258,6 +2284,139 @@ function exportTechnicalSVG() {
   downloadBlob(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}),safeFilename(selected.name)+'-ficha-tecnica.svg');
   toast('Ficha técnica SVG exportada.');
 }
+
+const booleanSolidTypes=new Set(['cube','sphere','cylinder','cone','torus','capsule','hexagon','octahedron','disk','triangle','rectangle','polygon','roundedCube','wedge','pyramid']);
+let csgModulePromise=null;
+function booleanSingleMesh(root){
+  if(!root||root.userData.isSceneGroup||!booleanSolidTypes.has(root.userData.designType))return null;
+  const meshes=[];root.traverse(node=>{if(node.isMesh&&node.geometry)meshes.push(node);});
+  return meshes.length===1?meshes[0]:null;
+}
+function serializeBooleanGeometry(geometry){
+  const position=geometry.getAttribute('position');
+  if(!position||position.count<3||position.count>180000)throw new Error('La malla resultante es demasiado grande o no contiene triángulos.');
+  const normal=geometry.getAttribute('normal'),uv=geometry.getAttribute('uv');
+  const index=geometry.index;
+  return {
+    position:Array.from(position.array),
+    normal:normal?Array.from(normal.array):null,
+    uv:uv?Array.from(uv.array):null,
+    index:index?Array.from(index.array):null
+  };
+}
+function restoreBooleanGeometry(data){
+  if(!data||!Array.isArray(data.position)||data.position.length<9||data.position.length>540000||data.position.length%3!==0)return null;
+  if(data.position.some(value=>!Number.isFinite(value)))return null;
+  const geometry=new THREE.BufferGeometry();
+  geometry.setAttribute('position',new THREE.Float32BufferAttribute(data.position,3));
+  const vertexCount=data.position.length/3;
+  if(Array.isArray(data.normal)&&data.normal.length===vertexCount*3&&data.normal.every(Number.isFinite))geometry.setAttribute('normal',new THREE.Float32BufferAttribute(data.normal,3));
+  if(Array.isArray(data.uv)&&data.uv.length===vertexCount*2&&data.uv.every(Number.isFinite))geometry.setAttribute('uv',new THREE.Float32BufferAttribute(data.uv,2));
+  if(Array.isArray(data.index)&&data.index.length%3===0&&data.index.every(v=>Number.isInteger(v)&&v>=0&&v<vertexCount))geometry.setIndex(data.index);
+  if(!geometry.getAttribute('normal'))geometry.computeVertexNormals();
+  geometry.computeBoundingBox();geometry.computeBoundingSphere();
+  return geometry;
+}
+function reverseBooleanWinding(geometry){
+  if(geometry.index){
+    const index=geometry.index.array;
+    for(let i=0;i+2<index.length;i+=3){const value=index[i+1];index[i+1]=index[i+2];index[i+2]=value;}
+    geometry.index.needsUpdate=true;
+  }else{
+    for(const attribute of Object.values(geometry.attributes)){
+      const array=attribute.array,size=attribute.itemSize;
+      for(let i=0;i+2<attribute.count;i+=3){
+        for(let j=0;j<size;j++){
+          const offsetA=(i+1)*size+j,offsetB=(i+2)*size+j,value=array[offsetA];
+          array[offsetA]=array[offsetB];array[offsetB]=value;
+        }
+      }
+      attribute.needsUpdate=true;
+    }
+  }
+  geometry.computeVertexNormals();
+}
+function makeWorldBooleanMesh(root,sourceMesh){
+  root.updateWorldMatrix(true,true);
+  sourceMesh.updateWorldMatrix(true,false);
+  const geometry=sourceMesh.geometry.clone();
+  const mirrored=sourceMesh.matrixWorld.determinant()<0;
+  geometry.applyMatrix4(sourceMesh.matrixWorld);
+  if(mirrored)reverseBooleanWinding(geometry);
+  const material=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.7,metalness:.05});
+  const mesh=new THREE.Mesh(geometry,material);
+  mesh.updateMatrix();
+  return mesh;
+}
+async function applyBooleanOperation(){
+  if(!selected){toast('Seleccioná el sólido A primero.');return;}
+  const cutters=designObjects.filter(root=>groupSelection.has(root)&&root!==selected);
+  if(cutters.length!==1){toast('Marcá exactamente un segundo objeto B en la lista Escena.');return;}
+  const base=selected,cutter=cutters[0],baseMesh=booleanSingleMesh(base),cutterMesh=booleanSingleMesh(cutter);
+  if(!baseMesh||!cutterMesh){
+    toast('Esta operación admite sólidos cerrados de una sola malla. Probá con un cubo, esfera, cilindro o forma paramétrica.');
+    return;
+  }
+  if(!base.visible||!cutter.visible){toast('Ambos sólidos deben estar visibles.');return;}
+  const mode=$('booleanMode').value;
+  if(!['union','subtract','intersect'].includes(mode)){toast('Elegí una operación booleana válida.');return;}
+  const sourceIndex=designObjects.indexOf(base),cutterIndex=designObjects.indexOf(cutter);
+  if(sourceIndex<0||cutterIndex<0){toast('No se pudieron identificar las piezas de la escena.');return;}
+  $('booleanApplyBtn').disabled=true;
+  try{
+    toast('Calculando la nueva geometría…');
+    if(!csgModulePromise)csgModulePromise=import('three-csg-ts');
+    const {CSG}=await csgModulePromise;
+    const a=makeWorldBooleanMesh(base,baseMesh),b=makeWorldBooleanMesh(cutter,cutterMesh);
+    let result;
+    try{
+      if(mode==='union')result=CSG.union(a,b);
+      else if(mode==='subtract')result=CSG.subtract(a,b);
+      else result=CSG.intersect(a,b);
+    }finally{
+      a.geometry.dispose();b.geometry.dispose();a.material.dispose();b.material.dispose();
+    }
+    const geometry=result?.geometry;
+    if(!geometry?.getAttribute('position')||geometry.getAttribute('position').count<3){
+      geometry?.dispose();result?.material?.dispose?.();
+      toast('La operación no generó una superficie. Revisá si las piezas se tocan o se superponen.');
+      return;
+    }
+    let payload;
+    try{payload=serializeBooleanGeometry(geometry);}
+    catch(error){geometry.dispose();result.material?.dispose?.();throw error;}
+    geometry.computeVertexNormals();
+    const style={...(base.userData.style||styleSnapshot())};
+    currentColor=style.color||currentColor;currentMaterial=style.material||currentMaterial;
+    currentTexture=style.texture||'none';textureScale=style.textureScale||2;
+    pushHistory();
+    const root=new THREE.Group();
+    const labels={union:'Unión',subtract:'Diferencia',intersect:'Intersección'};
+    root.name=base.name+' '+labels[mode]+' '+cutter.name;
+    root.userData.designRoot=true;root.userData.designType='boolean';root.userData.style={...style};root.userData.booleanGeometry=payload;
+    modelRoot.add(root);
+    const mesh=addMesh(root,geometry,currentColor,[0,0,0],[1,1,1],[0,0,0],true);
+    mesh.userData.booleanResult=true;
+    const highIndex=Math.max(sourceIndex,cutterIndex),lowIndex=Math.min(sourceIndex,cutterIndex);
+    for(const item of [base,cutter]){
+      const index=designObjects.indexOf(item);
+      if(index>=0)designObjects.splice(index,1);
+      modelRoot.remove(item);disposeTree(item);groupSelection.delete(item);
+    }
+    designObjects.splice(Math.min(lowIndex,designObjects.length),0,root);
+    groupSelection.clear();selected=root;currentType='boolean';
+    result.material?.dispose?.();
+    applyPrimaryMaterial(root);selectDesign(root);renderSceneList();updateMeta();updateDimensions();focusModel();persist();
+    toast(labels[mode]+' creada. Ya podés mover, editar el material o exportar la malla.');
+  }catch(error){
+    console.error('Boolean operation failed:',error);
+    toast('No se pudo calcular esta operación. Probá con dos sólidos simples que se superpongan claramente.');
+  }finally{
+    $('booleanApplyBtn').disabled=designObjects.length===0;
+    updateMeta();
+  }
+}
+
 function addDuplicate() {
   if(!selected)return;
   pushHistory();
@@ -2947,6 +3106,7 @@ $('unitsSelect').addEventListener('change',e=>{
 $('blueprintBtn').addEventListener('click',exportTechnicalSVG);
 $('applyArchSizeBtn').addEventListener('click',applyArchitecturalDimensions);
 $('groupBtn').addEventListener('click',groupSelectedObjects);
+$('booleanApplyBtn').addEventListener('click',applyBooleanOperation);
 $('arrayCreateBtn').addEventListener('click',createObjectArray);
 $('mirrorCreateBtn').addEventListener('click',createMirroredCopy);
 $('arrayAxis').addEventListener('change',()=>{
