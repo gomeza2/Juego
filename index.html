@@ -198,6 +198,8 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
 .scene-arrange-hint{font-size:9px;line-height:1.55;color:#7b899c}
 .array-number{width:100%;height:32px;border:1px solid #d7e0eb;border-radius:6px;background:#fff;color:#27384d;padding:0 7px;font:11px 'DM Mono',monospace;min-width:0}
 #repeatMirrorPanel .scene-arrange{margin-top:8px}
+#edgeBevelPanel{display:none;border:1px solid #dce4ed;border-radius:9px;padding:12px;margin:9px 0;background:#f8fafc}
+#edgeBevelPanel.show{display:block}
 @media(max-width:1180px){.scene-arrange-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
 
 
@@ -470,6 +472,33 @@ body,.main{background:#f4f7fb!important;color:#1d293b}
             <div class="scene-arrange-hint">Seleccioná el sólido A y marcá exactamente un segundo sólido B con la casilla de la lista Escena. El resultado reemplaza ambos objetos y se guarda como una malla editable.</div>
             <div class="scene-arrange-hint">Compatible en esta fase con sólidos cerrados de una sola malla: cubos, esferas, cilindros, conos y formas paramétricas. Muebles compuestos, huecos existentes y mallas importadas pueden no ser válidos.</div>
           </div>
+          <div class="scene-arrange">
+            <div class="scene-arrange-title">Cortar por plano</div>
+            <div class="scene-arrange-row">
+              <label class="arch-size-field">Eje de corte
+                <select class="select-control" id="planeCutAxis" aria-label="Eje global del corte"><option value="x">X · plano YZ</option><option value="y">Y · plano XZ</option><option value="z">Z · plano XY</option></select>
+              </label>
+              <label class="arch-size-field">Conservar
+                <select class="select-control" id="planeCutSide" aria-label="Lado del plano a conservar"><option value="negative">Lado −</option><option value="positive">Lado +</option></select>
+              </label>
+            </div>
+            <div class="prop-row" style="margin-top:8px">
+              <div class="prop-label"><span>Posición dentro de la pieza</span><strong id="planeCutPositionValue">50%</strong></div>
+              <input id="planeCutPosition" type="range" min="10" max="90" step="1" value="50" aria-label="Porcentaje de posición del plano de corte" style="width:100%">
+            </div>
+            <button class="btn" id="planeCutApplyBtn" type="button" style="width:100%;margin-top:8px">✂ Cortar y conservar un lado</button>
+            <div class="scene-arrange-hint">Crea una cara de corte real y conserva uno de los dos lados del sólido seleccionado. El corte reemplaza la pieza, se guarda en el proyecto y se puede deshacer.</div>
+          </div>
+        </div>
+        <div class="shape-extra-control" id="edgeBevelPanel">
+          <div class="prop-title">Bisel de bordes</div>
+          <div class="arch-size-grid">
+            <label class="arch-size-field">Radio <span class="arch-unit-tag" id="edgeBevelUnit">m</span><input id="edgeBevelRadius" class="array-number" type="number" min="0.001" max="1" step="0.01" value="0.08"></label>
+            <label class="arch-size-field">Segmentos<input id="edgeBevelSegments" class="array-number" type="number" min="1" max="8" step="1" value="3"></label>
+          </div>
+          <div class="arch-size-help">Redondea realmente las aristas de cubos y sólidos rectangulares compatibles. A más segmentos, más suave el borde.</div>
+          <button class="btn" id="edgeBevelApplyBtn" type="button" style="width:100%;margin-top:8px">Aplicar bisel</button>
+          <button class="btn" id="edgeBevelRemoveBtn" type="button" style="width:100%;margin-top:6px">Quitar bisel</button>
         </div>
         <div class="prop-section" id="repeatMirrorPanel">
           <div class="prop-title">Repetir y espejar</div>
@@ -1684,6 +1713,17 @@ function selectDesign(root) {
   $('wallOpeningControls').classList.toggle('show',!!selected&&currentType==='wall');
   $('polygonControls').classList.toggle('show',!!selected&&currentType==='polygon');
   $('bevelControls').classList.toggle('show',!!selected&&(currentType==='rectangle'||currentType==='roundedCube'));
+  $('edgeBevelPanel').classList.toggle('show',!!selected&&edgeBevelTypes.has(currentType));
+  if(selected){
+    const bevelFactor=unitFactors[unitSystem]||1,bevelDigits=unitSystem==='mm'?0:unitSystem==='cm'?1:2;
+    $('edgeBevelUnit').textContent=unitSystem;
+    $('edgeBevelRadius').value=((selected.userData.edgeBevel??.06)*bevelFactor).toFixed(bevelDigits);
+    $('edgeBevelSegments').value=String(selected.userData.edgeBevelSegments||3);
+    const meshBounds=new THREE.Box3().setFromObject(selected),meshSize=meshBounds.getSize(new THREE.Vector3());
+    $('edgeBevelRadius').min=String(.001*bevelFactor);
+    $('edgeBevelRadius').max=String(Math.max(.001,Math.min(meshSize.x||1,meshSize.y||1,meshSize.z||1)*.45)*bevelFactor);
+    $('edgeBevelRadius').step=unitSystem==='mm'?'1':unitSystem==='cm'?'0.1':'0.01';
+  }
   if(isParametric){
     const dims=root.userData.archSize||architecturalSizeDefaults[currentType];root.userData.archSize=[...dims];
     const factor=unitFactors[unitSystem]||1,digits=unitSystem==='mm'?0:unitSystem==='cm'?1:2;
@@ -1853,7 +1893,7 @@ function updateMeta() {
   $('wallOpeningControls').classList.toggle('show',!!selected&&currentType==='wall');
   $('polygonControls').classList.toggle('show',!!selected&&currentType==='polygon');
   $('bevelControls').classList.toggle('show',!!selected&&(currentType==='rectangle'||currentType==='roundedCube'));
-  const objectControls=['posX','posY','posZ','scaleRange','scaleX','scaleY','scaleZ','applyScaleXYZBtn','rotationRange','rotX','rotY','rotZ','resetTransform','centerSupportBtn','renameBtn','duplicateBtn','deleteBtn','blueprintBtn','dimensionsBtn','applyArchSizeBtn','wallOpeningType','openingWidth','openingHeight','polygonSides','bevelRadius','arrayAxis','arrayCount','arraySpacing','arrayCreateBtn','mirrorAxis','mirrorCreateBtn','booleanMode','booleanApplyBtn'];
+  const objectControls=['posX','posY','posZ','scaleRange','scaleX','scaleY','scaleZ','applyScaleXYZBtn','rotationRange','rotX','rotY','rotZ','resetTransform','centerSupportBtn','renameBtn','duplicateBtn','deleteBtn','blueprintBtn','dimensionsBtn','applyArchSizeBtn','wallOpeningType','openingWidth','openingHeight','polygonSides','bevelRadius','arrayAxis','arrayCount','arraySpacing','arrayCreateBtn','mirrorAxis','mirrorCreateBtn','booleanMode','booleanApplyBtn','planeCutAxis','planeCutSide','planeCutPosition','planeCutApplyBtn','edgeBevelRadius','edgeBevelSegments','edgeBevelApplyBtn','edgeBevelRemoveBtn'];
   objectControls.forEach(id=>{const el=$(id);if(el)el.disabled=empty;});
   if(empty){
     $('posX').value='0';$('posY').value='0';$('posZ').value='0';
@@ -1981,6 +2021,7 @@ function serializeSceneNode(node) {
     visible:node.visible,style:node.userData.style||null,assetKey:node.userData.assetKey||null,
     archSize:node.userData.archSize||null,archOpening:node.userData.archOpening||null,
     polygonSides:node.userData.polygonSides||null,bevelRadius:node.userData.bevelRadius??null,
+    edgeBevel:node.userData.edgeBevel??null,edgeBevelSegments:node.userData.edgeBevelSegments??null,
     booleanGeometry:node.userData.booleanGeometry||null,
     children:childRoots
   };
@@ -1999,6 +2040,7 @@ function restoreSceneNode(data,parent=modelRoot) {
   if(type==='wall'){const opening=data.archOpening||{};root.userData.archOpening={type:['door','window'].includes(opening.type)?opening.type:'none',width:Math.max(.2,Number(opening.width)||.9),height:Math.max(.2,Number(opening.height)||2.1)};}
   if(type==='polygon')root.userData.polygonSides=THREE.MathUtils.clamp(Math.round(Number(data.polygonSides)||6),3,16);
   if(type==='rectangle'||type==='roundedCube')root.userData.bevelRadius=THREE.MathUtils.clamp(Number(data.bevelRadius??(type==='rectangle'?.055:.12)),0,.7);
+  if(edgeBevelTypes.has(type)&&Number.isFinite(Number(data.edgeBevel))&&Number(data.edgeBevel)>0){root.userData.edgeBevel=Number(data.edgeBevel);root.userData.edgeBevelSegments=THREE.MathUtils.clamp(Math.round(Number(data.edgeBevelSegments)||3),1,8);}
   if(type==='boolean')root.userData.booleanGeometry=data.booleanGeometry||null;
   root.position.set(data.position?.[0]??0,data.position?.[1]??0,data.position?.[2]??0);
   root.scale.set(data.scale?.[0]??1,data.scale?.[1]??1,data.scale?.[2]??1);
@@ -2018,7 +2060,9 @@ function restoreSceneNode(data,parent=modelRoot) {
     }else{build('cube',root);toast('Esta malla booleana no tiene datos geométricos válidos; se restauró como cubo de emergencia.');}
     applyPrimaryMaterial(root);
   }else{
-    build(type,root);applyPrimaryMaterial(root);
+    build(type,root);
+    if(root.userData.edgeBevel)applyEdgeBevelToRoot(root,root.userData.edgeBevel,root.userData.edgeBevelSegments||3,false);
+    applyPrimaryMaterial(root);
   }
   return root;
 }
@@ -2285,7 +2329,8 @@ function exportTechnicalSVG() {
   toast('Ficha técnica SVG exportada.');
 }
 
-const booleanSolidTypes=new Set(['cube','sphere','cylinder','cone','torus','capsule','hexagon','octahedron','disk','triangle','rectangle','polygon','roundedCube','wedge','pyramid']);
+const booleanSolidTypes=new Set(['cube','sphere','cylinder','cone','torus','capsule','hexagon','octahedron','disk','triangle','rectangle','polygon','roundedCube','wedge','pyramid','boolean']);
+const edgeBevelTypes=new Set(['cube','rectangle','roundedCube']);
 let csgModulePromise=null;
 function booleanSingleMesh(root){
   if(!root||root.userData.isSceneGroup||!booleanSolidTypes.has(root.userData.designType))return null;
@@ -2413,6 +2458,129 @@ async function applyBooleanOperation(){
     toast('No se pudo calcular esta operación. Probá con dos sólidos simples que se superpongan claramente.');
   }finally{
     $('booleanApplyBtn').disabled=designObjects.length===0;
+    updateMeta();
+  }
+}
+
+
+function applyEdgeBevelToRoot(root,radius,segments=3,store=true){
+  if(!root||!edgeBevelTypes.has(root.userData.designType))return false;
+  const meshes=[];root.traverse(node=>{if(node.isMesh&&node.geometry)meshes.push(node);});
+  if(meshes.length!==1)return false;
+  const mesh=meshes[0];
+  mesh.updateMatrix();
+  const baked=mesh.geometry.clone();
+  baked.applyMatrix4(mesh.matrix);
+  baked.computeBoundingBox();
+  const bounds=baked.boundingBox;
+  if(!bounds){baked.dispose();return false;}
+  const size=bounds.getSize(new THREE.Vector3()),center=bounds.getCenter(new THREE.Vector3());
+  const minDim=Math.min(size.x,size.y,size.z);
+  if(!Number.isFinite(minDim)||minDim<=.002){baked.dispose();return false;}
+  const safeRadius=THREE.MathUtils.clamp(radius,.001,minDim*.45);
+  const safeSegments=THREE.MathUtils.clamp(Math.round(segments)||3,1,8);
+  let rounded;
+  try{
+    rounded=new RoundedBoxGeometry(size.x,size.y,size.z,safeSegments,safeRadius);
+    rounded.translate(center.x,center.y,center.z);
+  }catch(error){baked.dispose();throw error;}
+  baked.dispose();mesh.geometry.dispose();mesh.geometry=rounded;
+  mesh.position.set(0,0,0);mesh.rotation.set(0,0,0);mesh.scale.set(1,1,1);
+  mesh.userData.primary=true;
+  if(store){root.userData.edgeBevel=safeRadius;root.userData.edgeBevelSegments=safeSegments;}
+  mesh.geometry.computeBoundingBox();mesh.geometry.computeBoundingSphere();
+  return true;
+}
+function applyEdgeBevel(){
+  if(!selected||!edgeBevelTypes.has(currentType)){toast('El bisel directo está disponible para cubos, rectángulos y cubos biselados.');return;}
+  const factor=unitFactors[unitSystem]||1;
+  const radiusShown=Number.parseFloat($('edgeBevelRadius').value);
+  const segments=Number.parseInt($('edgeBevelSegments').value,10);
+  if(!Number.isFinite(radiusShown)||radiusShown<=0||!Number.isInteger(segments)||segments<1||segments>8){
+    toast('Ingresá un radio positivo y entre 1 y 8 segmentos.');return;
+  }
+  const radius=radiusShown/factor;
+  const source=selected;
+  const bounds=new THREE.Box3().setFromObject(source),size=bounds.getSize(new THREE.Vector3());
+  if(radius>Math.min(size.x,size.y,size.z)*.45){toast('El radio es demasiado grande para esta pieza. Reducilo para evitar geometría inválida.');return;}
+  pushHistory();
+  if(!applyEdgeBevelToRoot(source,radius,segments,true)){toast('No se pudo aplicar el bisel a esta geometría.');return;}
+  applyPrimaryMaterial(source);selectDesign(source);updateMeta();updateDimensions();persist();
+  toast('Bisel aplicado al sólido: '+segments+' segmentos.');
+}
+function removeEdgeBevel(){
+  if(!selected||!edgeBevelTypes.has(currentType)){toast('Seleccioná un cubo o sólido rectangular compatible.');return;}
+  pushHistory();
+  const source=selected;
+  delete source.userData.edgeBevel;delete source.userData.edgeBevelSegments;
+  while(source.children.length){const child=source.children[0];source.remove(child);disposeTree(child);}
+  build(source.userData.designType,source);applyPrimaryMaterial(source);selectDesign(source);updateMeta();updateDimensions();persist();
+  toast('Bisel eliminado y geometría base restaurada.');
+}
+async function applyPlaneCut(){
+  if(!selected){toast('Seleccioná un sólido para cortarlo.');return;}
+  const source=selected,mesh=booleanSingleMesh(source);
+  if(!mesh){toast('El corte por plano requiere un sólido cerrado de una sola malla. Probá con un cubo, esfera, cilindro o forma paramétrica.');return;}
+  if(!source.visible){toast('Mostrá el objeto antes de cortarlo.');return;}
+  const axis=$('planeCutAxis').value,side=$('planeCutSide').value;
+  if(!['x','y','z'].includes(axis)||!['negative','positive'].includes(side)){toast('Configurá un eje y un lado válidos.');return;}
+  const percentage=Number.parseFloat($('planeCutPosition').value);
+  if(!Number.isFinite(percentage)||percentage<10||percentage>90){toast('La posición del corte debe estar entre el 10% y el 90%.');return;}
+  const sourceIndex=designObjects.indexOf(source);
+  if(sourceIndex<0){toast('No se pudo identificar el sólido seleccionado.');return;}
+  $('planeCutApplyBtn').disabled=true;
+  let worldA=null,cutter=null,result=null;
+  try{
+    if(!csgModulePromise)csgModulePromise=import('three-csg-ts');
+    const {CSG}=await csgModulePromise;
+    source.updateWorldMatrix(true,true);
+    const worldBounds=new THREE.Box3().setFromObject(source);
+    if(worldBounds.isEmpty())throw new Error('Empty source bounds');
+    const boundsSize=worldBounds.getSize(new THREE.Vector3());
+    const axisIndex={x:0,y:1,z:2}[axis];
+    const min=worldBounds.min.getComponent(axisIndex),max=worldBounds.max.getComponent(axisIndex);
+    if(max-min<.002)throw new Error('Source is too thin for a cut');
+    const cutCoordinate=min+(max-min)*percentage/100;
+    const pad=Math.max(boundsSize.x,boundsSize.y,boundsSize.z,1)*1.5;
+    const epsilon=Math.max(boundsSize.x,boundsSize.y,boundsSize.z,1)*.00005;
+    const low=worldBounds.min.clone().add(new THREE.Vector3(-pad,-pad,-pad));
+    const high=worldBounds.max.clone().add(new THREE.Vector3(pad,pad,pad));
+    if(side==='negative')low.setComponent(axisIndex,cutCoordinate-epsilon);
+    else high.setComponent(axisIndex,cutCoordinate+epsilon);
+    const cutterSize=high.clone().sub(low);
+    const center=low.clone().add(high).multiplyScalar(.5);
+    const cutterGeometry=new THREE.BoxGeometry(cutterSize.x,cutterSize.y,cutterSize.z);
+    cutter=new THREE.Mesh(cutterGeometry,new THREE.MeshStandardMaterial({color:0xffffff}));
+    cutter.position.copy(center);cutter.updateMatrixWorld(true);
+    const sourceMesh=booleanSingleMesh(source);
+    worldA=makeWorldBooleanMesh(source,sourceMesh);
+    result=CSG.subtract(worldA,cutter);
+    const geometry=result?.geometry;
+    if(!geometry?.getAttribute('position')||geometry.getAttribute('position').count<3){
+      throw new Error('Cut produced an empty result');
+    }
+    const payload=serializeBooleanGeometry(geometry);
+    geometry.computeVertexNormals();
+    const style={...(source.userData.style||styleSnapshot())};
+    const root=new THREE.Group();
+    root.name=source.name+' · corte '+axis.toUpperCase()+' '+percentage+'%';
+    root.userData.designRoot=true;root.userData.designType='boolean';root.userData.style={...style};root.userData.booleanGeometry=payload;
+    modelRoot.add(root);
+    const outMesh=addMesh(root,geometry,[style.color||currentColor],[0,0,0],[1,1,1],[0,0,0],true);
+    outMesh.userData.booleanResult=true;
+    modelRoot.remove(source);disposeTree(source);designObjects[sourceIndex]=root;
+    currentColor=style.color||currentColor;currentMaterial=style.material||currentMaterial;currentTexture=style.texture||'none';textureScale=style.textureScale||2;
+    groupSelection.clear();selected=root;currentType='boolean';
+    applyPrimaryMaterial(root);selectDesign(root);renderSceneList();updateMeta();updateDimensions();focusModel();persist();
+    toast('Corte aplicado. La cara de corte forma parte de la nueva malla.');
+  }catch(error){
+    console.error('Plane cut failed:',error);
+    toast('No se pudo cortar esa forma. Probá un sólido simple y una posición distinta del plano.');
+  }finally{
+    if(worldA){worldA.geometry.dispose();worldA.material?.dispose?.();}
+    if(cutter){cutter.geometry.dispose();cutter.material?.dispose?.();}
+    if(result?.material&&result.material!==cutter?.material)result.material.dispose?.();
+    $('planeCutApplyBtn').disabled=designObjects.length===0;
     updateMeta();
   }
 }
@@ -3107,6 +3275,10 @@ $('blueprintBtn').addEventListener('click',exportTechnicalSVG);
 $('applyArchSizeBtn').addEventListener('click',applyArchitecturalDimensions);
 $('groupBtn').addEventListener('click',groupSelectedObjects);
 $('booleanApplyBtn').addEventListener('click',applyBooleanOperation);
+$('planeCutApplyBtn').addEventListener('click',applyPlaneCut);
+$('planeCutPosition').addEventListener('input',e=>{$('planeCutPositionValue').textContent=e.target.value+'%';});
+$('edgeBevelApplyBtn').addEventListener('click',applyEdgeBevel);
+$('edgeBevelRemoveBtn').addEventListener('click',removeEdgeBevel);
 $('arrayCreateBtn').addEventListener('click',createObjectArray);
 $('mirrorCreateBtn').addEventListener('click',createMirroredCopy);
 $('arrayAxis').addEventListener('change',()=>{
