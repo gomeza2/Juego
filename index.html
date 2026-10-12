@@ -2562,11 +2562,12 @@ async function applyPlaneCut(){
     const payload=serializeBooleanGeometry(geometry);
     geometry.computeVertexNormals();
     const style={...(source.userData.style||styleSnapshot())};
+    pushHistory();
     const root=new THREE.Group();
     root.name=source.name+' · corte '+axis.toUpperCase()+' '+percentage+'%';
     root.userData.designRoot=true;root.userData.designType='boolean';root.userData.style={...style};root.userData.booleanGeometry=payload;
     modelRoot.add(root);
-    const outMesh=addMesh(root,geometry,[style.color||currentColor],[0,0,0],[1,1,1],[0,0,0],true);
+    const outMesh=addMesh(root,geometry,style.color||currentColor,[0,0,0],[1,1,1],[0,0,0],true);
     outMesh.userData.booleanResult=true;
     modelRoot.remove(source);disposeTree(source);designObjects[sourceIndex]=root;
     currentColor=style.color||currentColor;currentMaterial=style.material||currentMaterial;currentTexture=style.texture||'none';textureScale=style.textureScale||2;
